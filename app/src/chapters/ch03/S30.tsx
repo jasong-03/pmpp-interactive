@@ -149,7 +149,7 @@ export const questionsS30: Record<string, Question> = {
           <p>
             <code>cudaMalloc</code> nhận địa chỉ của một con trỏ, ép kiểu thành <code>(void**)</code>, và một kích thước
             tính bằng <b>byte</b>. Nó ghi con trỏ qua đối số thứ nhất để giá trị trả về được dành cho việc báo lỗi. Kernel
-            đầu tiên của chương này đọc đúng một bộ đệm như vậy, và thừa số 3 lại xuất hiện bên trong nó dưới dạng một chỉ số.
+            đầu tiên của chương này đọc đúng một buffer như vậy, và thừa số 3 lại xuất hiện bên trong nó dưới dạng một chỉ số.
           </p>
         }
       >
@@ -240,10 +240,9 @@ export function S30() {
       <Translated
         vi={
           <p>
-            Trong PyTorch, một tensor là một hình dạng (shape) và một bộ đệm phẳng. Khi bạn viết <code>x[b, t, h]</code>{' '}
+            Trong PyTorch, một tensor là một hình dạng (shape) và một buffer phẳng. Khi bạn viết <code>x[b, t, h]</code>{' '}
             hay gọi <code>torch.matmul</code>, có hai phép tính số học diễn ra khuất mắt. Một thứ quyết định đơn vị công
-            việc nào xử lý phần tử nào, và một thứ biến các chỉ số <code>(b, t, h)</code> thành một offset duy nhất trong bộ
-            đệm. Người viết kernel tự tay viết cả hai. Chương này chính là hai phép tính đó.
+            việc nào xử lý phần tử nào, và một thứ biến các chỉ số <code>(b, t, h)</code> thành một offset duy nhất trong buffer. Người viết kernel tự tay viết cả hai. Chương này chính là hai phép tính đó.
           </p>
         }
       >

@@ -493,7 +493,7 @@ export const questionsS63: Record<string, Question> = {
         why: <Translated vi="Chi phí của phép cộng không phải vấn đề. Điều thay đổi là những gì trình biên dịch được phép giả định về chỉ số, và do đó cách nó có thể nạp.">The cost of the addition is not the issue. What changes is what the compiler may assume about the index, and so how it can load.</Translated>,
       },
       {
-        label: <Translated vi="Liệu bộ đệm float4 có được gắn ở một độ lệch là bội của 16 byte không.">Whether the float4 buffer is bound at an offset that is a multiple of 16 bytes.</Translated>,
+        label: <Translated vi="Liệu buffer float4 có được gắn ở một độ lệch là bội của 16 byte không.">Whether the float4 buffer is bound at an offset that is a multiple of 16 bytes.</Translated>,
         why: <Translated vi="Điều đó quyết định kernel float4 có hợp lệ không, chứ không giải thích vì sao bản cơ sở chậm.">That decides whether the float4 kernel is valid, not why the baseline is slow.</Translated>,
       },
     ],
@@ -777,7 +777,7 @@ export function S63() {
       <Translated
         vi={
           <p>
-            Metal có con đường riêng được ghi trong tài liệu, và các tab Metal của lời giải tham chiếu đi theo nó. Apple mô tả việc đọc bốn float một lúc bằng cách khai báo bộ đệm là <code>device float4*</code> (căn chỉnh 16 byte) hoặc <code>device packed_float4*</code> (căn chỉnh 4 byte), nên không cần ép kiểu; khi đó độ lệch gắn (bind offset) của một bộ đệm device phải là bội của 16. Kernel của lab nhận cùng các bộ đệm đó lần thứ hai dưới dạng <code>float</code> thường cho phần đuôi, và đánh chỉ số bằng <code>int</code>, vì một lý do mà câu hỏi tiếp theo đề cập.
+            Metal có con đường riêng được ghi trong tài liệu, và các tab Metal của lời giải tham chiếu đi theo nó. Apple mô tả việc đọc bốn float một lúc bằng cách khai báo buffer là <code>device float4*</code> (căn chỉnh 16 byte) hoặc <code>device packed_float4*</code> (căn chỉnh 4 byte), nên không cần ép kiểu; khi đó độ lệch gắn (bind offset) của một buffer device phải là bội của 16. Kernel của lab nhận cùng các buffer đó lần thứ hai dưới dạng <code>float</code> thường cho phần đuôi, và đánh chỉ số bằng <code>int</code>, vì một lý do mà câu hỏi tiếp theo đề cập.
           </p>
         }
       >

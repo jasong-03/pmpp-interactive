@@ -113,7 +113,7 @@ function say(tl: Timeline, done: number, backend: Backend): { text: string; bad:
     o.outcome === 'not finished'
       ? tr(
           `Grid ${o.grid} was still ${gridStateAt(tl, o.grid, h.from)}: the host read whatever was in memory at that moment.`,
-          `Lưới ${o.grid} vẫn chưa xong (${gridStateAt(tl, o.grid, h.from)}): host đọc bất cứ thứ gì đang nằm trong bộ nhớ lúc đó.`,
+          `Lưới ${o.grid} vẫn chưa xong (${({ 'not launched': 'chưa khởi chạy', queued: 'đang xếp hàng', running: 'đang chạy', finished: 'đã xong', blocked: 'bị chặn' } as Record<string, string>)[gridStateAt(tl, o.grid, h.from)] ?? gridStateAt(tl, o.grid, h.from)}): host đọc bất cứ thứ gì đang nằm trong bộ nhớ lúc đó.`,
         )
       : o.outcome === 'finished by timing only'
         ? tr(
@@ -263,7 +263,7 @@ function TimelineBench() {
         ))}
         <text x={x + w / 2} y={DEV_Y + DEV_H + 13} fontSize="10.5" textAnchor="middle" fontWeight="600">
           <Translated vi={<>lưới {g.grid}</>}>grid {g.grid}</Translated>
-          {w > 70 ? `, ${state}` : ''}
+          {w > 70 ? tr(`, ${state}`, `, ${({ 'not launched': 'chưa khởi chạy', queued: 'đang xếp hàng', running: 'đang chạy', finished: 'đã xong', blocked: 'bị chặn' } as Record<string, string>)[state] ?? state}`) : ''}
         </text>
       </g>
     );
@@ -441,7 +441,7 @@ function TimelineBench() {
                       </td>
                       <td>
                         {ran ? (
-                          h.state
+                          tr(h.state, ({ 'not launched': 'chưa khởi chạy', queued: 'đang xếp hàng', running: 'đang chạy', finished: 'đã xong', blocked: 'bị chặn' } as Record<string, string>)[h.state] ?? h.state)
                         ) : i === done ? (
                           <span className="muted">
                             <Translated vi="tiếp theo">next</Translated>
@@ -479,7 +479,7 @@ function TimelineBench() {
                       </td>
                       <td>
                         <output data-out={'grid-' + g.grid} data-state={g.state}>
-                          {g.state}
+                          {tr(g.state, ({ 'not launched': 'chưa khởi chạy', queued: 'đang xếp hàng', running: 'đang chạy', finished: 'đã xong', blocked: 'bị chặn' } as Record<string, string>)[g.state] ?? g.state)}
                         </output>
                       </td>
                     </tr>

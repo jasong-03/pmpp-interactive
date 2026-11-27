@@ -4,7 +4,7 @@ import { Code, MATMUL_TIERS, useLabFile } from '../../components/Code';
 import { defineLabs, solutionTabStatus } from '../../components/LabKit';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
 import { useReports } from '../../lib/reports';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import {
   KIND_LABEL,
@@ -79,7 +79,7 @@ const EXCHANGE_TIERS = {
   v: 'reg', me: 'reg', other: 'reg', i: 'reg', inBuffer: 'reg', outBuffer: 'reg',
 } as const;
 
-const [LAB65] = defineLabs('ch06', [{ num: '6.5', dir: 'lab5_doublebuf', name: 'double buffering', vi: { name: 'bộ đệm kép' } }]);
+const [LAB65] = defineLabs('ch06', [{ num: '6.5', dir: 'lab5_doublebuf', name: 'double buffering', vi: { name: 'buffer kép' } }]);
 const [LAB52] = defineLabs('ch05', [{ num: '5.2', dir: 'lab2_tiled', name: 'tiled', vi: { name: 'phân ô' } }]);
 
 const show = (v: number) => (Number.isNaN(v) ? '·' : String(v));
@@ -99,7 +99,7 @@ function describe(s: Step, variant: Variant, prevOp: Op | 'release' | undefined)
   const who = tr(`Thread ${s.thread}, iteration ${s.iter}`, `Luồng ${s.thread}, lần lặp ${s.iter}`);
   const where = (b: number, slot: number) =>
     isDouble(variant)
-      ? tr(`buffer ${bufName(variant, b)}, slot ${slot}`, `bộ đệm ${bufName(variant, b)}, ô ${slot}`)
+      ? tr(`buffer ${bufName(variant, b)}, slot ${slot}`, `buffer ${bufName(variant, b)}, ô ${slot}`)
       : tr(`slot ${slot}`, `ô ${slot}`);
   switch (s.op) {
     case 'read': {
@@ -133,7 +133,7 @@ function describe(s: Step, variant: Variant, prevOp: Op | 'release' | undefined)
     case 'swap':
       return tr(
         `${who}: swaps its own two pointers. From now on it reads buffer ${bufName(variant, s.pointers!.inBuf)} and writes buffer ${bufName(variant, s.pointers!.outBuf)}.`,
-        `${who}: hoán đổi hai con trỏ của chính nó. Từ giờ nó đọc bộ đệm ${bufName(variant, s.pointers!.inBuf)} và ghi bộ đệm ${bufName(variant, s.pointers!.outBuf)}.`,
+        `${who}: hoán đổi hai con trỏ của chính nó. Từ giờ nó đọc buffer ${bufName(variant, s.pointers!.inBuf)} và ghi buffer ${bufName(variant, s.pointers!.outBuf)}.`,
       );
     default:
       return '';
@@ -149,7 +149,8 @@ function Stepper() {
   const [n, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
 
-  const trace = useMemo(() => run({ threads: P, iterations: N, variant }, schedule), [P, N, variant, schedule]);
+  const locale = useLocale();
+  const trace = useMemo(() => run({ threads: P, iterations: N, variant }, schedule), [P, N, variant, schedule, locale]);
   const total = trace.steps.length;
   const at = Math.min(n, total);
   const st = useMemo(() => stateAt(trace, at), [trace, at]);
@@ -206,12 +207,12 @@ function Stepper() {
                 <Translated
                   vi={
                     {
-                    'single-both': 'một bộ đệm, cả hai rào chắn',
-                    'single-no-read-barrier': 'một bộ đệm, không có rào chắn sau lần đọc',
-                    'single-no-write-barrier': 'một bộ đệm, không có rào chắn sau lần ghi',
-                    double: 'hai bộ đệm, một rào chắn',
-                    'double-no-swap': 'hai bộ đệm, quên hoán đổi',
-                    'double-no-barrier': 'hai bộ đệm, không có rào chắn',
+                    'single-both': 'một buffer, cả hai rào chắn',
+                    'single-no-read-barrier': 'một buffer, không có rào chắn sau lần đọc',
+                    'single-no-write-barrier': 'một buffer, không có rào chắn sau lần ghi',
+                    double: 'hai buffer, một rào chắn',
+                    'double-no-swap': 'hai buffer, quên hoán đổi',
+                    'double-no-barrier': 'hai buffer, không có rào chắn',
                   }[v]
                   }
                 >
@@ -296,11 +297,11 @@ function Stepper() {
                       {{
                     'read-after-write': 'đọc-sau-ghi',
                     'write-after-read': 'ghi-sau-đọc',
-                    'wrong-buffer': 'sai bộ đệm (không có race)',
+                    'wrong-buffer': 'sai buffer (không có race)',
                   }[cur.violation.kind]}
                       ):{' '}
                       {cur.violation.kind === 'wrong-buffer'
-                        ? `luồng ${cur.violation.thread} đọc ở lần lặp ${cur.violation.iter} từ bộ đệm mà giá trị của lần lặp trước không bao giờ được ghi vào`
+                        ? `luồng ${cur.violation.thread} đọc ở lần lặp ${cur.violation.iter} từ buffer mà giá trị của lần lặp trước không bao giờ được ghi vào`
                         : cur.violation.kind === 'read-after-write'
                           ? `luồng ${cur.violation.thread} đọc ở lần lặp ${cur.violation.iter} trước khi luồng láng giềng ghi giá trị của lần lặp đó vào ô`
                           : `luồng ${cur.violation.thread} vẫn cần giá trị cũ ở lần lặp ${cur.violation.iter}, nhưng luồng láng giềng đã ghi đè nó`}
@@ -334,7 +335,7 @@ function Stepper() {
           {(dbl ? [0, 1] : [0]).map((b) => (
             <div key={b} style={{ marginBottom: '0.8rem' }}>
               <div className="mx-label t-shared">
-                <Translated vi={<>{dbl ? `bộ đệm ${bufName(variant, b)}` : 'bộ đệm'} (chia sẻ)</>}>
+                <Translated vi={<>{dbl ? `buffer ${bufName(variant, b)}` : 'buffer'} (chia sẻ)</>}>
                   <>{dbl ? `buffer ${bufName(variant, b)}` : 'buffer'} (shared)</>
                 </Translated>
               </div>
@@ -461,12 +462,12 @@ function Outcomes() {
             <Translated
               vi={
                 {
-                    'single-both': 'một bộ đệm, cả hai rào chắn',
-                    'single-no-read-barrier': 'một bộ đệm, không có rào chắn sau lần đọc',
-                    'single-no-write-barrier': 'một bộ đệm, không có rào chắn sau lần ghi',
-                    double: 'hai bộ đệm, một rào chắn',
-                    'double-no-swap': 'hai bộ đệm, quên hoán đổi',
-                    'double-no-barrier': 'hai bộ đệm, không có rào chắn',
+                    'single-both': 'một buffer, cả hai rào chắn',
+                    'single-no-read-barrier': 'một buffer, không có rào chắn sau lần đọc',
+                    'single-no-write-barrier': 'một buffer, không có rào chắn sau lần ghi',
+                    double: 'hai buffer, một rào chắn',
+                    'double-no-swap': 'hai buffer, quên hoán đổi',
+                    'double-no-barrier': 'hai buffer, không có rào chắn',
                   }[v]
               }
             >
@@ -500,12 +501,12 @@ function Outcomes() {
                     .map(
                       (v) =>
                         ({
-                    'single-both': 'một bộ đệm, cả hai rào chắn',
-                    'single-no-read-barrier': 'một bộ đệm, không có rào chắn sau lần đọc',
-                    'single-no-write-barrier': 'một bộ đệm, không có rào chắn sau lần ghi',
-                    double: 'hai bộ đệm, một rào chắn',
-                    'double-no-swap': 'hai bộ đệm, quên hoán đổi',
-                    'double-no-barrier': 'hai bộ đệm, không có rào chắn',
+                    'single-both': 'một buffer, cả hai rào chắn',
+                    'single-no-read-barrier': 'một buffer, không có rào chắn sau lần đọc',
+                    'single-no-write-barrier': 'một buffer, không có rào chắn sau lần ghi',
+                    double: 'hai buffer, một rào chắn',
+                    'double-no-swap': 'hai buffer, quên hoán đổi',
+                    'double-no-barrier': 'hai buffer, không có rào chắn',
                   }[v]),
                     )
                     .join('; ')}
@@ -548,12 +549,12 @@ function Outcomes() {
                       <Translated
                         vi={
                           {
-                    'single-both': 'một bộ đệm, cả hai rào chắn',
-                    'single-no-read-barrier': 'một bộ đệm, không có rào chắn sau lần đọc',
-                    'single-no-write-barrier': 'một bộ đệm, không có rào chắn sau lần ghi',
-                    double: 'hai bộ đệm, một rào chắn',
-                    'double-no-swap': 'hai bộ đệm, quên hoán đổi',
-                    'double-no-barrier': 'hai bộ đệm, không có rào chắn',
+                    'single-both': 'một buffer, cả hai rào chắn',
+                    'single-no-read-barrier': 'một buffer, không có rào chắn sau lần đọc',
+                    'single-no-write-barrier': 'một buffer, không có rào chắn sau lần ghi',
+                    double: 'hai buffer, một rào chắn',
+                    'double-no-swap': 'hai buffer, quên hoán đổi',
+                    'double-no-barrier': 'hai buffer, không có rào chắn',
                   }[v]
                         }
                       >
@@ -582,7 +583,7 @@ function Outcomes() {
                                   {
                     'read-after-write': 'đọc-sau-ghi',
                     'write-after-read': 'ghi-sau-đọc',
-                    'wrong-buffer': 'sai bộ đệm (không có race)',
+                    'wrong-buffer': 'sai buffer (không có race)',
                   }[x]
                                 }
                               >
@@ -616,8 +617,8 @@ function TiledListing() {
     <Code
       tabs={[
         { label: tr('Chapter 5: two barriers', 'Chương 5: hai rào chắn'), code: ch5, tiers: MATMUL_TIERS, status: solutionTabStatus(reports, LAB52, 'kernel.cu') },
-        { label: tr('Double-buffered (CUDA)', 'Bộ đệm kép (CUDA)'), code: cu, tiers: MATMUL_TIERS, status: solutionTabStatus(reports, LAB65, 'kernel.cu') },
-        { label: tr('Double-buffered (Metal)', 'Bộ đệm kép (Metal)'), code: metal, tiers: MATMUL_TIERS, status: solutionTabStatus(reports, LAB65, 'kernel.metal') },
+        { label: tr('Double-buffered (CUDA)', 'Buffer kép (CUDA)'), code: cu, tiers: MATMUL_TIERS, status: solutionTabStatus(reports, LAB65, 'kernel.cu') },
+        { label: tr('Double-buffered (Metal)', 'Buffer kép (Metal)'), code: metal, tiers: MATMUL_TIERS, status: solutionTabStatus(reports, LAB65, 'kernel.metal') },
       ]}
       caption={
         <Translated
@@ -706,7 +707,7 @@ export const questionsS67: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Trong vòng lặp một bộ đệm (đọc, rào chắn, ghi, rào chắn), hai bộ đệm làm cho rào chắn nào trở nên không cần
+            Trong vòng lặp một buffer (đọc, rào chắn, ghi, rào chắn), hai buffer làm cho rào chắn nào trở nên không cần
             thiết?
           </>
         }
@@ -732,14 +733,14 @@ export const questionsS67: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Rào chắn đó bắt những luồng đọc của lần lặp sau chờ những luồng ghi của lần lặp này. Chúng cần các giá trị mới; không bộ đệm thứ hai nào cung cấp chúng sớm hơn.">
+          <Translated vi="Rào chắn đó bắt những luồng đọc của lần lặp sau chờ những luồng ghi của lần lặp này. Chúng cần các giá trị mới; không buffer thứ hai nào cung cấp chúng sớm hơn.">
             That one makes the next iteration's readers wait for this iteration's writers. They need the new values; no second buffer supplies them sooner.
           </Translated>
         ),
       },
       {
         label: (
-          <Translated vi="Cả hai: với hai bộ đệm, đọc và ghi không bao giờ dùng chung một vị trí.">
+          <Translated vi="Cả hai: với hai buffer, đọc và ghi không bao giờ dùng chung một vị trí.">
             Both: with two buffers, reads and writes never share a location.
           </Translated>
         ),
@@ -751,12 +752,12 @@ export const questionsS67: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Không cái nào: hai bộ đệm tiết kiệm lưu lượng bộ nhớ, không tiết kiệm rào chắn.">
+          <Translated vi="Không cái nào: hai buffer tiết kiệm lưu lượng bộ nhớ, không tiết kiệm rào chắn.">
             Neither: two buffers save memory traffic, not barriers.
           </Translated>
         ),
         why: (
-          <Translated vi="Chúng không tiết kiệm lưu lượng nào. Một rào chắn tồn tại chỉ vì lần ghi rơi vào chỗ mà một lần đọc chưa diễn ra, và hai bộ đệm bỏ được nó.">
+          <Translated vi="Chúng không tiết kiệm lưu lượng nào. Một rào chắn tồn tại chỉ vì lần ghi rơi vào chỗ mà một lần đọc chưa diễn ra, và hai buffer bỏ được nó.">
             They save no traffic. One barrier exists only because the write lands where a read has yet to happen, and two buffers remove it.
           </Translated>
         ),
@@ -766,8 +767,7 @@ export const questionsS67: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Rào chắn sau lần đọc ngăn một luồng ghi đè một ô mà luồng láng giềng của nó chưa đọc. Khi các lần ghi đi tới bộ
-            đệm kia, không có gì để ghi đè, nên rào chắn đó có thể bỏ. Trang 147 nói rào chắn "thứ hai" có thể được loại bỏ;
+            Rào chắn sau lần đọc ngăn một luồng ghi đè một ô mà luồng láng giềng của nó chưa đọc. Khi các lần ghi đi tới buffer kia, không có gì để ghi đè, nên rào chắn đó có thể bỏ. Trang 147 nói rào chắn "thứ hai" có thể được loại bỏ;
             phần phân tích trước đó, đoạn mã sau đó và câu tiếp theo đều có ý nói rào chắn thứ nhất, sau lần đọc. Ghi chú của
             khóa học này ghi lại điều đó như một lỗi in.
           </p>
@@ -788,7 +788,7 @@ export const questionsS67: Record<string, Question> = {
     kind: 'choice',
     id: 'ch06/6.7/q-swap',
     prompt: (
-      <Translated vi={<>Vòng lặp bộ đệm kép quên phép hoán đổi. Chuyện gì xảy ra?</>}>
+      <Translated vi={<>Vòng lặp buffer kép quên phép hoán đổi. Chuyện gì xảy ra?</>}>
         <>The double-buffered loop forgets the swap. What happens?</>
       </Translated>
     ),
@@ -830,7 +830,7 @@ export const questionsS67: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Không có phép hoán đổi, mỗi luồng đọc bộ đệm A và ghi bộ đệm B ở mọi lần lặp, nên mọi lần lặp lại bắt đầu từ các
+            Không có phép hoán đổi, mỗi luồng đọc buffer A và ghi buffer B ở mọi lần lặp, nên mọi lần lặp lại bắt đầu từ các
             giá trị ban đầu. Bảng kết quả cho thấy nó là hàng duy nhất cũng thất bại dưới lockstep. Điều đó khiến nó là một
             lỗi logic: bộ phát hiện race không có gì để báo, và kết quả sai trên mọi thiết bị.
           </p>
@@ -873,7 +873,7 @@ export const questionsS67: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Không: một luồng hoán đổi cho cả khối, vì các bộ đệm là chia sẻ.">
+          <Translated vi="Không: một luồng hoán đổi cho cả khối, vì các buffer là chia sẻ.">
             No: one thread swaps for the whole block, since the buffers are shared.
           </Translated>
         ),
@@ -900,7 +900,7 @@ export const questionsS67: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Các bộ đệm là chia sẻ; con trỏ tới chúng thì không, nên một luồng bỏ qua phép hoán đổi sẽ đọc và ghi sai bộ đệm.
+            Các buffer là chia sẻ; con trỏ tới chúng thì không, nên một luồng bỏ qua phép hoán đổi sẽ đọc và ghi sai buffer.
             Sách không cho thấy <code>swap</code> được viết thế nào (notes mục 15), và điều đó che mất điểm mấu chốt: nó hoán
             đổi chính các con trỏ của luồng gọi nó. Đoạn mã ở trên truyền chúng theo tham chiếu cho <code>swapPointers</code>,
             và mọi luồng đều gọi nó.
@@ -926,7 +926,7 @@ export const questionsS67: Record<string, Question> = {
         vi={
           <>
             Một phép nhân ma trận phân ô với <code>TILE_WIDTH = 32</code> giữ một ô của M và một ô của N trong bộ nhớ chia sẻ,
-            dạng <code>float</code>. Các ô của phiên bản bộ đệm kép cần bao nhiêu byte?
+            dạng <code>float</code>. Các ô của phiên bản buffer kép cần bao nhiêu byte?
           </>
         }
       >
@@ -943,7 +943,7 @@ export const questionsS67: Record<string, Question> = {
         vi={
           <>
             <p>
-              Hai cặp × hai ô × 32 × 32 float × 4 byte = 16,384 byte, gấp đôi 8192 của kernel một bộ đệm. Lượng bộ nhớ đó bị
+              Hai cặp × hai ô × 32 × 32 float × 4 byte = 16,384 byte, gấp đôi 8192 của kernel một buffer. Lượng bộ nhớ đó bị
               tính vào occupancy như mọi lượng khác (mục 5.6), và trước hết nó phải vừa giới hạn mỗi khối của thiết bị bạn.{' '}
               <code>python3 labs/pmpp.py doctor</code> in giới hạn đó là <code>sharedMemPerBlock</code> trên CUDA và HIP và{' '}
               <code>maxThreadgroupMemoryLength</code> trên Metal.
@@ -994,7 +994,7 @@ export const questionsS67: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="Mọi lần đọc tile[(t + 1) % 64]: mỗi lần là bản sao của một luồng khác, và việc chờ của một luồng chỉ bao phủ bản sao của chính nó.">
+          <Translated vi="Mọi lần đọc tile[(t + 1) % 64]: mỗi lần đọc dữ liệu do một luồng khác chép, và việc chờ của một luồng chỉ bao phủ các lần sao chép của chính nó.">
             Every read of tile[(t + 1) % 64]: each is another thread's copy, and a thread's wait covers only its own.
           </Translated>
         ),
@@ -1007,7 +1007,7 @@ export const questionsS67: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="NVIDIA nói điều ngược lại: mặc định mỗi luồng chỉ chờ các bản sao của chính nó.">
+          <Translated vi="NVIDIA nói điều ngược lại: mặc định mỗi luồng chỉ chờ các lần sao chép của chính nó.">
             NVIDIA says the opposite: by default each thread only waits for its own copies.
           </Translated>
         ),
@@ -1019,19 +1019,19 @@ export const questionsS67: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Quy tắc tính theo luồng, không theo warp. Luồng 4 đọc phần tử 5 là đọc bản sao của luồng 5, và việc chờ của chính nó không nói gì về bản sao đó.">
+          <Translated vi="Quy tắc tính theo luồng, không theo warp. Luồng 4 đọc phần tử 5 là đọc dữ liệu do luồng 5 chép, và việc chờ của chính nó không nói gì về lần sao chép đó.">
             The rule is per thread, not per warp. Thread 4 reading element 5 reads thread 5's copy, and its own wait says nothing about that copy.
           </Translated>
         ),
       },
       {
         label: (
-          <Translated vi="Cả 128 lần đọc, kể cả tile[t]: các bản sao bất đồng bộ chỉ hiển thị sau một rào chắn.">
+          <Translated vi="Cả 128 lần đọc, kể cả tile[t]: các lần sao chép bất đồng bộ chỉ hiển thị sau một rào chắn.">
             All 128 reads, tile[t] included: asynchronous copies are visible only after a barrier.
           </Translated>
         ),
         why: (
-          <Translated vi="Việc chờ của một luồng chính là điều bảo đảm các bản sao của chính nó. Rào chắn dành cho dữ liệu mà các luồng khác đã chép.">
+          <Translated vi="Việc chờ của một luồng chính là điều bảo đảm các lần sao chép của chính nó. Rào chắn dành cho dữ liệu mà các luồng khác đã chép.">
             A thread's wait is exactly what guarantees its own copies. The barrier is for data other threads copied.
           </Translated>
         ),
@@ -1042,10 +1042,10 @@ export const questionsS67: Record<string, Question> = {
         vi={
           <p>
             NVIDIA: &ldquo;By default, each thread only waits for its own LDGSTS copies,&rdquo; (mặc định mỗi luồng chỉ chờ
-            các bản sao LDGSTS của chính nó) nên dữ liệu nạp trước cho các luồng khác cần một <code>__syncthreads()</code> sau
-            việc chờ. Các lần đọc <code>tile[t]</code> là an toàn: mỗi lần là bản sao của chính luồng đó. Một ô được nhiều
+            các lần sao chép LDGSTS của chính nó) nên dữ liệu nạp trước cho các luồng khác cần một <code>__syncthreads()</code> sau
+            việc chờ. Các lần đọc <code>tile[t]</code> là an toàn: mỗi lần đọc dữ liệu do chính luồng đó chép. Một ô được nhiều
             luồng điền là dữ liệu chia sẻ, nên khối vẫn cần một rào chắn giữa việc chờ và lần đọc đầu tiên phần tử của một
-            luồng khác. Đây là một phụ thuộc thật (đọc sau ghi), loại mà bộ đệm kép không bao giờ loại bỏ. Hàm trợ giúp của
+            luồng khác. Đây là một phụ thuộc thật (đọc sau ghi), loại mà buffer kép không bao giờ loại bỏ. Hàm trợ giúp của
             llama.cpp cho các phép sao chép này có một chú thích nói điều tương tự.
           </p>
         }
@@ -1067,7 +1067,7 @@ export const questionsS67: Record<string, Question> = {
     kind: 'choice',
     id: 'ch06/6.7/q-race',
     prompt: (
-      <Translated vi={<>Kernel bộ đệm kép của bạn chạy sạch trên backend race. Bạn đã chứng tỏ được điều gì?</>}>
+      <Translated vi={<>Kernel buffer kép của bạn chạy sạch trên backend race. Bạn đã chứng tỏ được điều gì?</>}>
         <>Your double-buffered kernel runs clean on the race backend. What have you shown?</>
       </Translated>
     ),
@@ -1134,7 +1134,7 @@ export function S67() {
       <Translated
         vi={
           <p>
-            Giả sử các luồng của một khối truyền giá trị cho nhau qua một bộ đệm chia sẻ, bên trong một vòng lặp. Mỗi luồng
+            Giả sử các luồng của một khối truyền giá trị cho nhau qua một buffer chia sẻ, bên trong một vòng lặp. Mỗi luồng
             đọc một giá trị mà một luồng khác đã ghi ở lần lặp trước, rồi ghi giá trị của riêng nó. Phiên bản của sách có hai
             rào chắn (barrier) trong vòng lặp: một sau lần đọc, một sau lần ghi.
           </p>
@@ -1154,7 +1154,7 @@ export function S67() {
           <Translated
             vi={
               <>
-                Vòng lặp của sách (p. 146) dưới dạng một kernel, từ <code>labs/ch06/snippets/</code>, với phiên bản hai bộ đệm
+                Vòng lặp của sách (p. 146) dưới dạng một kernel, từ <code>labs/ch06/snippets/</code>, với phiên bản hai buffer
                 (p. 147) bên dưới. Phép tính, các khai báo và <code>swapPointers</code> là của chúng tôi; sách chỉ cho thấy
                 vòng lặp.
               </>
@@ -1210,7 +1210,7 @@ export function S67() {
       <Translated
         vi={
           <p>
-            Trong trình chạy từng bước, đặt kernel là "một bộ đệm, không có rào chắn sau lần đọc" với mỗi luồng chạy xa nhất
+            Trong trình chạy từng bước, đặt kernel là "một buffer, không có rào chắn sau lần đọc" với mỗi luồng chạy xa nhất
             có thể, và nhấn <i>Đi tới lỗi đầu tiên</i>. Rồi thử "không có rào chắn sau lần ghi", rồi lockstep.
           </p>
         }
@@ -1241,14 +1241,14 @@ export function S67() {
       <Outcomes />
 
       <h2>
-        <Translated vi="Hai bộ đệm">Two buffers</Translated>
+        <Translated vi="Hai buffer">Two buffers</Translated>
       </h2>
       <Translated
         vi={
           <p>
-            Một bộ đệm mới cho mỗi lần lặp sẽ loại bỏ phụ thuộc giả, nhưng nó dùng bộ nhớ tỉ lệ với số lần lặp. Hai bộ đệm là
+            Một buffer mới cho mỗi lần lặp sẽ loại bỏ phụ thuộc giả, nhưng nó dùng bộ nhớ tỉ lệ với số lần lặp. Hai buffer là
             đủ: đọc từ một cái, ghi vào cái kia, và hoán đổi vai trò của chúng mỗi lần lặp. Còn lại một rào chắn, sau lần ghi,
-            cho phụ thuộc thật. Đó là <b>bộ đệm kép</b> (double buffering).
+            cho phụ thuộc thật. Đó là <b>buffer kép</b> (double buffering).
           </p>
         }
       >
@@ -1350,8 +1350,8 @@ export function S67() {
       <Translated
         vi={
           <p>
-            Ngày nay ý tưởng này thường đi cùng các phép sao chép bất đồng bộ: một bộ đệm được điền trong khi các luồng tính
-            trên bộ đệm kia, điều đi xa hơn một bước so với việc bỏ một rào chắn.
+            Ngày nay ý tưởng này thường đi cùng các phép sao chép bất đồng bộ: một buffer được điền trong khi các luồng tính
+            trên buffer kia, điều đi xa hơn một bước so với việc bỏ một rào chắn.
           </p>
         }
       >
@@ -1365,9 +1365,9 @@ export function S67() {
           vi={
             <>
               <p>
-                Ngày nay NVIDIA chủ yếu mô tả bộ đệm kép cùng với các phép sao chép bất đồng bộ vào bộ nhớ chia sẻ (LDGSTS từ
-                compute capability 8.0, TMA, <code>cuda::memcpy_async</code>): một bộ đệm được điền trong khi bộ đệm kia được
-                dùng. Mỗi luồng chỉ chờ các bản sao của chính nó, nên vẫn cần <code>__syncthreads()</code>.
+                Ngày nay NVIDIA chủ yếu mô tả buffer kép cùng với các phép sao chép bất đồng bộ vào bộ nhớ chia sẻ (LDGSTS từ
+                compute capability 8.0, TMA, <code>cuda::memcpy_async</code>): một buffer được điền trong khi buffer kia được
+                dùng. Mỗi luồng chỉ chờ các lần sao chép của chính nó, nên vẫn cần <code>__syncthreads()</code>.
               </p>
               <p>
                 HIP chỉ mô tả một phép sao chép bất đồng bộ từ bộ nhớ toàn cục sang LDS cho CDNA 3 và 4, qua{' '}
@@ -1401,7 +1401,7 @@ export function S67() {
           vi={
             <p>
               Mã thật, đọc vào 2026-11-20: kernel flash-attention CUDA của llama.cpp chạy hai tầng pipeline với các phép sao
-              chép bất đồng bộ nơi phần cứng hỗ trợ. Vòng lặp GEMM Metal chính của MLX dùng một bộ đệm với hai rào chắn mỗi
+              chép bất đồng bộ nơi phần cứng hỗ trợ. Vòng lặp GEMM Metal chính của MLX dùng một buffer với hai rào chắn mỗi
               bước, tức vòng lặp "trước" của sách.
             </p>
           }

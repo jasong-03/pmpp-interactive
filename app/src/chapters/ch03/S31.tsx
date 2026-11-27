@@ -1364,7 +1364,7 @@ export const questionsS31: Record<string, Question> = {
         <Translated
           vi={
             <>
-              Một hàm host khởi chạy một kernel với <code>dimBlock(32, 32, 2)</code>, sao chép bộ đệm đầu ra về và in nó ra. Nó
+              Một hàm host khởi chạy một kernel với <code>dimBlock(32, 32, 2)</code>, sao chép buffer đầu ra về và in nó ra. Nó
               không bao giờ gọi <code>cudaGetLastError()</code>. Theo tài liệu của NVIDIA, điều gì xảy ra?
             </>
           }
@@ -1413,7 +1413,7 @@ export const questionsS31: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Không luồng nào chạy, không có gì được báo, và chương trình in ra bất cứ thứ gì bộ đệm đang chứa.">
+          <Translated vi="Không luồng nào chạy, không có gì được báo, và chương trình in ra bất cứ thứ gì buffer đang chứa.">
             No thread runs, nothing is reported, and the program prints whatever the buffer held.
           </Translated>
         ),
@@ -2194,7 +2194,7 @@ export function S31() {
           <p>
             Một lần khởi chạy với <code>dimBlock(32, 32, 2)</code> vẫn biên dịch, vì hình dạng là dữ liệu lúc chạy bình thường.
             Câu lệnh khởi chạy không có giá trị, nên không có gì để kiểm tra trên dòng đó. Lúc chạy, lời gọi thất bại. Không
-            luồng nào chạy, và bộ đệm đầu ra giữ nguyên thứ nó đang chứa. Runtime ghi thất bại là{' '}
+            luồng nào chạy, và buffer đầu ra giữ nguyên thứ nó đang chứa. Runtime ghi thất bại là{' '}
             <code>cudaErrorInvalidConfiguration</code>, giá trị 9, vào một trạng thái lỗi mà nó giữ cho mỗi luồng host, và chương
             trình tiếp tục. Bạn chỉ thấy lỗi nếu bạn hỏi.
           </p>
@@ -2232,7 +2232,7 @@ export function S31() {
         highlight={[11, 12]}
         caption={tr(
           "Asking after the launch. On the course's CPU emulator, blockShapeIsRejected returns true and the buffer is left untouched (emulator-checked: python3 labs/ch03/snippets/check.py). The emulator also prints a line of its own; the documentation describes no message from a device.",
-          'Hỏi sau lần khởi chạy. Trên trình giả lập CPU của khóa học, blockShapeIsRejected trả về true và bộ đệm không bị động đến (emulator-checked: python3 labs/ch03/snippets/check.py). Trình giả lập cũng in một dòng của riêng nó; tài liệu không mô tả thông báo nào từ thiết bị.',
+          'Hỏi sau lần khởi chạy. Trên trình giả lập CPU của khóa học, blockShapeIsRejected trả về true và buffer không bị động đến (emulator-checked: python3 labs/ch03/snippets/check.py). Trình giả lập cũng in một dòng của riêng nó; tài liệu không mô tả thông báo nào từ thiết bị.',
         )}
       />
       <Translated

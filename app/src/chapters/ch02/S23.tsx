@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
-import { Translated, tr as trText } from '../../lib/i18n';
+import { Translated, tr as trText, useLocale } from '../../lib/i18n';
 import { benchRows, fmt, num, useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -217,12 +217,13 @@ function BoundaryTraffic() {
   const [strategy, setStrategy] = useState<Strategy>('transparent');
   const [memory, setMemory] = useState<Memory>('separate');
   const n = 2 ** exp;
+  const locale = useLocale();
   const both = useMemo(
     () => ({
       transparent: boundaryTraffic(k, 'transparent', memory, n),
       resident: boundaryTraffic(k, 'resident', memory, n),
     }),
-    [k, memory, n],
+    [k, memory, n, locale],
   );
   const t = both[strategy];
   const ops = chainOps(k);

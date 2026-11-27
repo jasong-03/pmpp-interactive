@@ -436,10 +436,10 @@ function example(a: BadAccess, n: number): string {
   if (a.op === 'read')
     return a.kind === 'wrapped'
       ? tr(`${who} read in[${a.index}]: it wanted position ${at(a.wanted)}, which is not in the picture, and got pixel ${at(a.got!)}.`, `${who} đọc in[${a.index}]: nó muốn vị trí ${at(a.wanted)}, vốn không nằm trong ảnh, và nhận được điểm ảnh ${at(a.got!)}.`)
-      : tr(`${who} read in[${a.index}] for position ${at(a.wanted)}; the buffer has elements 0 to ${n - 1}.`, `${who} đọc in[${a.index}] cho vị trí ${at(a.wanted)}; bộ đệm có các phần tử từ 0 đến ${n - 1}.`);
+      : tr(`${who} read in[${a.index}] for position ${at(a.wanted)}; the buffer has elements 0 to ${n - 1}.`, `${who} đọc in[${a.index}] cho vị trí ${at(a.wanted)}; buffer có các phần tử từ 0 đến ${n - 1}.`);
   return a.kind === 'wrapped'
     ? tr(`${who}, which owns no pixel, stored to out[${a.index}]: that is pixel ${at(a.got!)}, which belongs to another thread.`, `${who}, vốn không sở hữu điểm ảnh nào, đã ghi vào out[${a.index}]: đó là điểm ảnh ${at(a.got!)}, thuộc về một luồng khác.`)
-    : tr(`${who}, which owns no pixel, stored to out[${a.index}]; the buffer has elements 0 to ${n - 1}.`, `${who}, vốn không sở hữu điểm ảnh nào, đã ghi vào out[${a.index}]; bộ đệm có các phần tử từ 0 đến ${n - 1}.`);
+    : tr(`${who}, which owns no pixel, stored to out[${a.index}]; the buffer has elements 0 to ${n - 1}.`, `${who}, vốn không sở hữu điểm ảnh nào, đã ghi vào out[${a.index}]; buffer có các phần tử từ 0 đến ${n - 1}.`);
 }
 
 function BreakTheKernel() {
@@ -456,14 +456,14 @@ function BreakTheKernel() {
   const setClause = (cl: Clause, on: boolean) => setO({ ...o, clauses: { ...o.clauses, [cl]: on } });
   const kinds: { n: number; cls: string; text: string; ex?: BadAccess }[] = [
     { n: tl.readWrapped, cls: 'read-wrapped', text: tr(`${plural(tl.readWrapped, 'read', 'reads')} fetched a wrong element (wrapped into another row)`, `${tl.readWrapped} lần đọc lấy sai phần tử (tràn sang một hàng khác)`), ex: first('read', 'wrapped') },
-    { n: tl.readOutside, cls: 'read-outside', text: tr(`${plural(tl.readOutside, 'read', 'reads')} outside the buffer`, `${tl.readOutside} lần đọc ra ngoài bộ đệm`), ex: first('read', 'outside') },
+    { n: tl.readOutside, cls: 'read-outside', text: tr(`${plural(tl.readOutside, 'read', 'reads')} outside the buffer`, `${tl.readOutside} lần đọc ra ngoài buffer`), ex: first('read', 'outside') },
     { n: tl.writeWrapped, cls: 'write-wrapped', text: tr(`${plural(tl.writeWrapped, 'store', 'stores')} landed on another thread's pixel (wrapped into another row)`, `${tl.writeWrapped} lần ghi rơi vào điểm ảnh của luồng khác (tràn sang một hàng khác)`), ex: first('write', 'wrapped') },
-    { n: tl.writeOutside, cls: 'write-outside', text: tr(`${plural(tl.writeOutside, 'store', 'stores')} outside the buffer`, `${tl.writeOutside} lần ghi ra ngoài bộ đệm`), ex: first('write', 'outside') },
+    { n: tl.writeOutside, cls: 'write-outside', text: tr(`${plural(tl.writeOutside, 'store', 'stores')} outside the buffer`, `${tl.writeOutside} lần ghi ra ngoài buffer`), ex: first('write', 'outside') },
   ];
   return (
     <Bench
       title={tr('Break the kernel', 'Làm hỏng kernel')}
-      task={tr('Untick one piece at a time. Before you look at the result: which pixels will be wrong, and will anything leave the buffer?', 'Bỏ chọn từng phần một. Trước khi nhìn kết quả: những điểm ảnh nào sẽ sai, và có gì ra ngoài bộ đệm không?')}
+      task={tr('Untick one piece at a time. Before you look at the result: which pixels will be wrong, and will anything leave the buffer?', 'Bỏ chọn từng phần một. Trước khi nhìn kết quả: những điểm ảnh nào sẽ sai, và có gì ra ngoài buffer không?')}
       foot={
         <Translated
           vi={
@@ -514,12 +514,12 @@ function BreakTheKernel() {
         </label>
         <label className="check">
           <input type="checkbox" checked={!o.inPlace} onChange={(e) => setO({ ...o, inPlace: !e.target.checked })} />
-          <span><Translated vi={<>một bộ đệm <code>out</code> riêng (khi bỏ chọn: <code>out</code> chính là <code>in</code>)</>}>a separate <code>out</code> buffer (unticked: <code>out</code> is <code>in</code>)</Translated></span>
+          <span><Translated vi={<>một buffer <code>out</code> riêng (khi bỏ chọn: <code>out</code> chính là <code>in</code>)</>}>a separate <code>out</code> buffer (unticked: <code>out</code> is <code>in</code>)</Translated></span>
         </label>
       </div>
       <div className="cols" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', marginTop: '0.9rem' }}>
         <Pic title={tr('in, as the host filled it', 'in, như host đã điền')} w={pic.w} h={pic.h} values={pic.data} />
-        <Pic title={o.inPlace ? tr('the one buffer after the run', 'bộ đệm duy nhất sau khi chạy') : 'out'} w={pic.w} h={pic.h} values={r.out} wrong={new Set(r.wrong)} />
+        <Pic title={o.inPlace ? tr('the one buffer after the run', 'buffer duy nhất sau khi chạy') : 'out'} w={pic.w} h={pic.h} values={r.out} wrong={new Set(r.wrong)} />
         <Pic title={tr('reference (the correct kernel)', 'tham chiếu (kernel đúng)')} w={pic.w} h={pic.h} values={r.reference} tier={false} />
       </div>
       <div className="panel" style={{ marginTop: '0.9rem' }} data-verdict={r.wrong.length ? 'wrong' : 'correct'}>
@@ -562,7 +562,7 @@ function BreakTheKernel() {
                 vi={
                   <>
                     <b className="t-fail">{r.overwrittenReads} lần đọc gặp một phần tử mà luồng khác đã ghi rồi.</b>{' '}
-                    Tất cả đều nằm trong bộ đệm.
+                    Tất cả đều nằm trong buffer.
                   </>
                 }
               >
@@ -601,8 +601,8 @@ function ThreeOrders() {
   const same = new Set(runs.map((x) => x.out.join())).size === 1;
   return (
     <Bench
-      title={tr('One buffer, three thread orders', 'Một bộ đệm, ba thứ tự luồng')}
-      task={tr('The kernel is correct apart from the buffer. Untick the box: what do you expect the three pictures to do?', 'Kernel đúng, chỉ trừ bộ đệm. Bỏ chọn ô: bạn nghĩ ba ảnh sẽ thế nào?')}
+      title={tr('One buffer, three thread orders', 'Một buffer, ba thứ tự luồng')}
+      task={tr('The kernel is correct apart from the buffer. Untick the box: what do you expect the three pictures to do?', 'Kernel đúng, chỉ trừ buffer. Bỏ chọn ô: bạn nghĩ ba ảnh sẽ thế nào?')}
       foot={tr('A 6 by 6 picture covered by one block of 6 by 6 threads, the configuration of the animation above.', 'Một ảnh 6 × 6 được phủ bởi một khối 6 × 6 luồng, đúng cấu hình của hoạt hình ở trên.')}
     >
       <div className="row" style={{ marginBottom: '0.8rem' }}>
@@ -613,7 +613,7 @@ function ThreeOrders() {
           </select>
         </label>
         <label className="check">
-          <input type="checkbox" checked={inPlace} onChange={(e) => setInPlace(e.target.checked)} /> <span><Translated vi={<><code>out</code> là cùng bộ đệm với <code>in</code></>}><code>out</code> is the same buffer as <code>in</code></Translated></span>
+          <input type="checkbox" checked={inPlace} onChange={(e) => setInPlace(e.target.checked)} /> <span><Translated vi={<><code>out</code> là cùng buffer với <code>in</code></>}><code>out</code> is the same buffer as <code>in</code></Translated></span>
         </label>
       </div>
       <div className="cols" style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
@@ -630,7 +630,7 @@ function ThreeOrders() {
       <p style={{ margin: '0.8rem 0 0' }} data-same={same ? 'yes' : 'no'}>
         {same
           ? tr('The three orders give the same picture: no thread reads anything that another thread writes.', 'Ba thứ tự cho cùng một ảnh: không luồng nào đọc thứ mà luồng khác ghi.')
-          : tr('Three orders, three different pictures, and not one access outside the buffer.', 'Ba thứ tự, ba ảnh khác nhau, và không một truy cập nào ra ngoài bộ đệm.')}
+          : tr('Three orders, three different pictures, and not one access outside the buffer.', 'Ba thứ tự, ba ảnh khác nhau, và không một truy cập nào ra ngoài buffer.')}
       </p>
     </Bench>
   );
@@ -639,10 +639,10 @@ function ThreeOrders() {
 // ---------------------------------------------------------------- name the defect
 const WHY: Record<Exclude<Defect, 'outer'>, string> = {
   get rowLo() {
-    return tr('Only the top row is wrong. Its threads read the row above the picture, which lies before the start of the buffer (the model reads 0 there, so the values are too low).', 'Chỉ hàng trên cùng sai. Các luồng của nó đọc hàng phía trên ảnh, vốn nằm trước đầu bộ đệm (mô hình đọc 0 ở đó, nên các giá trị quá thấp).');
+    return tr('Only the top row is wrong. Its threads read the row above the picture, which lies before the start of the buffer (the model reads 0 there, so the values are too low).', 'Chỉ hàng trên cùng sai. Các luồng của nó đọc hàng phía trên ảnh, vốn nằm trước đầu buffer (mô hình đọc 0 ở đó, nên các giá trị quá thấp).');
   },
   get rowHi() {
-    return tr('Only the bottom row is wrong. Its threads read a row below the picture, past the end of the buffer.', 'Chỉ hàng dưới cùng sai. Các luồng của nó đọc một hàng bên dưới ảnh, quá cuối bộ đệm.');
+    return tr('Only the bottom row is wrong. Its threads read a row below the picture, past the end of the buffer.', 'Chỉ hàng dưới cùng sai. Các luồng của nó đọc một hàng bên dưới ảnh, quá cuối buffer.');
   },
   get colLo() {
     return tr('Only the left-hand column is wrong. in[curRow*w - 1] is the last pixel of the row above, so each of those threads averaged in values from the far side of the picture.', 'Chỉ cột bên trái sai. in[curRow*w - 1] là điểm ảnh cuối của hàng phía trên, nên mỗi luồng đó đã lấy trung bình cả những giá trị từ phía bên kia của ảnh.');
@@ -667,7 +667,7 @@ const listOf = (xs: number[]) => (xs.length < 2 ? xs.join('') : tr(`${xs.slice(0
  */
 function whyOuter(wrong: number[], w: number): string {
   const { rows, cols, spared } = wrongSpan(wrong, w);
-  if (!rows.length) return tr('Nothing is wrong in this picture: every surplus store landed outside the buffer or was overwritten later.', 'Không có gì sai trong ảnh này: mọi lần ghi dư đều rơi ra ngoài bộ đệm hoặc bị ghi đè sau đó.');
+  if (!rows.length) return tr('Nothing is wrong in this picture: every surplus store landed outside the buffer or was overwritten later.', 'Không có gì sai trong ảnh này: mọi lần ghi dư đều rơi ra ngoài buffer hoặc bị ghi đè sau đó.');
   const extra = Array.from({ length: cols.length }, (_, k) => w + k);
   return tr(
     `${cols.length === 1 ? 'Column' : 'Columns'} ${listOf(cols)} ${cols.length === 1 ? 'is' : 'are'} wrong in rows ${listOf(rows)}. ` +
@@ -709,12 +709,12 @@ function NameTheDefect() {
               <select aria-label={tr(`Defect behind picture ${i + 1}`, `Lỗi đằng sau ảnh ${i + 1}`)} value={picks[i]} style={{ width: '100%' }}
                 onChange={(e) => { setPicks(picks.map((p, j) => (j === i ? (e.target.value as Defect | '') : p))); setChecked(false); }}>
                 <option value="">{tr('choose', 'chọn')}</option>
-                {DEFECTS.map((d) => <option key={d} value={d}>{tr(DEFECT_LABEL[d], d === 'rowLo' ? 'thiếu curRow >= 0' : d === 'rowHi' ? 'thiếu curRow < h' : d === 'colLo' ? 'thiếu curCol >= 0' : d === 'colHi' ? 'thiếu curCol < w' : d === 'area' ? 'số chia là diện tích vùng' : d === 'outer' ? 'thiếu phép kiểm tra ngoài (dòng 05)' : 'out là cùng bộ đệm với in')}</option>)}
+                {DEFECTS.map((d) => <option key={d} value={d}>{tr(DEFECT_LABEL[d], d === 'rowLo' ? 'thiếu curRow >= 0' : d === 'rowHi' ? 'thiếu curRow < h' : d === 'colLo' ? 'thiếu curCol >= 0' : d === 'colHi' ? 'thiếu curCol < w' : d === 'area' ? 'số chia là diện tích vùng' : d === 'outer' ? 'thiếu phép kiểm tra ngoài (dòng 05)' : 'out là cùng buffer với in')}</option>)}
               </select>
             </label>
             {checked ? (
               <p style={{ margin: '0.5rem 0 0' }}>
-                {picks[i] === x.d ? <span className="chip ok"><Translated vi="đúng">right</Translated></span> : <span className="chip fail"><Translated vi={<>thực ra là: {tr(DEFECT_LABEL[x.d], x.d === 'rowLo' ? 'thiếu curRow >= 0' : x.d === 'rowHi' ? 'thiếu curRow < h' : x.d === 'colLo' ? 'thiếu curCol >= 0' : x.d === 'colHi' ? 'thiếu curCol < w' : x.d === 'area' ? 'số chia là diện tích vùng' : x.d === 'outer' ? 'thiếu phép kiểm tra ngoài (dòng 05)' : 'out là cùng bộ đệm với in')}</>}>it was: {DEFECT_LABEL[x.d]}</Translated></span>}{' '}
+                {picks[i] === x.d ? <span className="chip ok"><Translated vi="đúng">right</Translated></span> : <span className="chip fail"><Translated vi={<>thực ra là: {tr(DEFECT_LABEL[x.d], x.d === 'rowLo' ? 'thiếu curRow >= 0' : x.d === 'rowHi' ? 'thiếu curRow < h' : x.d === 'colLo' ? 'thiếu curCol >= 0' : x.d === 'colHi' ? 'thiếu curCol < w' : x.d === 'area' ? 'số chia là diện tích vùng' : x.d === 'outer' ? 'thiếu phép kiểm tra ngoài (dòng 05)' : 'out là cùng buffer với in')}</>}>it was: {DEFECT_LABEL[x.d]}</Translated></span>}{' '}
                 {why(x.d, x.r.wrong)}
               </p>
             ) : null}
@@ -914,7 +914,7 @@ export const questionsS33: Record<string, Question> = {
       },
       {
         label: <Translated vi="Một lỗi biên dịch, vì row và col được dùng mà không kiểm tra.">A compile error, because row and col are used unchecked.</Translated>,
-        why: <Translated vi="Trình biên dịch không hề biết các bộ đệm lớn đến đâu.">The compiler has no idea how large the buffers are.</Translated>,
+        why: <Translated vi="Trình biên dịch không hề biết các buffer lớn đến đâu.">The compiler has no idea how large the buffers are.</Translated>,
       },
     ],
     explain: (
@@ -958,7 +958,7 @@ export const questionsS33: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Host truyền cùng một bộ đệm làm <code>in</code> và làm <code>out</code>. Phát biểu nào đúng?
+            Host truyền cùng một buffer làm <code>in</code> và làm <code>out</code>. Phát biểu nào đúng?
           </>
         }
       >
@@ -986,8 +986,8 @@ export const questionsS33: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Với hai bộ đệm, mỗi luồng ghi một phần tử mà không ai đọc, và đọc các phần tử mà không ai ghi, nên
-            thứ tự không thể ảnh hưởng. Với một bộ đệm, việc một luồng thấy giá trị gốc của điểm lân cận hay giá trị trung bình của nó
+            Với hai buffer, mỗi luồng ghi một phần tử mà không ai đọc, và đọc các phần tử mà không ai ghi, nên
+            thứ tự không thể ảnh hưởng. Với một buffer, việc một luồng thấy giá trị gốc của điểm lân cận hay giá trị trung bình của nó
             phụ thuộc vào luồng nào trong hai luồng chạy trước. Hoạt hình cho thấy hai thứ tự cho ra hai ảnh sai. Một GPU chạy các
             luồng cùng lúc, theo một thứ tự mà bạn không chọn được và cũng không lặp lại được.
           </p>
@@ -1362,7 +1362,7 @@ export function S33() {
           vi={
             <p>
               Các luồng chạy từng cái một, mỗi cái đến khi xong, hết khối này đến khối khác, như trong trình giả lập (emulator) CPU của các lab. Ở đây một lần đọc
-              ngoài bộ đệm trả về 0 và một lần ghi ra ngoài bị bỏ; trên thiết bị thật cả hai đều không xác định. 0/0 được
+              ngoài buffer trả về 0 và một lần ghi ra ngoài bị bỏ; trên thiết bị thật cả hai đều không xác định. 0/0 được
               hiển thị là dấu hỏi.
             </p>
           }
@@ -1379,7 +1379,7 @@ export function S33() {
         vi={
           <p>
             Có ba điều đáng tìm trong bảng tương tác. Bỏ chọn <code>{'curCol < w'}</code>: cột bên phải
-            sai, 17 lần đọc lấy một điểm ảnh từ hàng khác, và chỉ 2 lần nhắm xuống dưới hàng cuối mới ra ngoài bộ đệm. Một
+            sai, 17 lần đọc lấy một điểm ảnh từ hàng khác, và chỉ 2 lần nhắm xuống dưới hàng cuối mới ra ngoài buffer. Một
             công cụ kiểm tra địa chỉ, như bản build AddressSanitizer của trình giả lập của các lab, có thể báo 2 lần đó và
             không nói được gì về 17 lần kia. Giờ hãy chuyển ảnh sang
             xám đều: gần như mọi hư hại biến mất, vì một điểm ảnh sai mà tình cờ giữ đúng giá trị thì
@@ -1547,7 +1547,7 @@ export function S33() {
         </Translated>
       </Beyond>
 
-      <h2><Translated vi="Vì sao cần hai bộ đệm">Why two buffers</Translated></h2>
+      <h2><Translated vi="Vì sao cần hai buffer">Why two buffers</Translated></h2>
       <Translated
         vi={
           <p>
@@ -1565,9 +1565,9 @@ export function S33() {
       <Translated
         vi={
           <p>
-            Với hai bộ đệm, mỗi luồng ghi một phần tử mà không luồng nào đọc, và đọc các phần tử mà không luồng nào
+            Với hai buffer, mỗi luồng ghi một phần tử mà không luồng nào đọc, và đọc các phần tử mà không luồng nào
             ghi. Các luồng không chia sẻ thứ gì thay đổi, nên chúng có thể chạy theo bất kỳ thứ tự nào, hoặc cùng lúc, và kết quả
-            vẫn thế. Truyền một bộ đệm cho cả hai thì mỗi luồng đọc tới tám phần tử mà luồng khác ghi. Việc
+            vẫn thế. Truyền một buffer cho cả hai thì mỗi luồng đọc tới tám phần tử mà luồng khác ghi. Việc
             nó thấy giá trị gốc của điểm lân cận hay giá trị trung bình phụ thuộc vào ai tới đó trước.
           </p>
         }
@@ -1597,7 +1597,7 @@ export function S33() {
       <Translated
         vi={
           <p>
-            Bảng tương tác tiếp theo đặt ba thứ tự luồng cạnh nhau, và bạn tự chọn dùng một hay hai bộ đệm.
+            Bảng tương tác tiếp theo đặt ba thứ tự luồng cạnh nhau, và bạn tự chọn dùng một hay hai buffer.
           </p>
         }
       >

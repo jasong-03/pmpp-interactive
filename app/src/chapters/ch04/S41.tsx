@@ -3,7 +3,7 @@ import { Ask, Predict, type Question } from '../../components/Ask';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
 import { fmt, useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   BOOK_DEVICE,
   BOOK_DEVICE_TODAY,
@@ -129,7 +129,8 @@ function LevelExplorer() {
     return mine.length ? mine : [noReport(vocab)];
   }, [reports, vocab]);
   const d = devices[Math.min(pickDevice, devices.length - 1)];
-  const ls = useMemo(() => levels(d), [d]);
+  const locale = useLocale();
+  const ls = useMemo(() => levels(d), [d, locale]);
   const cur = ls.find((l) => l.id === sel)!;
   const hardware = ls.filter((l) => ['cluster', 'unit', 'group', 'core'].includes(l.id));
   const askable = hardware.filter((l) => l.ask != null).length;
@@ -228,7 +229,7 @@ function LevelExplorer() {
           <ul style={{ margin: '0 0 0.5rem', paddingLeft: '1.2em' }}>
             {cur.holds.map((h) => (
               <li key={h.what}>
-                {h.what} (<a href={where(h.where)}>{h.where.startsWith('4.') ? tr('section ', 'phần ') + h.where : h.where}</a>)
+                {h.what} (<a href={where(h.where)}>{h.where.startsWith('4.') ? tr('section ', 'phần ') + h.where : tr(h.where, ({ 'chapter 5': 'chương 5' } as Record<string, string>)[h.where] ?? h.where)}</a>)
               </li>
             ))}
           </ul>

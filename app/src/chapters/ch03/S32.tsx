@@ -2,7 +2,7 @@ import { useMemo, useState, type CSSProperties, type KeyboardEvent, type MouseEv
 import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code } from '../../components/Code';
 import { Bench, Beyond, Simplification, Source, TierLegend, Today, type Tier } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { useProgress } from '../../lib/progress';
 import { href } from '../../lib/router';
 import {
@@ -702,7 +702,8 @@ const KERNEL_FIRST = 3, KERNEL_LAST = 21;
 
 function KernelStepper({ launch, sel, setSel }: { launch: Launch; sel: XY; setSel: (p: XY) => void }) {
   const [n, setN] = useState(0);
-  const steps = useMemo(() => stepsGrayscale(launch, sel.x, sel.y), [launch, sel.x, sel.y]);
+  const locale = useLocale();
+  const steps = useMemo(() => stepsGrayscale(launch, sel.x, sel.y), [launch, sel.x, sel.y, locale]);
   const L = layout(launch);
   const t = threadAt(launch, sel.x, sel.y);
   const at = Math.min(n, steps.length);
@@ -1101,7 +1102,7 @@ const FINDINGS: { id: Finding; title: string; body: ReactNode; scored: boolean }
         vi={
           <>
             Kernel được khai báo là <Cw>(Pout, Pin, width, height)</Cw>; lời gọi ở p. 50 truyền{' '}
-            <Cw>(Pin_d, Pout_d, m, n)</Cw>. Như bản in, kernel sẽ đọc từ bộ đệm đầu ra và ghi vào chính
+            <Cw>(Pin_d, Pout_d, m, n)</Cw>. Như bản in, kernel sẽ đọc từ buffer đầu ra và ghi vào chính
             ảnh mà lẽ ra nó phải đọc.
           </>
         }
@@ -1365,7 +1366,7 @@ export const questionsS32: Record<string, Question> = {
               Chiều x của lưới giờ lấy từ chiều cao: ceil(62/16) = 4 khối, 64 cột luồng. Chiều y lấy từ chiều rộng:
               5 khối, 80 hàng luồng. Cả 62 hàng đều được tới, nhưng các cột 64 đến 75 không có luồng nào:{' '}
               {BOOK.width - SWAPPED.coveredCols} cột × {BOOK.height} hàng = {SWAPPED.unreached} điểm ảnh giữ nguyên bất cứ
-              thứ gì bộ đệm đang chứa.
+              thứ gì buffer đang chứa.
             </p>
             <p>
               Lệnh khởi chạy còn tạo ra một hàng 4 khối, các hàng luồng 64 đến 79, trong đó không luồng nào làm việc. Và
@@ -1622,8 +1623,8 @@ export const questionsS32: Record<string, Question> = {
       },
       { label: <Translated vi="Mỗi phần tử là 4 byte, nên từ điểm ảnh thứ hai trở đi nó đọc sai byte.">Each element is 4 bytes, so from the second pixel on it reads the wrong bytes.</Translated>, correct: true },
       {
-        label: <Translated vi="Nó không biên dịch: một bộ đệm device không thể chứa kiểu vector.">It does not compile: a device buffer cannot hold a vector type.</Translated>,
-        why: <Translated vi="Bộ đệm có thể chứa kiểu vector. Vấn đề nằm ở kích thước của chúng.">Buffers may hold vector types. The trouble is their size.</Translated>,
+        label: <Translated vi="Nó không biên dịch: một buffer device không thể chứa kiểu vector.">It does not compile: a device buffer cannot hold a vector type.</Translated>,
+        why: <Translated vi="Buffer có thể chứa kiểu vector. Vấn đề nằm ở kích thước của chúng.">Buffers may hold vector types. The trouble is their size.</Translated>,
       },
       {
         label: <Translated vi="Nó đọc đúng các byte nhưng theo thứ tự b, g, r.">It reads the right bytes in the order b, g, r.</Translated>,
@@ -1636,7 +1637,7 @@ export const questionsS32: Record<string, Question> = {
           <p>
             <code>Pin[i]</code> trên một <code>uchar3*</code> nằm ở byte 4·i, còn dữ liệu có một điểm ảnh cứ mỗi 3 byte. Điểm ảnh 0
             đúng, điểm ảnh 1 bắt đầu trễ một byte, và từ đó càng lúc càng tệ hơn. Hãy giữ phép tính của sách trên một{' '}
-            <code>uchar*</code> (<code>rgbOffset = grayOffset*3</code>), hoặc khai báo bộ đệm là{' '}
+            <code>uchar*</code> (<code>rgbOffset = grayOffset*3</code>), hoặc khai báo buffer là{' '}
             <code>packed_uchar3</code>, có kích thước 3 byte với căn lề 1.
           </p>
         }
@@ -1683,7 +1684,7 @@ export const questionsS32: Record<string, Question> = {
         why: <Translated vi="Một trong hai tạo đúng 76 × 62 luồng.">One of them creates exactly 76 × 62 threads.</Translated>,
       },
       {
-        label: <Translated vi="Không cái nào: Metal bỏ qua các lần ghi ra ngoài bộ đệm.">Neither: Metal discards writes outside a buffer.</Translated>,
+        label: <Translated vi="Không cái nào: Metal bỏ qua các lần ghi ra ngoài buffer.">Neither: Metal discards writes outside a buffer.</Translated>,
         why: (
           <Translated vi="Không trang nào chúng tôi đã kiểm tra nói vậy. Apple bảo bạn thoát sớm khi lưới lớn hơn dữ liệu.">
             Nothing in the pages we checked says so. Apple tells you to exit early when the grid is larger than the data.
@@ -2039,8 +2040,8 @@ export function S32() {
         vi={
           <p>
             Bạn sẽ muốn viết <code>Pin_d[row][col]</code>. C++ chỉ đánh chỉ số mảng hai chiều theo cách đó khi
-            nó biết số cột lúc biên dịch, và với một bộ đệm được cấp phát lúc chạy thì nó không biết. Vì vậy
-            bộ đệm là một chiều và bạn tự tính offset. Không mất gì cả. Bộ nhớ là một dãy phẳng các
+            nó biết số cột lúc biên dịch, và với một buffer được cấp phát lúc chạy thì nó không biết. Vì vậy
+            buffer là một chiều và bạn tự tính offset. Không mất gì cả. Bộ nhớ là một dãy phẳng các
             byte có địa chỉ, nên mọi mảng đa chiều đều được làm phẳng ở đâu đó: với mảng tĩnh thì trình biên dịch làm
             việc đó, với mảng động thì bạn làm.
           </p>
@@ -2124,7 +2125,7 @@ export function S32() {
           vi={
             <p>
               nvcc giờ chấp nhận C++ tới C++23, và libcu++ của NVIDIA có <code>cuda::std::mdspan</code>, nhờ đó một
-              kernel có thể viết <code>m(row, col)</code> trên một bộ đệm phẳng (<code>operator()</code>, vì{' '}
+              kernel có thể viết <code>m(row, col)</code> trên một buffer phẳng (<code>operator()</code>, vì{' '}
               <code>operator[]</code> bị tắt). Chưa kiểm chứng: bản toolkit nào đưa nó vào đầu tiên. Chính hướng dẫn của NVIDIA,
               llama.cpp, MLX và PyTorch đều vẫn làm phẳng bằng tay, và các lab ở đây cũng vậy.
             </p>
@@ -2164,8 +2165,8 @@ export function S32() {
       <Translated
         vi={
           <p>
-            Bạn đã dùng bố cục này nhiều năm. Một tensor PyTorch là một bộ đệm phẳng cộng một bộ các bước nhảy (stride), và{' '}
-            <code>x.stride()</code> là bước nhảy trong bộ đệm đó cho một bước dọc theo mỗi chiều. Một tensor liền kề có
+            Bạn đã dùng bố cục này nhiều năm. Một tensor PyTorch là một buffer phẳng cộng một bộ các bước nhảy (stride), và{' '}
+            <code>x.stride()</code> là bước nhảy trong buffer đó cho một bước dọc theo mỗi chiều. Một tensor liền kề có
             shape (2, 5) có stride (5, 1): một bước xuống là 5 phần tử và một bước ngang là 1, tức là{' '}
             <code>row*Width + col</code> với chiều rộng 5. Tên PyTorch đặt cho bố cục này, <code>contiguous_format</code>,
             được định nghĩa bằng các bước nhảy theo thứ tự giảm dần. Đánh dấu "hiện các bước nhảy" trong trình khám phá ở trên là bạn đang nhìn thấy
@@ -2610,7 +2611,7 @@ export function S32() {
       <Translated
         vi={
           <p>
-            Bên trong kernel, có ba điều cần cẩn thận. Một ảnh dạng byte là một bộ đệm thường, <code>device uchar*</code>, đánh chỉ số
+            Bên trong kernel, có ba điều cần cẩn thận. Một ảnh dạng byte là một buffer thường, <code>device uchar*</code>, đánh chỉ số
             y hệt như trong CUDA, nhưng đừng dùng <code>uchar3</code> để đọc một điểm ảnh: trong Metal Shading Language nó
             chiếm 4 byte. Hãy giữ phép tính <code>rgbOffset</code> trên một con trỏ <code>uchar</code>, hoặc dùng{' '}
             <code>packed_uchar3</code>, có kích thước 3. Không có <code>double</code>, nên hãy viết <code>0.299f</code> với hậu

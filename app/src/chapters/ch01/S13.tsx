@@ -1056,7 +1056,7 @@ export const questions13: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Trong một bước decode, việc lấy mẫu và các lần chép cấp dữ liệu cho nó chạy trên host và chiếm 8% thời gian. Mọi thứ
+            Trong một bước decode, việc lấy mẫu và các lần sao chép cấp dữ liệu cho nó chạy trên host và chiếm 8% thời gian. Mọi thứ
             khác là kernel. Dù bạn làm các kernel nhanh đến đâu, bước đó có thể được lợi tối đa bao nhiêu từ đầu đến cuối?
           </>
         }
@@ -1479,7 +1479,7 @@ export function S13() {
             <p>
               Chỉ có hai phần, và chúng không chồng lấn về thời gian; chương 22 (<a href={href('ch22', '22.3')}>§22.3</a>) nới
               lỏng điều đó. Phần không đụng tới được giả định giữ nguyên kích thước, dù việc chuyển công việc sang GPU thêm vào đó
-              các lần chép và khởi chạy kernel. Kích thước bài toán cố định.
+              các lần sao chép và khởi chạy kernel. Kích thước bài toán cố định.
             </p>
           }
         >

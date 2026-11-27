@@ -461,7 +461,7 @@ export function Labs() {
             Chạy <code>python3 labs/pmpp.py run 5.3</code>. Các bài kiểm thử là những hình dạng được chọn để làm hỏng một kernel
             vẫn còn nghĩ theo ma trận vuông: ví dụ 3×3 của sách với ô rộng hơn, một phần tử duy nhất, đúng một ô, một trường hợp
             chữ nhật mà mọi thứ đều là bội số của ô, một trường hợp không gì là bội số, một hàng duy nhất (một token qua một lớp
-            tuyến tính), một tích ngoài, và trên thiết bị thêm hai trường hợp lớn và khó chịu. Bộ đệm đầu ra được điền trước một
+            tuyến tính), một tích ngoài, và trên thiết bị thêm hai trường hợp lớn và khó chịu. Buffer đầu ra được điền trước một
             giá trị đánh dấu, nên một phần tử mà kernel của bạn không bao giờ ghi sẽ bị phát hiện. Với{' '}
             <code>--bench</code>, một lớp có 1024 đầu vào và 4096 đầu ra được đo thời gian ở các kích thước batch từ 1 đến 1024.
           </p>

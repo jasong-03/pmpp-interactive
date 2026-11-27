@@ -447,7 +447,7 @@ function Shared({ cursor, head, foot }: { cursor: number; head: string; foot?: s
         )}
       </Box>
       <text x={g.narrow ? g.bytes.x : g.W / 2} y={g.narrow ? g.bytes.y + 14 : g.bytes.y} fontSize="12" textAnchor="middle" fontWeight="600" style={{ whiteSpace: 'pre' }}>
-        {tr('bytes across:', 'byte đã qua:')} {pic.bytes}{'   ·   '}{tr('copies:', 'bản sao:')} {run(p, Math.floor(cursor)).copies}
+        {tr('bytes across:', 'byte đã qua:')} {pic.bytes}{'   ·   '}{tr('copies:', 'lần sao chép:')} {run(p, Math.floor(cursor)).copies}
       </text>
       <Lanes g={g} steps={steps} cursor={cursor} labels={p.calls.map((c) => slotLabel(p, c.id))} />
       <Status g={g} parts={[tr(`host thread: ${hostText}`, `luồng host: ${hostText}`), tr(`device: ${devText}`, `device: ${devText}`), tr(`free calls: ${pic.frees}`, `lời gọi free: ${pic.frees}`)]} />
@@ -547,11 +547,11 @@ const beats: Beat[] = [
     draw: (p) =>
       p < 0.4 ? (
         <Separate cursor={CALLS} head={tr(`The bill: ${N} additions, ${BILL.bytesMoved} bytes across the boundary`, `Hóa đơn: ${N} phép cộng, ${BILL.bytesMoved} byte qua ranh giới`)}
-          foot={p > 0.12 ? tr(`${BILL.bytesMoved / N} bytes moved for every element added, ${BILL.copies} copies, ${BILL.frees} free calls`, `${BILL.bytesMoved / N} byte được chuyển cho mỗi phần tử được cộng, ${BILL.copies} bản sao, ${BILL.frees} lời gọi free`) : undefined} />
+          foot={p > 0.12 ? tr(`${BILL.bytesMoved / N} bytes moved for every element added, ${BILL.copies} copies, ${BILL.frees} free calls`, `${BILL.bytesMoved / N} byte được chuyển cho mỗi phần tử được cộng, ${BILL.copies} lần sao chép, ${BILL.frees} lời gọi free`) : undefined} />
       ) : (
         <Shared cursor={ramp(p, 0.44, 0.9) * SCENE_METAL.calls.length} head={tr('The same steps with one shared memory', 'Cùng các bước với một bộ nhớ dùng chung')}
           foot={p > 0.9
-            ? tr(`${SHARED_END.bytesMoved} bytes across, ${SHARED_END.copies} copies, ${SHARED_END.frees} free calls, and still one wait before the read`, `${SHARED_END.bytesMoved} byte đã qua, ${SHARED_END.copies} bản sao, ${SHARED_END.frees} lời gọi free, và vẫn một lần chờ trước khi đọc`)
+            ? tr(`${SHARED_END.bytesMoved} bytes across, ${SHARED_END.copies} copies, ${SHARED_END.frees} free calls, and still one wait before the read`, `${SHARED_END.bytesMoved} byte đã qua, ${SHARED_END.copies} lần sao chép, ${SHARED_END.frees} lời gọi free, và vẫn một lần chờ trước khi đọc`)
             : undefined} />
       ),
   },

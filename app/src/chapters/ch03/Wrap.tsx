@@ -107,7 +107,7 @@ export const questionsWrap: Record<string, Question> = {
               Trên trình giả lập (emulator) CPU của khóa học, vốn chạy từng luồng một, ba thứ tự luồng mà các lab dùng (theo thứ
               tự, đảo ngược, xáo trộn) để lại lần lượt 4, 64 và 37 trên 200 phần tử bằng 1.0 (emulator-checked:{' '}
               <code>python3 labs/ch03/snippets/check.py</code>; không dùng GPU nào). Cách sửa là cách mục 3.3 đã dùng cho phép làm
-              mờ: ghi sang một bộ đệm thứ hai, hoặc truyền các số chia trong một mảng riêng mà không luồng nào ghi.
+              mờ: ghi sang một buffer thứ hai, hoặc truyền các số chia trong một mảng riêng mà không luồng nào ghi.
             </p>
           </>
         }
@@ -129,7 +129,7 @@ export const questionsWrap: Record<string, Question> = {
       </Translated>
     ),
     source: 'our kernel; the discipline is that of ch. 3 §3.4, p. 60 (one thread, one output element), and of "Why two buffers" in section 3.3',
-    vi: { source: 'kernel của khóa học này; kỷ luật là của ch. 3 §3.4, p. 60 (một luồng, một phần tử đầu ra), và của "Vì sao cần hai bộ đệm" ở mục 3.3' },
+    vi: { source: 'kernel của khóa học này; kỷ luật là của ch. 3 §3.4, p. 60 (một luồng, một phần tử đầu ra), và của "Vì sao cần hai buffer" ở mục 3.3' },
   },
   'ch03/wrap/q-batched': {
     kind: 'choice',

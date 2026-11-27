@@ -269,27 +269,27 @@ export const questionsWrap: Record<string, Question> = {
     ),
     options: [
       {
-        label: <Translated vi="Không: rào chắn đó canh một phụ thuộc thật, thứ mà không số bộ đệm nào loại bỏ được.">No: that barrier guards a true dependence, which no number of buffers removes.</Translated>,
+        label: <Translated vi="Không: rào chắn đó canh một phụ thuộc thật, thứ mà không số buffer nào loại bỏ được.">No: that barrier guards a true dependence, which no number of buffers removes.</Translated>,
         correct: true,
       },
       {
-        label: <Translated vi="Có: với ba bộ đệm, không luồng nào có thể ghi đè một ô mà luồng khác vẫn đang đọc.">Yes: with three buffers no thread can overwrite a tile someone is still reading.</Translated>,
-        why: <Translated vi="Đó là phụ thuộc giả, và hai bộ đệm đã loại bỏ nó. Rào chắn còn lại liên quan đến việc đọc một giá trị trước khi nó được ghi.">That was the false dependence, and two buffers already removed it. The remaining barrier is about reading a value before it is written.</Translated>,
+        label: <Translated vi="Có: với ba buffer, không luồng nào có thể ghi đè một ô mà luồng khác vẫn đang đọc.">Yes: with three buffers no thread can overwrite a tile someone is still reading.</Translated>,
+        why: <Translated vi="Đó là phụ thuộc giả, và hai buffer đã loại bỏ nó. Rào chắn còn lại liên quan đến việc đọc một giá trị trước khi nó được ghi.">That was the false dependence, and two buffers already removed it. The remaining barrier is about reading a value before it is written.</Translated>,
       },
       {
         label: <Translated vi="Có, trên phần cứng chạy một warp theo kiểu đồng bộ từng bước (lockstep).">Yes, on hardware that runs a warp in lockstep.</Translated>,
         why: <Translated vi="Một khối 16 × 16 là tám warp 32 luồng, và không có gì bảo đảm các lần nạp của warp này xảy ra trước các lần đọc của warp khác.">A 16 × 16 block is eight warps of 32, and nothing orders one warp's loads before another warp's reads.</Translated>,
       },
       {
-        label: <Translated vi="Không: ba bộ đệm cần hai rào chắn mỗi giai đoạn.">No: three buffers need two barriers per phase.</Translated>,
-        why: <Translated vi="Thêm bộ đệm không bao giờ thêm rào chắn. Chúng chỉ làm cho việc chờ ghi-sau-đọc trở nên không cần thiết.">More buffers never add barriers. They only make the write-after-read wait unnecessary.</Translated>,
+        label: <Translated vi="Không: ba buffer cần hai rào chắn mỗi giai đoạn.">No: three buffers need two barriers per phase.</Translated>,
+        why: <Translated vi="Thêm buffer không bao giờ thêm rào chắn. Chúng chỉ làm cho việc chờ ghi-sau-đọc trở nên không cần thiết.">More buffers never add barriers. They only make the write-after-read wait unnecessary.</Translated>,
       },
     ],
     explain: (
       <Translated
         vi={
           <p>
-            Bộ đệm tách biệt vị trí, và điều đó chỉ loại bỏ các lần chờ ghi-sau-đọc. Rào chắn sau các lần nạp là một lần chờ đọc-sau-ghi: tích vô hướng đọc các ô nhớ trong tile mà các luồng khác ghi trong cùng giai đoạn. Điều mà thêm bộ đệm có thể làm là cho các lần nạp của giai đoạn tiếp theo bắt đầu sớm, việc này cần một phép sao chép mà các luồng không phải chờ; đó là hướng chương 15 đưa bộ đệm kép tới.
+            Buffer tách biệt vị trí, và điều đó chỉ loại bỏ các lần chờ ghi-sau-đọc. Rào chắn sau các lần nạp là một lần chờ đọc-sau-ghi: tích vô hướng đọc các ô nhớ trong tile mà các luồng khác ghi trong cùng giai đoạn. Điều mà thêm buffer có thể làm là cho các lần nạp của giai đoạn tiếp theo bắt đầu sớm, việc này cần một phép sao chép mà các luồng không phải chờ; đó là hướng chương 15 đưa buffer kép tới.
           </p>
         }
       >
@@ -444,7 +444,7 @@ export function Wrap() {
         <Translated
           vi={
             <li>
-              Gộp việc, trải vòng lặp và bộ đệm kép, mỗi thứ tiêu một thứ (tính song song, thanh ghi, bộ nhớ chia sẻ) để loại bỏ một thứ (chi phí phụ, các lần chờ, một rào chắn). Mỗi thứ chỉ có lợi khi thứ nó loại bỏ đang tốn thời gian.
+              Gộp việc, trải vòng lặp và buffer kép, mỗi thứ tiêu một thứ (tính song song, thanh ghi, bộ nhớ chia sẻ) để loại bỏ một thứ (chi phí phụ, các lần chờ, một rào chắn). Mỗi thứ chỉ có lợi khi thứ nó loại bỏ đang tốn thời gian.
             </li>
           }
         >
@@ -624,7 +624,7 @@ export function Wrap() {
         <Translated
           vi={
             <li>
-              p. 147 nói bộ đệm kép loại bỏ rào chắn &ldquo;thứ hai&rdquo;; theo chính phân tích và mã của sách, rào chắn bị loại bỏ là cái thứ nhất, sau lần đọc. Trong vòng lặp của lab 6.5, vốn nạp trước, thì đó là cái thứ hai. Xem <a href={href('ch06', '6.7')}>6.7</a>.
+              p. 147 nói buffer kép loại bỏ rào chắn &ldquo;thứ hai&rdquo;; theo chính phân tích và mã của sách, rào chắn bị loại bỏ là cái thứ nhất, sau lần đọc. Trong vòng lặp của lab 6.5, vốn nạp trước, thì đó là cái thứ hai. Xem <a href={href('ch06', '6.7')}>6.7</a>.
             </li>
           }
         >

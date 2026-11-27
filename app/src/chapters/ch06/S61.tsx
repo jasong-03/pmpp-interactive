@@ -2461,7 +2461,7 @@ export function S61() {
       <Translated
         vi={
           <p>
-            Lab 6.1 quét bước nhảy của một lần đọc từ 1 đến 64 float và đo thời gian hai phép chuyển vị so với một bản sao
+            Lab 6.1 quét bước nhảy của một lần đọc từ 1 đến 64 float và đo thời gian hai phép chuyển vị so với một phép sao
             chép thuần. Trang lab có chi tiết: <a href={href('ch06', 'labs')}>lab</a>.
           </p>
         }

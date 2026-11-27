@@ -653,7 +653,7 @@ export function S69() {
       <Translated
         vi={
           <p>
-            Mọi tối ưu hóa trong danh sách kiểm tra đều tiêu thêm một tài nguyên để giải tỏa tài nguyên khác. Phân ô tiêu bộ nhớ chia sẻ để giải tỏa băng thông toàn cục; bộ đệm kép tiêu bộ nhớ chia sẻ để bỏ một rào chắn; gộp việc tiêu tính song song để loại bỏ một chi phí. Hai hệ quả theo sau, và chúng là toàn bộ chiến lược. Nếu tài nguyên được giải tỏa không phải thứ đang giới hạn kernel, chẳng có gì nhanh hơn. Nếu tài nguyên bị tiêu chính là thứ đang giới hạn nó, kernel sẽ chậm đi.
+            Mọi tối ưu hóa trong danh sách kiểm tra đều tiêu thêm một tài nguyên để giải tỏa tài nguyên khác. Phân ô tiêu bộ nhớ chia sẻ để giải tỏa băng thông toàn cục; buffer kép tiêu bộ nhớ chia sẻ để bỏ một rào chắn; gộp việc tiêu tính song song để loại bỏ một chi phí. Hai hệ quả theo sau, và chúng là toàn bộ chiến lược. Nếu tài nguyên được giải tỏa không phải thứ đang giới hạn kernel, chẳng có gì nhanh hơn. Nếu tài nguyên bị tiêu chính là thứ đang giới hạn nó, kernel sẽ chậm đi.
           </p>
         }
       >

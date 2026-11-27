@@ -6,7 +6,7 @@ import { Bench, Beyond, Simplification, Source, Today, type Tier } from '../../c
 import { useProgress } from '../../lib/progress';
 import { benchRows, fmt, num, useReports, type Reports } from '../../lib/reports';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   CLASS_LABEL,
   DEFECTS,
@@ -263,11 +263,12 @@ function StubView({ prog, env, step, setStep, measured, status, label }: {
   label: string;
 }) {
   const { lines, range } = useMemo(() => listing(prog), [prog]);
-  const end = useMemo(() => run(prog, prog.calls.length, env), [prog, env]);
+  const locale = useLocale();
+  const end = useMemo(() => run(prog, prog.calls.length, env), [prog, env, locale]);
   const total = end.stoppedAt ?? prog.calls.length;
   const at = Math.min(step, total);
-  const s = useMemo(() => run(prog, at, env), [prog, at, env]);
-  const before = useMemo(() => (at > 0 ? run(prog, at - 1, env) : null), [prog, at, env]);
+  const s = useMemo(() => run(prog, at, env), [prog, at, env, locale]);
+  const before = useMemo(() => (at > 0 ? run(prog, at - 1, env) : null), [prog, at, env, locale]);
   const call = at > 0 ? prog.calls[at - 1] : null;
   const shared = prog.memory === 'shared';
   const groups = groupsOf(prog);
@@ -435,7 +436,7 @@ function StubView({ prog, env, step, setStep, measured, status, label }: {
               {s.pointers.map((ptr) => (
                 <tr key={ptr.name} data-pointer={ptr.name}>
                   <td><code>{ptr.name}</code></td>
-                  <td>{ptr.refersTo}</td>
+                  <td>{tr(ptr.refersTo, ({ 'the one shared memory': 'bộ nhớ dùng chung duy nhất', 'host memory': 'bộ nhớ host', 'nothing yet': 'chưa trỏ tới đâu', 'freed device memory': 'bộ nhớ device đã giải phóng', 'device memory': 'bộ nhớ device' } as Record<string, string>)[ptr.refersTo] ?? ptr.refersTo)}</td>
                   <td>{ptr.hostMayUse ? tr('yes', 'có') : tr('no', 'không')}</td>
                 </tr>
               ))}
@@ -511,7 +512,8 @@ function RoundTripStepper() {
   const [backend, setBackend] = useState<Backend>('cuda');
   const [iface, setIface] = useState<Iface>('buffers');
   const [step, setStep] = useState(0);
-  const prog = useMemo(() => program(backend, iface), [backend, iface]);
+  const locale = useLocale();
+  const prog = useMemo(() => program(backend, iface), [backend, iface, locale]);
   useEffect(() => setStep(0), [backend, iface]);
   const measured = measuredPhases(reports, backend, prog);
   return (
@@ -613,9 +615,10 @@ function BreakTheStub() {
   const [step, setStep] = useState(0);
   const over = round >= HUNT_ROUNDS;
   const defect = order[Math.min(round, HUNT_ROUNDS - 1)];
-  const dev = useMemo(() => outcome(defect, 'cuda'), [defect]);
-  const emu = useMemo(() => outcome(defect, 'emu'), [defect]);
-  const all = useMemo(() => (['cuda', 'hip', 'emu', 'metal'] as Env[]).map((e) => outcome(defect, e)), [defect]);
+  const locale = useLocale();
+  const dev = useMemo(() => outcome(defect, 'cuda'), [defect, locale]);
+  const emu = useMemo(() => outcome(defect, 'emu'), [defect, locale]);
+  const all = useMemo(() => (['cuda', 'hip', 'emu', 'metal'] as Env[]).map((e) => outcome(defect, e)), [defect, locale]);
   const stopCall = emu.stoppedAt != null ? emu.program!.calls[emu.stoppedAt - 1] : null;
   const right = pick === defect;
   const next = () => {
@@ -1569,7 +1572,7 @@ export const questionsS24: Record<string, Question> = {
         vi={
           <p>
             <code>commit</code> trả về trong khi Metal vẫn đang chuẩn bị và lên lịch công việc. Với shared storage không
-            có bản sao nào để nấp sau, nên việc giữ đúng thứ tự là trách nhiệm của bạn: hoàn tất công việc của GPU trên
+            có lần sao chép nào để nấp sau, nên việc giữ đúng thứ tự là trách nhiệm của bạn: hoàn tất công việc của GPU trên
             một buffer trước khi CPU chạm vào nó, mà trên thực tế nghĩa là <code>waitUntilCompleted</code> hoặc một
             completion handler. Đây là nhiệm vụ duy nhất của stub CUDA còn tồn tại trên Apple silicon.
           </p>

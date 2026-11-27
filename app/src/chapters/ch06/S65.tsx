@@ -409,12 +409,12 @@ function PitfallCards() {
               <p style={{ marginTop: 0 }}>{p.scenario}</p>
               <div className="row" role="group" aria-label={tr('your prediction', 'dự đoán của bạn')}>
                 {VERDICTS.map((v) => (
-                  <button key={v} aria-pressed={mine === v} onClick={() => setPick({ ...pick, [p.id]: v })}>{v}</button>
+                  <button key={v} aria-pressed={mine === v} onClick={() => setPick({ ...pick, [p.id]: v })}>{tr(v, ({ helps: 'có ích', 'little or no change': 'ít hoặc không thay đổi', 'can hurt': 'có thể có hại' } as Record<string, string>)[v] ?? v)}</button>
                 ))}
               </div>
               {mine ? (
                 <p style={{ marginBottom: 0 }} data-k="reveal">
-                  <span className={'chip ' + (mine === p.answer ? 'ok' : 'fail')}>{mine === p.answer ? tr('right', 'đúng') : tr('the answer', 'đáp án')}: {p.answer}</span>{' '}
+                  <span className={'chip ' + (mine === p.answer ? 'ok' : 'fail')}>{mine === p.answer ? tr('right', 'đúng') : tr('the answer', 'đáp án')}: {tr(p.answer, ({ helps: 'có ích', 'little or no change': 'ít hoặc không thay đổi', 'can hurt': 'có thể có hại' } as Record<string, string>)[p.answer] ?? p.answer)}</span>{' '}
                   {p.why} <span className="muted">({/[–,]/.test(p.pages) ? 'pp.' : 'p.'} {p.pages})</span>
                 </p>
               ) : null}

@@ -1527,7 +1527,7 @@ export const questionsS52: Record<string, Question> = {
             <>
               Bạn chuyển một chương trình CUDA sang Metal trên Apple silicon. Bản CUDA chép đầu vào sang device, khởi chạy kernel
               rồi chép kết quả về. Trong bản Metal, đầu vào và đầu ra là các buffer ở chế độ lưu trữ shared. Chuyện gì xảy ra với
-              hai lần chép đó?
+              hai lần sao chép đó?
             </>
           }
         >
@@ -2366,7 +2366,7 @@ export function S52() {
                 <Translated
                   vi={
                     <>
-                      Một lần chép tường minh. Chiều chép được gọi tên bằng <code>cudaMemcpyHostToDevice</code>.
+                      Một lần sao chép tường minh. Chiều chép được gọi tên bằng <code>cudaMemcpyHostToDevice</code>.
                     </>
                   }
                 >
@@ -2377,7 +2377,7 @@ export function S52() {
                 <Translated
                   vi={
                     <>
-                      Một lần chép tường minh, <code>hipMemcpyHostToDevice</code>.
+                      Một lần sao chép tường minh, <code>hipMemcpyHostToDevice</code>.
                     </>
                   }
                 >
@@ -2477,7 +2477,7 @@ export function S52() {
         vi={
           <p>
             Metal đổi bộ từ vựng, và trên Apple silicon nó đổi phần dưới của bản đồ bộ nhớ. Trong bản đồ, host nằm dưới một ranh
-            giới, và trong CUDA dữ liệu vượt ranh giới đó bằng một lần chép. Trên Apple silicon, CPU và GPU dùng chung bộ nhớ hệ
+            giới, và trong CUDA dữ liệu vượt ranh giới đó bằng một lần sao chép. Trên Apple silicon, CPU và GPU dùng chung bộ nhớ hệ
             thống. Một buffer tạo ở chế độ lưu trữ shared là một vùng cấp phát duy nhất mà cả hai đều truy cập được, nên một lần
             chép từ host sang device không có gì để di chuyển, và không lời gọi nào thay thế nó. Điều còn lại với bạn là thứ tự:
             khi một bên có công việc đã lập lịch làm thay đổi buffer, bên kia không được chạm vào nó cho đến khi công việc đó hoàn

@@ -626,7 +626,7 @@ const MAP: { part: string; rows: [string, string, string][] }[] = [
       return tr('Synchronisation', 'Đồng bộ hóa');
     },
     get rows(): [string, string, string][] {
-      return [['6.7', tr('Double buffering', 'Bộ đệm kép'), tr('Removing the barrier that only protects a location', 'Bỏ rào chắn chỉ bảo vệ một vị trí')]];
+      return [['6.7', tr('Double buffering', 'Buffer kép'), tr('Removing the barrier that only protects a location', 'Bỏ rào chắn chỉ bảo vệ một vị trí')]];
     },
   },
   {
@@ -667,7 +667,7 @@ const LABS = (): [string, string, string][] => [
     ),
     '6.1, 6.4',
   ],
-  ['6.5', tr('Double buffering, with a race detector watching', 'Bộ đệm kép, với một bộ phát hiện race condition theo dõi'), '6.7'],
+  ['6.5', tr('Double buffering, with a race detector watching', 'Buffer kép, với một bộ phát hiện race condition theo dõi'), '6.7'],
 ];
 
 export function S60() {
@@ -682,7 +682,7 @@ export function S60() {
             mà các luồng của một warp cùng yêu cầu, bao nhiêu yêu cầu đang bay cùng lúc, và mỗi yêu cầu rộng bao nhiêu.
             Chương bắt đầu từ chính các chip nhớ (vì sao chúng giao dữ liệu theo từng loạt, và qua các kênh và bank song
             song), chuyển sang các bank của bộ nhớ chia sẻ (shared memory), rồi thêm ba công cụ thay đổi lượng việc mỗi luồng
-            làm và mức độ thường xuyên nó phải chờ: gộp việc, trải vòng lặp và bộ đệm kép. Chương kết thúc bằng một danh
+            làm và mức độ thường xuyên nó phải chờ: gộp việc, trải vòng lặp và buffer kép. Chương kết thúc bằng một danh
             sách kiểm tra mọi tối ưu hóa trong Phần 1, và một phương pháp để chọn giữa chúng.
           </p>
         }

@@ -440,7 +440,7 @@ export const questionsWrap: Record<string, Question> = {
         get label() {
           return tr(
             'Steps 3 and 6, the two copies: both processors read the same memory.',
-            'Bước 3 và 6, hai lần chép: cả hai bộ xử lý đọc cùng một bộ nhớ.',
+            'Bước 3 và 6, hai lần sao chép: cả hai bộ xử lý đọc cùng một bộ nhớ.',
           );
         },
         correct: true,

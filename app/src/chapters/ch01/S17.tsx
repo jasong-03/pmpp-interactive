@@ -1745,7 +1745,7 @@ export function S17() {
             Phần giới thiệu chương 2 của sách nêu một công thức sáu bước để chuyển một phép tính sang GPU (§1.7, p. 15): chọn
             phần cần song song hóa, cấp phát bộ nhớ device, chép dữ liệu sang, viết kernel, khởi chạy nó, chép kết quả về. Chương
             2 đi qua nó, nên ở đây chỉ nêu tên. Trình tự phía host của Apple cho một kernel tính toán Metal phủ cùng nội dung dưới
-            tên khác, không có hai lần chép: trên Apple silicon, một buffer ở chế độ lưu trữ shared hiện ra với cả hai bộ xử lý
+            tên khác, không có hai lần sao chép: trên Apple silicon, một buffer ở chế độ lưu trữ shared hiện ra với cả hai bộ xử lý
             (xem câu hỏi cuối của <a href={href('ch01', 'wrap')}>phần tóm tắt</a>).
           </p>
         }

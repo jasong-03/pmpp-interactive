@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Scene, type Beat } from '../../components/Scene';
 import { KIND_LABEL, firstFailure, isDouble, run, stateAt, tileBytes, type Trace, type Variant } from '../../sim/doublebuf';
-import { Translated, tr as trText } from '../../lib/i18n';
+import { Translated, getLocale, tr as trText } from '../../lib/i18n';
 
 // "Two buffers, one barrier": four threads running the book's exchange loop
 // (section 6.7) under the in-order schedule. Every frame of beats 1 to 5 is a state
@@ -11,7 +11,8 @@ import { Translated, tr as trText } from '../../lib/i18n';
 const P = 4;
 const N = 2;
 const traces: Record<string, Trace> = {};
-const traceOf = (v: Variant) => (traces[v] ??= run({ threads: P, iterations: N, variant: v }, 'in-order'));
+// Cached per language: a trace carries its failure messages in the language active when it was run.
+const traceOf = (v: Variant) => (traces[getLocale() + v] ??= run({ threads: P, iterations: N, variant: v }, 'in-order'));
 
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 const ramp = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
@@ -114,11 +115,11 @@ function Frame({ variant, n, showB, headline, sub }: FrameProps) {
   return (
     <svg data-variant={variant} data-step={n} viewBox="0 0 600 350" role="img" aria-label={trText('Four threads exchanging values through shared memory', 'Bốn luồng trao đổi giá trị qua bộ nhớ chia sẻ')} style={{ width: '100%', maxWidth: 600, display: 'block' }}>
       <text x={24} y={26} fontSize="13" fontWeight="600" style={{ fill: 'var(--ink)' }}>{headline}</text>
-      <text x={24} y={AY + 28} fontSize="12" fontWeight="600" style={{ fill: 'var(--shared)' }}>{dbl || b > 0 ? trText('buffer A', 'bộ đệm A') : trText('buffer', 'bộ đệm')}</text>
+      <text x={24} y={AY + 28} fontSize="12" fontWeight="600" style={{ fill: 'var(--shared)' }}>{dbl || b > 0 ? trText('buffer A', 'buffer A') : trText('buffer', 'buffer')}</text>
       {[0, 1, 2, 3].map((s) => slot(0, s))}
       {b > 0 ? (
         <g opacity={b}>
-          <text x={24} y={BY + 28} fontSize="12" fontWeight="600" style={{ fill: 'var(--shared)' }}><Translated vi="bộ đệm B">buffer B</Translated></text>
+          <text x={24} y={BY + 28} fontSize="12" fontWeight="600" style={{ fill: 'var(--shared)' }}><Translated vi="buffer B">buffer B</Translated></text>
           {[0, 1, 2, 3].map((s) => slot(1, s))}
         </g>
       ) : null}
@@ -248,7 +249,7 @@ const beats: Beat[] = [
   {
     clip: 'double-buffer-1',
     get label() {
-      return trText('One buffer', 'Một bộ đệm');
+      return trText('One buffer', 'Một buffer');
     },
     draw: (p) => (
       <Frame variant="single-both" n={stepAt(p, traceOf('single-both').steps.length, 0.95)}
@@ -281,18 +282,18 @@ const beats: Beat[] = [
     },
     draw: (p) => (
       <Frame variant="single-no-read-barrier" n={fail2} showB={ramp(p, 0.45, 0.75)}
-        headline={p < 0.45 ? trText('iteration 0 reads slot 0, iteration 0 writes slot 0: the same place', 'vòng lặp 0 đọc ô nhớ 0, vòng lặp 0 ghi ô nhớ 0: cùng một chỗ') : trText('a second buffer for the writes', 'một bộ đệm thứ hai cho các lần ghi')} />
+        headline={p < 0.45 ? trText('iteration 0 reads slot 0, iteration 0 writes slot 0: the same place', 'vòng lặp 0 đọc ô nhớ 0, vòng lặp 0 ghi ô nhớ 0: cùng một chỗ') : trText('a second buffer for the writes', 'một buffer thứ hai cho các lần ghi')} />
     ),
   },
   {
     clip: 'double-buffer-5',
     get label() {
-      return trText('Two buffers', 'Hai bộ đệm');
+      return trText('Two buffers', 'Hai buffer');
     },
     draw: (p) => (
       <Frame variant="double" n={stepAt(p, traceOf('double').steps.length, 0.95)}
-        headline={trText('two buffers: read one, write the other, one barrier, swap', 'hai bộ đệm: đọc một, ghi cái kia, một rào chắn, hoán đổi')}
-        sub={trText('a thread that runs ahead writes into the other buffer', 'một luồng chạy trước sẽ ghi vào bộ đệm kia')} />
+        headline={trText('two buffers: read one, write the other, one barrier, swap', 'hai buffer: đọc một, ghi cái kia, một rào chắn, hoán đổi')}
+        sub={trText('a thread that runs ahead writes into the other buffer', 'một luồng chạy trước sẽ ghi vào buffer kia')} />
     ),
   },
   {
@@ -305,5 +306,5 @@ const beats: Beat[] = [
 ];
 
 export function DoubleBufferScene() {
-  return <Scene chapter="ch06" title={trText('Two buffers, one barrier', 'Hai bộ đệm, một rào chắn')} beats={beats} />;
+  return <Scene chapter="ch06" title={trText('Two buffers, one barrier', 'Hai buffer, một rào chắn')} beats={beats} />;
 }

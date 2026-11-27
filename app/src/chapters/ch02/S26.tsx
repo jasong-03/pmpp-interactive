@@ -5,7 +5,7 @@ import { Aside, Bench, Beyond, Simplification, Source, Today } from '../../compo
 import { solutionTabStatus } from '../../components/LabKit';
 import { useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   BOOK_BLOCK,
   BOOK_NS,
@@ -255,7 +255,8 @@ function LaunchCalculator() {
     setTyped(c);
   };
   const rows = useMemo(() => EXPRESSIONS.map((e) => ({ e, r: launchWith(e.key, n, B) })), [n, B]);
-  const count = useMemo(() => blockCount(key, n, B), [key, n, B]);
+  const locale = useLocale();
+  const count = useMemo(() => blockCount(key, n, B), [key, n, B, locale]);
   const r = rows.find((x) => x.e.key === key)!.r;
   const expr = expression(key);
 
@@ -464,7 +465,7 @@ function LaunchCalculator() {
                   {r.zero.map((z) => (
                     <tr key={z.backend} data-backend={z.backend}>
                       <td className="nowrap">{z.name}</td>
-                      <td className="nowrap"><b>{z.outcome}</b></td>
+                      <td className="nowrap"><b>{tr(z.outcome, ({ 'not documented': 'không có trong tài liệu', 'error, documented': 'lỗi, có trong tài liệu', error: 'lỗi' } as Record<string, string>)[z.outcome] ?? z.outcome)}</b></td>
                       <td>{z.outcome === 'not documented' ? z.detail : <code>{z.detail}</code>}</td>
                     </tr>
                   ))}

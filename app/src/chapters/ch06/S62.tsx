@@ -991,7 +991,7 @@ export const questionsS62: Record<string, Question> = {
         vi={
           <>
             Các phép nạp của một kernel được hợp nhất hoàn hảo, nhưng nó chỉ đạt một nửa băng thông bạn đã đo cho thiết bị
-            của mình bằng một bản sao chép đơn giản. Occupancy (mức chiếm dụng) của nó là 25 %. Lý do khả dĩ nhất là gì?
+            của mình bằng một phép sao chép đơn giản. Occupancy (mức chiếm dụng) của nó là 25 %. Lý do khả dĩ nhất là gì?
           </>
         }
       >
@@ -1025,7 +1025,7 @@ export const questionsS62: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Bản sao chép đơn giản của bạn đã đạt được nó, với cùng độ trễ. Đủ nhiều yêu cầu đang bay sẽ che được độ trễ.">
+          <Translated vi="Phép sao chép đơn giản của bạn đã đạt được nó, với cùng độ trễ. Đủ nhiều yêu cầu đang bay sẽ che được độ trễ.">
             Your simple copy reached it, against the same latency. Enough requests in flight hide it.
           </Translated>
         ),

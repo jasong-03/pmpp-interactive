@@ -3,7 +3,7 @@ import { Ask, Predict, type Question } from '../../components/Ask';
 import { Aside, Bench, Beyond, Simplification, Source } from '../../components/notes';
 import { Code, MATMUL_TIERS, useLabFile } from '../../components/Code';
 import { solutionTabStatus } from '../../components/LabKit';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -213,10 +213,11 @@ function BoundaryExplorer() {
   const by = Math.min(pos.by, g - 1);
   const ph = Math.min(pos.ph, nPh - 1);
 
+  const locale = useLocale();
   const { prob, res } = useMemo(() => {
     const prob = makeProblem(w);
     return { prob, res: runAll(config(w, t, opts), prob, 'lockstep') };
-  }, [w, t, opts]);
+  }, [w, t, opts, locale]);
   const sweep = useMemo(
     () =>
       TILES.map((tile) => ({

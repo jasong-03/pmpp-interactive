@@ -3,7 +3,7 @@ import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code, MATMUL_TIERS, useLabFile } from '../../components/Code';
 import { solutionTabStatus } from '../../components/LabKit';
 import { Aside, Bench, Beyond, Simplification, Source, TierLegend, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { benchRows, fmt, num, realBackends, useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -133,7 +133,8 @@ function Stepper() {
   const { width, tile } = SIZES[size];
   const cfg: Config = useMemo(() => ({ ...CORRECT, width, tile, barrier1: b1, barrier2: b2 }), [width, tile, b1, b2]);
   const prob = useMemo(() => makeProblem(width), [width]);
-  const trace = useMemo(() => runBlock(cfg, prob, bx, by, schedule, 5), [cfg, prob, bx, by, schedule]);
+  const locale = useLocale();
+  const trace = useMemo(() => runBlock(cfg, prob, bx, by, schedule, 5), [cfg, prob, bx, by, schedule, locale]);
   const total = trace.steps.length;
   const at = Math.min(n, total);
   const st = useMemo(() => stateAt(cfg, trace, at), [cfg, trace, at]);
@@ -617,7 +618,7 @@ export const questionsS54: Record<string, Question> = {
             nhớ cũng không loại bỏ được nó. Rào chắn 2 bảo vệ một phụ thuộc <b>giả</b>: bên ghi của pha sau không cần gì từ bên
             đọc của pha này; chúng chỉ không được phá hủy thứ vẫn đang được đọc (ghi sau đọc). Ghi vào chỗ khác thì xung đột đó
             biến mất. Chương 6 biến nhận xét này thành một kỹ thuật,{' '}
-            <a href={href('ch06', '6.7')}>phần 6.7, Bộ đệm kép (double buffering)</a>.
+            <a href={href('ch06', '6.7')}>phần 6.7, Buffer kép (double buffering)</a>.
           </p>
         }
       >

@@ -1484,16 +1484,16 @@ export const questionsS34: Record<string, Question> = {
     ),
     options: [
       {
-        label: <Translated vi="Bộ đệm trọng số đúng như PyTorch lưu nó.">The weight buffer exactly as PyTorch stores it.</Translated>,
+        label: <Translated vi="Buffer trọng số đúng như PyTorch lưu nó.">The weight buffer exactly as PyTorch stores it.</Translated>,
         why: (
-          <Translated vi="Kernel sẽ đọc một bộ đệm (out, in) như thể nó là (in, out). Với in ≠ out nó lấy sai phần tử; với in = out nó lặng lẽ tính x A thay vì x Aᵀ.">
+          <Translated vi="Kernel sẽ đọc một buffer (out, in) như thể nó là (in, out). Với in ≠ out nó lấy sai phần tử; với in = out nó lặng lẽ tính x A thay vì x Aᵀ.">
             The kernel would read an (out, in) buffer as if it were (in, out). With in ≠ out it fetches the wrong elements; with in = out it silently computes x A instead of x Aᵀ.
           </Translated>
         ),
       },
       {
         label: (
-          <Translated vi="Trọng số được chuyển vị một lần trên host thành một bộ đệm (in, out) theo thứ tự hàng.">
+          <Translated vi="Trọng số được chuyển vị một lần trên host thành một buffer (in, out) theo thứ tự hàng.">
             The weight transposed once on the host into an (in, out) row-major buffer.
           </Translated>
         ),
@@ -1522,7 +1522,7 @@ export const questionsS34: Record<string, Question> = {
           <p>
             Kernel của sách đọc toán hạng thứ hai dọc xuống một cột, <code>N[k*Width + col]</code>. PyTorch lưu mỗi hàng một
             đặc trưng đầu ra, nên cùng những con số đó nằm ở <code>W[col*in + k]</code>. Khi chỉ số giữ nguyên,
-            dữ liệu phải di chuyển để khớp với kernel. Con đường kia, nằm ngoài câu hỏi này, là giữ bộ đệm đã lưu
+            dữ liệu phải di chuyển để khớp với kernel. Con đường kia, nằm ngoài câu hỏi này, là giữ buffer đã lưu
             và đổi chỉ số của kernel thành <code>W[col*in + k]</code>; tích vẫn như nhau. Lab 3.3 đi con đường thứ nhất để
             hợp đồng của nó khớp với lab 5.3, và chương trình điều khiển (driver) của nó kiểm tra kết quả với x Aᵀ tính từ một trọng số được lưu
             theo cách của PyTorch.
@@ -1863,7 +1863,7 @@ export function S34() {
           vi={
             <p>
               Mỗi lần một luồng. Trên thiết bị, cả mười sáu luồng chạy cùng nhau, theo một thứ tự bạn không kiểm soát; hoạt hình
-              bên dưới cho thấy điều đó. Không có thời gian, không có bộ đệm (cache): trình chạy từng bước chính xác về việc mỗi bước đọc ô nào, ngoài ra không gì khác.
+              bên dưới cho thấy điều đó. Không có thời gian, không có bộ nhớ đệm (cache): trình chạy từng bước chính xác về việc mỗi bước đọc ô nào, ngoài ra không gì khác.
             </p>
           }
         >
@@ -2003,7 +2003,7 @@ export function S34() {
             chỉ được đọc, và mỗi phần tử của P có đúng một luồng ghi, vì phép ánh xạ là một-một. Các luồng không chia sẻ
             thứ gì chúng ghi thì không thể làm phiền nhau, nên các khối có thể chạy theo bất kỳ thứ tự nào, hoặc cùng lúc, và P ra
             vẫn như nhau. Hãy tận hưởng khi còn có thể: kernel phân ô của chương 5 bắt các luồng của một khối chia sẻ một
-            bộ đệm, và trả giá cho điều đó bằng hai rào chắn.
+            buffer, và trả giá cho điều đó bằng hai rào chắn.
           </p>
         }
       >
@@ -2428,7 +2428,7 @@ export function S34() {
             <li>
               <b>Toán hạng thứ hai.</b> <code>ggml_mul_mat</code> của llama.cpp đọc cả hai toán hạng dọc một hàng, như{' '}
               <code>nn.Linear</code>; header của nó gọi toán hạng thứ hai là "k columns, m rows (i.e. we transpose it
-              internally)". Khi llama.cpp trao các bộ đệm thứ tự hàng của nó cho cuBLAS, thư viện lưu ma trận theo từng cột,
+              internally)". Khi llama.cpp trao các buffer thứ tự hàng của nó cho cuBLAS, thư viện lưu ma trận theo từng cột,
               nó không sao chép gì: nó gọi <code>cublasSgemm(…, CUBLAS_OP_T, CUBLAS_OP_N, …)</code>, và cùng lời gọi đó
               tới hipBLAS trên AMD qua một lần đổi tên.
             </li>

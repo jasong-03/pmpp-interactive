@@ -34,7 +34,7 @@ const LABS = defineLabs('ch06', [
   { num: '6.2', dir: 'lab2_vector', name: 'vector loads', vi: { name: 'nạp vector' } },
   { num: '6.3', dir: 'lab3_banks', name: 'bank conflicts', vi: { name: 'xung đột bank' } },
   { num: '6.4', dir: 'lab4_linear', name: 'linear layer (M2)', vi: { name: 'lớp tuyến tính (M2)' } },
-  { num: '6.5', dir: 'lab5_doublebuf', name: 'double buffering', vi: { name: 'bộ đệm kép' } },
+  { num: '6.5', dir: 'lab5_doublebuf', name: 'double buffering', vi: { name: 'buffer kép' } },
 ]);
 const [l1, l2, l3, l4, l5] = LABS;
 
@@ -335,7 +335,7 @@ export function Labs() {
             Bạn viết ba kernel chỉ khác nhau ở địa chỉ mà mỗi luồng chạm tới. Một phép đọc theo bước nhảy (stride): luồng{' '}
             <code>i</code> chép <code>in[i * stride]</code> sang <code>out[i]</code>, nên phép ghi liền mạch ở mọi bước nhảy
             còn phép đọc chỉ liền mạch ở bước nhảy 1. Rồi hai phép chuyển vị ngây thơ của một ma trận rows × cols, một bản
-            đọc hàng và ghi cột, một bản đọc cột và ghi hàng. Một bản sao chép có sẵn, đọc và ghi liền mạch, là thước đo.
+            đọc hàng và ghi cột, một bản đọc cột và ghi hàng. Một phép sao chép có sẵn, đọc và ghi liền mạch, là thước đo.
             Không cái nào trong số này là một listing trong sách: chúng là phép thăm dò quy tắc mà mục 6.1 phát biểu, và trên
             máy Mac chúng là cách duy nhất để biết quy tắc đó trông ra sao ở đó.
           </p>
@@ -368,7 +368,7 @@ export function Labs() {
             chỉ ra dòng của bất kỳ phép đọc nào vượt quá nó. Các phép chuyển vị chạy trên 1 × 1, 1 × 37, 37 × 1, 32 × 32,
             33 × 65 và 100 × 7, và trên thiết bị trên 1000 × 513 và 2048 × 2048. Đầu ra khởi đầu là NaN, nên một phần tử bạn
             không bao giờ ghi sẽ thất bại, và phép so sánh là chính xác: các kernel này chỉ di chuyển giá trị chứ không tính
-            gì. Với <code>--bench</code>, bản sao chép, phép đọc theo bước nhảy ở các bước nhảy 1 đến 64 trên một đầu vào
+            gì. Với <code>--bench</code>, phép sao chép, phép đọc theo bước nhảy ở các bước nhảy 1 đến 64 trên một đầu vào
             2<sup>25</sup> float, và cả hai phép chuyển vị trên ma trận 4096 × 4096 được đo thời gian, và độ rộng SIMD mà
             thiết bị của bạn báo cáo được ghi lại.
           </p>
@@ -605,7 +605,7 @@ export function Labs() {
             theo từng hàng, một rào chắn, ghi ô đầu ra theo từng hàng, nghĩa là đọc ô chia sẻ dọc theo một cột. Pitch của ô là
             một đối số lúc chạy, nên một kernel phục vụ cả bố cục không đệm (pitch T) lẫn bố cục có đệm (pitch T + 1). Hai
             công cụ đo được cung cấp sẵn: một phép thăm dò trong đó một warp đọc và ghi một mảng chia sẻ ở các bước nhảy của
-            Bài tập 5, và một bản sao chép.
+            Bài tập 5, và một phép sao chép.
           </p>
         }
       >
@@ -639,7 +639,7 @@ export function Labs() {
             tự luồng, và <code>--backend race</code> chỉ ra hai dòng mà nó để không có thứ tự. Các bài kiểm thử không thấy
             được bạn đã dùng pitch nào: đầu ra như nhau dù thế nào, và chỉ benchmark mới phân biệt được. Với{' '}
             <code>--bench</code>, phép thăm dò chạy các bước nhảy 1, 2, 4, 7, 8, 12, 16, 24, 31, 32 và 33, và phép chuyển vị
-            được đo thời gian ở T = 16 và 32 ở cả hai pitch bên cạnh bản sao chép.
+            được đo thời gian ở T = 16 và 32 ở cả hai pitch bên cạnh phép sao chép.
           </p>
         }
       >
@@ -753,7 +753,7 @@ export function Labs() {
             vi={
               <>
                 Xung đột nằm ở một lần đọc bộ nhớ chia sẻ mỗi phần tử, và phép chuyển vị còn đọc và ghi bộ nhớ toàn cục một
-                lần mỗi phần tử. Hãy so sánh cả hai pitch với bản sao chép trong bảng: một phép chuyển vị vốn đã chạy gần
+                lần mỗi phần tử. Hãy so sánh cả hai pitch với phép sao chép trong bảng: một phép chuyển vị vốn đã chạy gần
                 tốc độ sao chép thì bố cục của nó chẳng còn gì để giành. Rồi làm cặp T = 16, sau khi tính ra một warp 32 lane
                 chạm vào những gì khi khối rộng 16.
               </>
@@ -953,7 +953,7 @@ export function Labs() {
 
       {/* ------------------------------------------------------------ 6.5 */}
       <h2>
-        <Translated vi="Lab 6.5: bộ đệm kép, với một bộ phát hiện race condition theo dõi">Lab 6.5: double buffering, with a race detector watching</Translated>
+        <Translated vi="Lab 6.5: buffer kép, với một bộ phát hiện race condition theo dõi">Lab 6.5: double buffering, with a race detector watching</Translated>
       </h2>
       <Translated
         vi={
@@ -1090,7 +1090,7 @@ export function Labs() {
                 nhân-cộng mỗi luồng là ngắn. Cặp ô thứ hai cũng không miễn phí: chương 5 đã cho thấy bộ nhớ chia sẻ mỗi khối
                 có thể giới hạn số khối cư trú. GEMM Metal dùng trong sản phẩm của MLX giữ hai rào chắn mỗi bước, tức vòng lặp
                 &ldquo;trước&rdquo; của sách. Bất kể bạn đo được gì, đó là một sự thật về kernel này trên thiết bị của bạn,
-                không phải một quy tắc về bộ đệm kép.
+                không phải một quy tắc về buffer kép.
               </>
             }
           >
@@ -1110,7 +1110,7 @@ export function Labs() {
         cols={[
           {
             head: tr('Kernel measured', 'Kernel được đo'),
-            cell: (r) => (r.variant === 'two_barriers' ? tr('two barriers (provided)', 'hai rào chắn (có sẵn)') : r.variant === 'double_buffered' ? tr('double buffered, one barrier', 'bộ đệm kép, một rào chắn') : String(r.variant)),
+            cell: (r) => (r.variant === 'two_barriers' ? tr('two barriers (provided)', 'hai rào chắn (có sẵn)') : r.variant === 'double_buffered' ? tr('double buffered, one barrier', 'buffer kép, một rào chắn') : String(r.variant)),
           },
           rawCol('T', 'tile'),
           rawCol(tr('Width', 'Độ rộng'), 'width'),
@@ -1138,7 +1138,7 @@ export function Labs() {
         <Translated
           vi={
             <p>
-              Ngày nay NVIDIA chủ yếu mô tả bộ đệm kép bằng các phép sao chép bất đồng bộ vào bộ nhớ chia sẻ. AMD chỉ mô tả
+              Ngày nay NVIDIA chủ yếu mô tả buffer kép bằng các phép sao chép bất đồng bộ vào bộ nhớ chia sẻ. AMD chỉ mô tả
               một phép sao chép như vậy cho CDNA 3 và 4. Metal không mô tả cái nào, nên trên máy Mac dạng đồng bộ của lab
               này là dạng bạn có. GEMM Metal của MLX giữ hai rào chắn mỗi bước.
             </p>

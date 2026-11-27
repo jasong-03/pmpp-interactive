@@ -3,7 +3,7 @@ import { Ask, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Aside, Bench, Beyond, Simplification, Source, Today, type Tier } from '../../components/notes';
 import { solutionTabStatus } from '../../components/LabKit';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -648,11 +648,16 @@ function PipelineListing() {
 
 // ---------------------------------------------------------------- questions
 const FUTURE = {
-  cuda: canRunOnNewArchitecture('cuda', { ptx: true }),
-  hip: canRunOnNewArchitecture('hip', { archs: ['a'], newArch: 'b' }),
-  metal: canRunOnNewArchitecture('metal'),
+  cuda: () => canRunOnNewArchitecture('cuda', { ptx: true }),
+  hip: () => canRunOnNewArchitecture('hip', { archs: ['a'], newArch: 'b' }),
+  metal: () => canRunOnNewArchitecture('metal'),
 };
-const PLAIN = legalCall('kernel', 'none', 'cuda');
+const PLAIN = () => legalCall('kernel', 'none', 'cuda');
+// The questions record is built once, at import; the model's sentence is read while rendering so it follows the language switch.
+function Why({ of }: { of: () => { why: string } }) {
+  useLocale();
+  return of().why;
+}
 const BOTH = placement(fnOf('add1'), 'cuda').length;
 
 export const questionsS27: Record<string, Question> = {
@@ -721,7 +726,7 @@ export const questionsS27: Record<string, Question> = {
     explain: (
       <>
         <p>
-          CUDA: {FUTURE.cuda.why} Metal: {FUTURE.metal.why} HIP: {FUTURE.hip.why}{/* i18n-ignore: backend names before model text */}
+          CUDA: <Why of={FUTURE.cuda} /> Metal: <Why of={FUTURE.metal} /> HIP: <Why of={FUTURE.hip} />{/* i18n-ignore: backend names before model text */}
         </p>
         <Translated vi={<p>Đi qua ba backend bên dưới và xem bên trong tệp nhị phân được phát hành của mỗi backend có gì.</p>}>
           <p>Step through the three backends below and look at what is inside the shipped binary in each.</p>
@@ -877,12 +882,12 @@ export const questionsS27: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            {PLAIN.why} Đánh dấu một hàm phụ là <code>__device__</code> là cách sửa khi chỉ có kernel gọi nó.
+            <Why of={PLAIN} /> Đánh dấu một hàm phụ là <code>__device__</code> là cách sửa khi chỉ có kernel gọi nó.
           </p>
         }
       >
         <p>
-          {PLAIN.why} Marking a helper <code>__device__</code> is the fix when only kernels call it.
+          <Why of={PLAIN} /> Marking a helper <code>__device__</code> is the fix when only kernels call it.
         </p>
       </Translated>
     ),
@@ -1166,7 +1171,7 @@ export function S27() {
         <Translated
           vi={
             <p>
-              Các giai đoạn là những giai đoạn có trong tài liệu. Bị bỏ qua: liên kết, bộ đệm mà driver CUDA giữ cho những gì nó đã biên dịch, các tệp nhị phân build cho nhiều kiến trúc CUDA cùng lúc, và việc biên dịch mã nguồn qua một API lúc chạy trên CUDA và HIP.
+              Các giai đoạn là những giai đoạn có trong tài liệu. Bị bỏ qua: liên kết, bộ nhớ đệm (cache) mà driver CUDA giữ cho những gì nó đã biên dịch, các tệp nhị phân build cho nhiều kiến trúc CUDA cùng lúc, và việc biên dịch mã nguồn qua một API lúc chạy trên CUDA và HIP.
             </p>
           }
         >

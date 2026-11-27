@@ -54,7 +54,7 @@ export const chapter: Chapter = {
     {
       id: '6.7', num: '6.7', title: 'Double buffering', pages: '146–147',
       lede: 'Remove the barrier that guards a false dependence by alternating two buffers, and show the result is race-free.',
-      vi: { title: 'Bộ đệm kép', lede: 'Loại bỏ rào chắn đang canh một phụ thuộc giả bằng cách luân phiên hai bộ đệm, và chứng minh kết quả không có race condition.' },
+      vi: { title: 'Buffer kép', lede: 'Loại bỏ rào chắn đang canh một phụ thuộc giả bằng cách luân phiên hai buffer, và chứng minh kết quả không có race condition.' },
       load: () => import('./S67').then((m) => ({ Component: m.S67, questions: m.questionsS67 })),
     },
     {
@@ -72,7 +72,7 @@ export const chapter: Chapter = {
     {
       id: 'labs', num: '', title: 'Labs', pages: null,
       lede: 'Five labs on your own GPUs: see coalescing and bank conflicts in your timings, vectorise a kernel, tune the linear layer (milestone M2), and double-buffer with a race detector watching.',
-      vi: { title: 'Lab', lede: 'Năm lab trên chính GPU của bạn: thấy hợp nhất truy cập và xung đột bank trong số đo thời gian, vector hóa một kernel, tinh chỉnh lớp tuyến tính (mốc dự án M2), và dùng bộ đệm kép trong khi một trình phát hiện race theo dõi.' },
+      vi: { title: 'Lab', lede: 'Năm lab trên chính GPU của bạn: thấy hợp nhất truy cập và xung đột bank trong số đo thời gian, vector hóa một kernel, tinh chỉnh lớp tuyến tính (mốc dự án M2), và dùng buffer kép trong khi một trình phát hiện race theo dõi.' },
       load: () => import('./Labs').then((m) => ({ Component: m.Labs, questions: m.questionsLabs })),
     },
     {

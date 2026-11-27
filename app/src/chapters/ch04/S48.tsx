@@ -730,7 +730,7 @@ function LaunchExplorer() {
               {c.rules.map((r) => (
                 <tr key={r.key} data-rule={r.key} data-status={r.status}>
                   <td style={{ width: '5.2rem' }}><span className={CHIP[r.status].cls}>{CHIP[r.status].text}</span></td>
-                  <td style={{ width: '38%' }}>{r.name}</td>
+                  <td style={{ width: '38%' }}>{tr(r.name, `${({ 'per-block': 'không vượt maxThreadsPerBlock', dims: 'không vượt maxThreadsDim', warps: 'số warp nguyên', divides: 'chia hết số khe luồng', 'block-slots': 'khe khối không cạn trước', rows: 'không cao hơn số hàng', grid: 'không vượt maxGridSize' } as Record<string, string>)[r.key] ?? r.name} (${r.name})`)}</td>
                   <td className="muted">{r.detail}</td>
                 </tr>
               ))}
@@ -947,7 +947,7 @@ export const questionsS48: Record<string, Question> = {
           <p>
             <code>maxThreadsPerBlock</code> là giới hạn trên tích các chiều của khối. 32 × 32 = 1024 vượt quá 512,
             nên lần khởi chạy bị từ chối và không luồng nào chạy. Nếu sinh viên thấy có kết quả, thì hoặc hình dạng khối hoặc thiết bị
-            không như họ nghĩ, hoặc không ai kiểm tra lỗi của lần khởi chạy và bộ đệm kết quả còn giữ giá trị cũ.
+            không như họ nghĩ, hoặc không ai kiểm tra lỗi của lần khởi chạy và buffer kết quả còn giữ giá trị cũ.
             Truy vấn giới hạn trước, và kiểm tra lần khởi chạy sau đó, lẽ ra đã phát hiện điều này.
           </p>
         }

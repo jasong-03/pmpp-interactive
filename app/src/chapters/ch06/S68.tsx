@@ -769,7 +769,7 @@ export function S68() {
       <Translated
         vi={
           <p>
-            Khi bạn đọc các backend GPU của PyTorch, MLX hay llama.cpp, các hàng này rất dễ nhận ra một khi bạn biết hình dạng của chúng. Các kernel elementwise của PyTorch dùng nạp dạng vector và chọn độ rộng cho từng tensor dựa trên căn chỉnh của con trỏ: phương án lùi về vô hướng mà sách để lại cho bài tập 4, được làm lúc chạy. llama.cpp đệm các ô matmul lượng tử hóa trong bộ nhớ chia sẻ để chống xung đột bank, và kernel flash-attention của nó nạp khối tiếp theo vào một bộ đệm thứ hai trong khi tính toán trên bộ đệm thứ nhất. MLX cũng đệm các ô GEMM Metal của nó, nhưng vòng lặp chính của nó chỉ dùng một bộ đệm với hai rào chắn mỗi bước: vòng lặp &ldquo;trước&rdquo; của 6.7, trong mã production. Dòng &ldquo;seen in&rdquo; (thấy trong) của mỗi hàng ở trên nêu tên các tệp.
+            Khi bạn đọc các backend GPU của PyTorch, MLX hay llama.cpp, các hàng này rất dễ nhận ra một khi bạn biết hình dạng của chúng. Các kernel elementwise của PyTorch dùng nạp dạng vector và chọn độ rộng cho từng tensor dựa trên căn chỉnh của con trỏ: phương án lùi về vô hướng mà sách để lại cho bài tập 4, được làm lúc chạy. llama.cpp đệm các ô matmul lượng tử hóa trong bộ nhớ chia sẻ để chống xung đột bank, và kernel flash-attention của nó nạp khối tiếp theo vào một buffer thứ hai trong khi tính toán trên buffer thứ nhất. MLX cũng đệm các ô GEMM Metal của nó, nhưng vòng lặp chính của nó chỉ dùng một buffer với hai rào chắn mỗi bước: vòng lặp &ldquo;trước&rdquo; của 6.7, trong mã production. Dòng &ldquo;seen in&rdquo; (thấy trong) của mỗi hàng ở trên nêu tên các tệp.
           </p>
         }
       >

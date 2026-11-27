@@ -1127,7 +1127,7 @@ function BoundaryCounter() {
               <tr key={c.id} data-case={c.id} data-differs={differs ? '' : undefined}>
                 <td>{c.label}</td>
                 <td>{c.page}</td>
-                <td>{c.printed ?? tr('no count (an exercise)', 'không có số (một bài tập)')}</td>
+                <td>{tr(c.printed ?? tr('no count (an exercise)', 'không có số (một bài tập)'), c.printed != null ? c.printed.replace(' of ', ' trên ') : 'không có số (một bài tập)')}</td>
                 <td data-out="model">{model}{differs ? tr(' (the page differs)', ' (trang sách khác)') : ''}</td>
                 <td><button className="quiet" onClick={() => load(c.picture)}><Translated vi="Nạp">Load</Translated></button></td>
               </tr>

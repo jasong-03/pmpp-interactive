@@ -111,7 +111,7 @@ interface Grid {
 }
 function Stage({ grids, lines, rule }: { grids: Grid[]; lines: { text: string; tone?: 'fail' | 'ok' | 'muted'; bold?: boolean }[]; rule?: number }) {
   return (
-    <svg viewBox="0 0 720 330" role="img" aria-label={tr('Animation of a blur kernel writing to a second buffer and then in place', 'Hoạt hình một kernel làm mờ ghi vào bộ đệm thứ hai, rồi ghi tại chỗ')}
+    <svg viewBox="0 0 720 330" role="img" aria-label={tr('Animation of a blur kernel writing to a second buffer and then in place', 'Hoạt hình một kernel làm mờ ghi vào buffer thứ hai, rồi ghi tại chỗ')}
       style={{ width: '100%', maxWidth: 720, display: 'block' }}>
       {grids.map((g) => (
         <g key={g.title}>
@@ -163,7 +163,7 @@ const beats: Beat[] = [
   {
     clip: 'in-place-blur-1',
     get label() {
-      return tr('Two buffers', 'Hai bộ đệm');
+      return tr('Two buffers', 'Hai buffer');
     },
     draw: (p) => {
       const k = Math.min(N, Math.floor(ramp(p, 0.06, 0.78) * (N + 1)));
@@ -187,7 +187,7 @@ const beats: Beat[] = [
   {
     clip: 'in-place-blur-2',
     get label() {
-      return tr('One buffer', 'Một bộ đệm');
+      return tr('One buffer', 'Một buffer');
     },
     draw: (p) => {
       const k = Math.min(8, Math.floor(ramp(p, 0.3, 0.6) * 9));
@@ -196,7 +196,7 @@ const beats: Beat[] = [
       return (
         <Stage
           grids={[
-            { x: LX, title: tr('one buffer: in and out', 'một bộ đệm: vừa in vừa out'), look: buffer(s, { mark: true, reader: next }) },
+            { x: LX, title: tr('one buffer: in and out', 'một buffer: vừa in vừa out'), look: buffer(s, { mark: true, reader: next }) },
             { x: RX, title: tr('what it should become', 'kết quả đúng phải là'), tier: false, look: plain(ref) },
           ]}
           lines={[
@@ -221,7 +221,7 @@ const beats: Beat[] = [
       return (
         <Stage
           grids={[
-            { x: LX, title: tr('one buffer, threads in order', 'một bộ đệm, các luồng theo thứ tự'), look: buffer(s, { mark: true, reader: done ? undefined : forward[N].ran[k] }) },
+            { x: LX, title: tr('one buffer, threads in order', 'một buffer, các luồng theo thứ tự'), look: buffer(s, { mark: true, reader: done ? undefined : forward[N].ran[k] }) },
             { x: RX, title: tr('the reference', 'kết quả tham chiếu'), tier: false, look: plain(ref) },
           ]}
           lines={[
@@ -230,7 +230,7 @@ const beats: Beat[] = [
             ...(done
               ? [
                   { text: tr(`${s.wrong.length} of ${N} pixels are wrong`, `${s.wrong.length} trên ${N} điểm ảnh bị sai`) },
-                  { text: tr('accesses outside the buffer: ', 'số lần truy cập ra ngoài bộ đệm: ') + s.accesses.length, tone: 'muted' as const },
+                  { text: tr('accesses outside the buffer: ', 'số lần truy cập ra ngoài buffer: ') + s.accesses.length, tone: 'muted' as const },
                 ]
               : []),
           ]}

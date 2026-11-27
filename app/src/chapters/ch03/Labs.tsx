@@ -175,7 +175,7 @@ function NamedReveal({ committed }: { committed: number }) {
           vi={
             <>
               Con số này lấy từ một thiết bị, nơi mọi phép kiểm thử chạy đến cùng. Trên trình giả lập (emulator), một lần chạy dừng
-              ở lần truy cập đầu tiên ra ngoài một bộ đệm, nên các phép kiểm thử sau đó hoàn toàn không được chạy. Khi bạn bắt đầu
+              ở lần truy cập đầu tiên ra ngoài một buffer, nên các phép kiểm thử sau đó hoàn toàn không được chạy. Khi bạn bắt đầu
               sửa lỗi, con số giảm xuống; thứ bạn đã dự đoán là kernel như lúc phát hành.
             </>
           }
@@ -283,7 +283,7 @@ export function Labs() {
         lab={l1}
         files={[
           ['kernel.cu', <Translated vi={<><code>colorToGrayscaleKernel</code> và <code>launchGrayscale</code></>}><><code>colorToGrayscaleKernel</code> and <code>launchGrayscale</code></></Translated>],
-          ['kernel.metal', <Translated vi={<>thân của <code>grayscale</code>, trên các bộ đệm <code>uchar</code> thuần</>}><>the body of <code>grayscale</code>, over plain <code>uchar</code> buffers</></Translated>],
+          ['kernel.metal', <Translated vi={<>thân của <code>grayscale</code>, trên các buffer <code>uchar</code> thuần</>}><>the body of <code>grayscale</code>, over plain <code>uchar</code> buffers</></Translated>],
           ['launch.mm', <Translated vi={<>hai lời gọi <code>setBytes</code> và lệnh dispatch trong <code>encodeGrayscale</code></>}><>the two <code>setBytes</code> calls and the dispatch in <code>encodeGrayscale</code></></Translated>],
         ]}
       />
@@ -316,7 +316,7 @@ export function Labs() {
             còn trắng là 255. Sau đó là một dải chuyển màu có nhiễu ở 62 × 76 (bức ảnh của sách), 16 × 16, 1 × 1, 1 × 300,
             300 × 1, 33 × 17 và 64 × 80, và trên thiết bị là 1500 × 2000, mỗi kích thước với các khối 16 × 16, 32 × 8 và 8 × 32
             luồng. Đầu ra được điền trước bằng một giá trị đánh dấu, nên một điểm ảnh bạn không bao giờ ghi sẽ bị đếm. Trên
-            thiết bị, các bộ đệm lớn hơn bức ảnh và các byte sau nó phải giữ nguyên.
+            thiết bị, các buffer lớn hơn bức ảnh và các byte sau nó phải giữ nguyên.
           </p>
         }
       >
@@ -488,9 +488,9 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Phép kiểm thử đầu tiên đưa cho kernel 62 hàng trên cùng của một bộ đệm 66 hàng. Một lần đọc vượt quá mép phải của
+            Phép kiểm thử đầu tiên đưa cho kernel 62 hàng trên cùng của một buffer 66 hàng. Một lần đọc vượt quá mép phải của
             một hàng sẽ rơi vào đầu hàng kế tiếp, vốn là bộ nhớ hợp lệ, nên không trình kiểm tra biên nào phản đối và chỉ các giá
-            trị mới cho thấy lỗi. Trong một bộ đệm vừa đúng kích thước, cùng lỗi đó chỉ bị bắt ở hàng cuối cùng.
+            trị mới cho thấy lỗi. Trong một buffer vừa đúng kích thước, cùng lỗi đó chỉ bị bắt ở hàng cuối cùng.
           </p>
         }
       >
@@ -1013,7 +1013,7 @@ export function Labs() {
             <li>
               Hãy biết mỗi loại lỗi trông thế nào ở đó. Một lần truy cập ra ngoài tensor dừng lần chạy với một báo cáo
               AddressSanitizer: đọc xem nó ghi READ hay WRITE, khung đầu tiên chỉ tên một dòng của{' '}
-              <code>kernel.cu</code>, và địa chỉ nằm trước hay sau bộ đệm bao nhiêu byte. Một lần truy cập sai phần tử bên trong
+              <code>kernel.cu</code>, và địa chỉ nằm trước hay sau buffer bao nhiêu byte. Một lần truy cập sai phần tử bên trong
               tensor là một địa chỉ hợp lệ, nên sanitizer im lặng và bạn nhận được giá trị sai, kèm số phần tử không luồng nào
               ghi. Một lỗi trong cấu hình khởi chạy là mã host bình thường tính vài số nguyên; không công cụ nào đánh dấu nó, và
               bạn chỉ thấy hệ quả của nó.
