@@ -712,7 +712,7 @@ export function S210() {
           <p>
             Không kernel nào trong chương này tạo ra ma trận đó. Đóng góp của mỗi cặp được tính rồi cộng thẳng vào một
             tổng: vào một thanh ghi trong các kernel gather, vào lưới qua một phép toán nguyên tử trong kernel scatter.
-            Một kernel attention hợp nhất (fused) tránh ghi ma trận điểm số của nó vì cùng lý do, dù softmax làm việc đó
+            Một kernel attention gộp (fused) tránh ghi ma trận điểm số của nó vì cùng lý do, dù softmax làm việc đó
             khó hơn ở đấy: chương 20 xây dựng một kernel như vậy (<a href={href('ch20', '20.5')}>§20.5</a>).
           </p>
         }

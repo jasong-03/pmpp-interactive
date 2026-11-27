@@ -32,7 +32,7 @@ import { Translated, tr } from '../../lib/i18n';
 // are the contract with labs/ch23/lab1_overlap/main.cpp and with the stepper on page 23.3.
 export const questionsLabs: Record<string, Question> = {};
 
-const LABS = defineLabs('ch23', [{ num: '23.1', dir: 'lab1_overlap', name: 'hide the copies', vi: { name: 'giấu các lần chép' } }]);
+const LABS = defineLabs('ch23', [{ num: '23.1', dir: 'lab1_overlap', name: 'hide the copies', vi: { name: 'giấu các lần sao chép' } }]);
 const [l1] = LABS;
 const RUN = 'python3 labs/pmpp.py run 23.1';
 
@@ -68,7 +68,7 @@ export const stagedSpeedup = (host: 'pinned' | 'pageable') => (reports: Reports)
       value: a / b,
       detail: tr(
         `${ms(a)} serial and ${ms(b)} staged, ${host} host memory${note}`,
-        `${ms(a)} tuần tự và ${ms(b)} phân tầng, bộ nhớ host ${host === 'pinned' ? 'ghim' : 'phân trang'}${note}`,
+        `${ms(a)} tuần tự và ${ms(b)} chia giai đoạn, bộ nhớ host ${host === 'pinned' ? 'ghim' : 'phân trang'}${note}`,
       ),
     };
   });
@@ -277,7 +277,7 @@ function OrderTable() {
         vi={
           <p className="muted" data-order="none">
             Dự đoán bạn không ghi lại sẽ được trả lời ở đây khi lab 23.1 có các hàng <code>staged</code> từ CUDA hoặc HIP. Metal
-            không có thứ tự phát lệnh nào để so sánh: pipeline của nó không có lần chép nào. Hãy chạy <code>{RUN} --bench</code>{' '}
+            không có thứ tự phát lệnh nào để so sánh: pipeline của nó không có lần sao chép nào. Hãy chạy <code>{RUN} --bench</code>{' '}
             trên một máy có CUDA hoặc ROCm.
           </p>
         }
@@ -340,7 +340,7 @@ const ONLY_CUDA = (
   <Translated
     vi={
       <>
-        Tỉ số này chỉ có trên CUDA và HIP: trên Apple silicon không có lần chép nào để phân tầng, nên lần chạy Metal không có
+        Tỉ số này chỉ có trên CUDA và HIP: trên Apple silicon không có lần sao chép nào để chia giai đoạn, nên lần chạy Metal không có
         hàng <code>staged</code> nào. Hãy chạy <code>{RUN} --bench</code> trên một máy có CUDA hoặc ROCm, khi{' '}
         <code>runStaged</code> của bạn đã qua (hoặc với <code>--solution</code> để đo lời giải tham chiếu).
       </>
@@ -363,7 +363,7 @@ export function Labs() {
           vi={
             <>
               Một lab, trong <code>labs/ch23/lab1_overlap/</code>. Lab này không bắt buộc, vì chương này được rút gọn, và nó không
-              thêm gì vào dự án xuyên suốt. Nó biến vòng lặp phân tầng của trang <a href={href('ch23', '23.3')}>23.3</a> thành mã
+              thêm gì vào dự án xuyên suốt. Nó biến vòng lặp chia giai đoạn (staged) của trang <a href={href('ch23', '23.3')}>23.3</a> thành mã
               bạn chạy trên mọi backend, và benchmark của nó đặt lại câu hỏi của trang đó trên chính GPU của bạn: sự chồng lấp
               giấu được bao nhiêu phần việc chép?
             </>
@@ -397,7 +397,7 @@ export function Labs() {
         vi={
           <p>
             Có hai điều quan trọng riêng với lab này. Trên trình giả lập (emulator), mọi lệnh gọi stream đều đồng bộ: một lần
-            chép hay một lần khởi chạy đã xong khi lệnh gọi trả về. Vì thế trình giả lập kiểm tra mỗi khúc (chunk) tính ra gì và
+            chép hay một lần khởi chạy đã xong khi lệnh gọi trả về. Vì thế trình giả lập kiểm tra mỗi chunk tính ra gì và
             kết quả nằm ở đâu, chứ không bao giờ kiểm tra có gì chồng lấp hay không. Và lab này không được build cho{' '}
             <code>race</code>, biến thể chạy các luồng đồng thời dưới ThreadSanitizer, vì không luồng nào ghi vào thứ mà một
             luồng khác chạm tới.
@@ -415,14 +415,14 @@ export function Labs() {
 
       {/* ------------------------------------------------------------ 23.1 */}
       <h2>
-        <Translated vi="Lab 23.1: giấu các lần chép sau kernel">Lab 23.1: hide the copies behind the kernel</Translated>
+        <Translated vi="Lab 23.1: giấu các lần sao chép sau kernel">Lab 23.1: hide the copies behind the kernel</Translated>
       </h2>
       <Translated
         vi={
           <p>
             Vòng khứ hồi của chương 2 làm ba việc nối tiếp nhau: chép đầu vào lên device, chạy kernel, chép đầu ra về. Trong lúc
             đường truyền chép, các lõi (core) chờ; trong lúc các lõi tính, đường truyền chờ. Cách chữa của mục 23.3, áp dụng
-            cho một GPU: cắt công việc thành các khúc và để lần chép của một khúc chạy trong khi kernel của một khúc khác chạy.
+            cho một GPU: cắt công việc thành các chunk và để lần sao chép của một chunk chạy trong khi kernel của một chunk khác chạy.
             Bạn viết pipeline đó, rồi đo xem nó mang lại được gì.
           </p>
         }
@@ -463,7 +463,7 @@ export function Labs() {
         <Translated
           vi={
             <p>
-              Kernel, pipeline chia khúc, phiên bản Metal và mọi phép đo là của khóa học này. Mẫu phân tầng là của NVIDIA (Best
+              Kernel, pipeline chia chunk, phiên bản Metal và mọi phép đo là của khóa học này. Mẫu chia giai đoạn là của NVIDIA (Best
               Practices Guide 10.1.2, ch23-facts A7); mẫu Metal là của Apple (C5).
             </p>
           }
@@ -537,9 +537,9 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Một quy tắc chia khúc cho cả hai backend: khúc k là <code>[k*n/chunks, (k+1)*n/chunks)</code> theo phép chia số
-            nguyên, với tích tính bằng 64 bit. Bỏ qua các khúc rỗng, xuất hiện khi <code>n</code> nhỏ hơn <code>chunks</code>, và
-            đánh số các khúc bạn thực sự đưa vào hàng đợi là j = 0, 1, 2, cứ thế tiếp.
+            Một quy tắc chia chunk cho cả hai backend: chunk k là <code>[k*n/chunks, (k+1)*n/chunks)</code> theo phép chia số
+            nguyên, với tích tính bằng 64 bit. Bỏ qua các chunk rỗng, xuất hiện khi <code>n</code> nhỏ hơn <code>chunks</code>, và
+            đánh số các chunk bạn thực sự đưa vào hàng đợi là j = 0, 1, 2, cứ thế tiếp.
           </p>
         }
       >
@@ -553,12 +553,12 @@ export function Labs() {
         vi={
           <p>
             <b>CUDA, HIP và trình giả lập.</b> Tạo <code>streams</code> stream bằng{' '}
-            <code>cudaStreamCreateWithFlags(&amp;s, cudaStreamNonBlocking)</code>. Đưa khúc j vào stream{' '}
+            <code>cudaStreamCreateWithFlags(&amp;s, cudaStreamNonBlocking)</code>. Đưa chunk j vào stream{' '}
             <code>j mod streams</code>: một <code>cudaMemcpyAsync</code> chép phần của nó trong <code>hostIn</code> vào{' '}
             <code>d_in</code>, <code>launchPoly</code> từ <code>d_in</code> vào <code>d_out</code>, và một{' '}
             <code>cudaMemcpyAsync</code> chép phần của nó trong <code>d_out</code> vào <code>hostOut</code>, tất cả ở cùng một
-            offset. <code>Order::Depth</code> đưa vào hàng đợi từng khúc một; <code>Order::Breadth</code> đưa vào mọi lần chép
-            vào, rồi mọi kernel, rồi mọi lần chép ra. Sau đó đồng bộ hóa mọi stream, hủy mỗi stream đúng một lần, và trả về 0,
+            offset. <code>Order::Depth</code> đưa vào hàng đợi từng chunk một; <code>Order::Breadth</code> đưa vào mọi lần sao chép
+            vào, rồi mọi kernel, rồi mọi lần sao chép ra. Sau đó đồng bộ hóa mọi stream, hủy mỗi stream đúng một lần, và trả về 0,
             hoặc in lỗi ra và trả về 1.
           </p>
         }
@@ -576,12 +576,12 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            <b>Metal.</b> Apple silicon không có gì để chép, nên việc cần giấu là việc của CPU: nạp đầu vào của một khúc vào một
+            <b>Metal.</b> Apple silicon không có gì để chép, nên việc cần giấu là việc của CPU: nạp đầu vào của một chunk vào một
             shared buffer và rút đầu ra của nó. Lấy K = <code>buffers</code> slot, mỗi slot là một cặp shared buffer từ{' '}
-            <code>slotBuffer</code>, đủ dài cho khúc lớn nhất, và một dispatch semaphore khởi đầu bằng K. Với khúc j: chờ trên
-            semaphore; nếu slot <code>j mod K</code> vẫn còn giữ một khúc trước đó, <code>waitFor</code> command buffer của nó và
+            <code>slotBuffer</code>, đủ dài cho chunk lớn nhất, và một dispatch semaphore khởi đầu bằng K. Với chunk j: chờ trên
+            semaphore; nếu slot <code>j mod K</code> vẫn còn giữ một chunk trước đó, <code>waitFor</code> command buffer của nó và
             chép đầu ra của nó sang <code>hostOut</code>; nạp slot từ <code>hostIn</code>; encode bằng <code>encodePoly</code>{' '}
-            trong một command buffer riêng; thêm một completion handler chỉ làm mỗi việc báo hiệu semaphore; commit. Sau khúc
+            trong một command buffer riêng; thêm một completion handler chỉ làm mỗi việc báo hiệu semaphore; commit. Sau chunk
             cuối, chờ các slot còn đang chạy, cũ nhất trước, và rút chúng.
           </p>
         }
@@ -601,9 +601,9 @@ export function Labs() {
           <p>
             Hãy biết trước điều sẽ thấy trước khi đo. Một luồng CPU làm cả việc nạp lẫn việc rút, cái này sau cái kia, nên một
             máy Mac có hai làn chứ không phải ba: làn của CPU, nạp + rút, và làn của GPU. Chế độ xem Metal của trình chạy từng bước
-            cho cận dưới: một lần chạy mất ít nhất n · max(nạp + rút, kernel) cho mỗi khúc. Trừ khi kernel dài, làn của CPU là
+            cho cận dưới: một lần chạy mất ít nhất n · max(nạp + rút, kernel) cho mỗi chunk. Trừ khi kernel dài, làn của CPU là
             làn dài hơn, vì nó di chuyển dữ liệu hai lần. Driver đặt kernel vào khoảng nạp + rút, trường hợp tốt nhất, và ngay
-            cả khi đó sự chồng lấp cũng chỉ có thể giảm thời gian tuần tự đi tối đa một nửa. Chi phí của từng khúc, các lần chờ
+            cả khi đó sự chồng lấp cũng chỉ có thể giảm thời gian tuần tự đi tối đa một nửa. Chi phí của từng chunk, các lần chờ
             một slot rảnh, và việc CPU và GPU dùng chung một bộ nhớ đều ăn bớt phần đó; ăn bớt bao nhiêu là điều các hàng của bạn
             đo được.
           </p>
@@ -676,8 +676,8 @@ export function Labs() {
         vi={
           <p>
             <b>Không độ ưu tiên, không event.</b> Ở đây chỉ có một loại công việc, nên không có gì cần được ưu tiên; một độ ưu
-            tiên dù sao cũng không tác động tới các lần chép, và ROCm mặc định bỏ qua độ ưu tiên. Sách cần event vì ba kernel ở
-            ba stream dùng chung một chuẩn (norm). Ở đây ba thao tác của một khúc nằm cùng một stream, và thứ tự của stream đó
+            tiên dù sao cũng không tác động tới các lần sao chép, và ROCm mặc định bỏ qua độ ưu tiên. Sách cần event vì ba kernel ở
+            ba stream dùng chung một chuẩn (norm). Ở đây ba thao tác của một chunk nằm cùng một stream, và thứ tự của stream đó
             là tất cả sự sắp thứ tự chúng cần.
           </p>
         }
@@ -693,7 +693,7 @@ export function Labs() {
         vi={
           <p>
             <b>&ldquo;Bắt buộc&rdquo; bộ nhớ ghim.</b> Sách nói <code>cudaMemcpyAsync</code> bắt buộc bộ nhớ host được ghim. Từ
-            bộ nhớ phân trang, lệnh gọi vẫn chạy, nhưng nó có thể chờ lần chép xong, và khi đó nó không chồng lấp được gì. Các
+            bộ nhớ phân trang, lệnh gọi vẫn chạy, nhưng nó có thể chờ lần sao chép xong, và khi đó nó không chồng lấp được gì. Các
             bài kiểm tra chạy cả hai loại buffer; benchmark đo xem sự khác biệt tốn bao nhiêu.
           </p>
         }
@@ -708,9 +708,9 @@ export function Labs() {
         <Translated
           vi={
             <p>
-              NVIDIA: một lần chép như vậy &ldquo;will revert to a synchronous behavior which will not overlap with other
+              NVIDIA: một lần sao chép như vậy &ldquo;will revert to a synchronous behavior which will not overlap with other
               work&rdquo; (sẽ quay về hành vi đồng bộ, không chồng lấp với công việc khác). Header của AMD: &ldquo;the memory
-              copy will be performed synchronously&rdquo; (lần chép bộ nhớ sẽ được thực hiện đồng bộ).
+              copy will be performed synchronously&rdquo; (lần sao chép bộ nhớ sẽ được thực hiện đồng bộ).
             </p>
           }
         >
@@ -729,9 +729,9 @@ export function Labs() {
           <p>
             Chạy <code>{RUN} --backend emu</code> trước, rồi <code>{RUN}</code>. Các kích thước là 1, 7, 1,000, 4,099 và 65,536
             số float, và thiết bị thật thêm kích thước của benchmark. CUDA, HIP và trình giả lập chạy (streams, chunks) = (1,
-            1), (1, 4), (2, 2), (3, 5), (4, 16) và (8, 3), cộng thêm (2, 16) và (3, 16) ở n = 7, nơi các khúc rỗng nằm xen giữa
-            các khúc đầy; cả hai thứ tự; buffer host được ghim và phân trang, vốn là cùng một vùng cấp phát trên trình giả lập.
-            Metal chạy K = 1 tới 4 với cùng các số khúc. Với mỗi trường hợp:
+            1), (1, 4), (2, 2), (3, 5), (4, 16) và (8, 3), cộng thêm (2, 16) và (3, 16) ở n = 7, nơi các chunk rỗng nằm xen giữa
+            các chunk đầy; cả hai thứ tự; buffer host được ghim và phân trang, vốn là cùng một vùng cấp phát trên trình giả lập.
+            Metal chạy K = 1 tới 4 với cùng các số chunk. Với mỗi trường hợp:
           </p>
         }
       >
@@ -749,7 +749,7 @@ export function Labs() {
             vi={
               <>
                 <code>hostOut</code> khớp với phép tính Horner của CPU trong <code>main.cpp</code> trong một dung sai tương đối,
-                và <code>hostIn</code> không đổi. <code>hostOut</code> khởi đầu là NaN, nên một khúc chưa bao giờ được chép về
+                và <code>hostIn</code> không đổi. <code>hostOut</code> khởi đầu là NaN, nên một chunk chưa bao giờ được chép về
                 sẽ lộ ra.
               </>
             }
@@ -762,9 +762,9 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Họ CUDA, từ những gì <code>launchPoly</code> ghi lại: mọi phần tử được tính đúng một lần, mỗi khúc không rỗng
+                Họ CUDA, từ những gì <code>launchPoly</code> ghi lại: mọi phần tử được tính đúng một lần, mỗi chunk không rỗng
                 một lần khởi chạy trên đúng ranh giới của quy tắc, không lần nào bị từ chối vì số lượng bằng 0, không lần nào
-                nằm trong stream mặc định, <code>min(streams, non-empty chunks)</code> stream khác nhau, và các khúc liền kề
+                nằm trong stream mặc định, <code>min(streams, non-empty chunks)</code> stream khác nhau, và các chunk liền kề
                 nằm ở các stream khác nhau.
               </>
             }
@@ -778,8 +778,8 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Metal, từ những gì <code>encodePoly</code> ghi lại: mỗi khúc không rỗng một dispatch, nhiều nhất K buffer đầu
-                vào, các khúc liền kề nằm ở các buffer khác nhau, mỗi command buffer một <code>waitFor</code>, và khúc j được
+                Metal, từ những gì <code>encodePoly</code> ghi lại: mỗi chunk không rỗng một dispatch, nhiều nhất K buffer đầu
+                vào, các chunk liền kề nằm ở các buffer khác nhau, mỗi command buffer một <code>waitFor</code>, và chunk j được
                 encode sau nhiều nhất <code>max(0, j − K + 1)</code> lần chờ. Kiểm tra cuối cùng đó là điều làm nó thành một
                 pipeline.
               </>
@@ -794,7 +794,7 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Chỉ trình giả lập: AddressSanitizer chặn một khúc chạy vượt quá một mảng, kèm dòng mã nguồn của nó, và một
+                Chỉ trình giả lập: AddressSanitizer chặn một chunk chạy vượt quá một mảng, kèm dòng mã nguồn của nó, và một
                 stream bị hủy hai lần, kèm cả hai dòng. Một stream không bao giờ được hủy làm trường hợp đó thất bại qua số
                 byte heap còn sống, vốn phải bằng nhau trước và sau lệnh gọi.
               </>
@@ -825,7 +825,7 @@ export function Labs() {
             vi={
               <>
                 <b>Mọi thứ về thời gian trên trình giả lập.</b> Thiếu <code>cudaStreamSynchronize</code> trước khi trả về, một{' '}
-                <code>cudaDeviceSynchronize</code> sau mỗi khúc, và buffer phân trang đều qua được ở đó. Trên GPU, cái đầu là một
+                <code>cudaDeviceSynchronize</code> sau mỗi chunk, và buffer phân trang đều qua được ở đó. Trên GPU, cái đầu là một
                 race condition (tranh chấp dữ liệu) có kết quả phụ thuộc vào thời điểm; hai cái còn lại chỉ lộ ra trong
                 benchmark.
               </>
@@ -840,8 +840,8 @@ export function Labs() {
           <Translated
             vi={
               <>
-                <b>Stream của các lần chép.</b> Chỉ các lần khởi chạy được ghi lại. Một lần chép được đưa vào một stream khác
-                với kernel của khúc đó là một race condition trên GPU và vô hình trên trình giả lập.
+                <b>Stream của các lần sao chép.</b> Chỉ các lần khởi chạy được ghi lại. Một lần sao chép được đưa vào một stream khác
+                với kernel của chunk đó là một race condition trên GPU và vô hình trên trình giả lập.
               </>
             }
           >
@@ -884,7 +884,7 @@ export function Labs() {
         vi={
           <p>
             Dùng trình chạy từng bước ở trang <a href={href('ch23', '23.3')}>23.3</a>. Driver làm cho kernel mất khoảng bằng lần
-            chép vào, nên hãy bắt đầu từ thiết lập sẵn &ldquo;các giai đoạn bằng nhau&rdquo; và đặt số khúc và số stream như
+            chép vào, nên hãy bắt đầu từ thiết lập sẵn &ldquo;các giai đoạn bằng nhau&rdquo; và đặt số chunk và số stream như
             bên dưới. Trên CUDA, hãy tra <code>asyncEngineCount</code> trước (<code>python3 labs/pmpp.py doctor</code> và các
             dòng mở đầu của benchmark in ra giá trị này, và bảng bên dưới các dự đoán này hiện nó khi bạn đã chạy) rồi đặt số
             copy engine của trình chạy từng bước cho khớp.
@@ -903,7 +903,7 @@ export function Labs() {
         <Translated
           vi={
             <p>
-              Với một copy engine, một lần chép vào và một lần chép ra không thể chạy cùng lúc; với hai thì có thể. Trên ROCm,{' '}
+              Với một copy engine, một lần sao chép vào và một lần sao chép ra không thể chạy cùng lúc; với hai thì có thể. Trên ROCm,{' '}
               <code>asyncEngineCount</code> là một hằng số của runtime, giống nhau trên mọi thiết bị.
             </p>
           }
@@ -920,7 +920,7 @@ export function Labs() {
           <Translated
             vi={
               <>
-                CUDA hoặc HIP: thời gian tuần tự chia cho thời gian phân tầng ở 4 stream, 16 khúc, theo chiều sâu, bộ nhớ host
+                CUDA hoặc HIP: thời gian tuần tự chia cho thời gian chia giai đoạn ở 4 stream, 16 chunk, theo chiều sâu, bộ nhớ host
                 được ghim. (Trên 1 nghĩa là pipeline thắng.)
               </>
             }
@@ -940,7 +940,7 @@ export function Labs() {
               <>
                 Thiết lập sẵn &ldquo;thiết bị của bạn&rdquo; của trình chạy từng bước đưa các phần đo được này vào mô hình, để
                 bạn đặt mức tăng tốc của mô hình cạnh con số này. Thời gian đo được gồm cả việc tạo các stream và chi phí cố
-                định của từng khúc, những thứ mà mô hình bỏ qua trừ khi bạn cho nó một chi phí cho mỗi thao tác.
+                định của từng chunk, những thứ mà mô hình bỏ qua trừ khi bạn cho nó một chi phí cho mỗi thao tác.
               </>
             }
           >
@@ -958,7 +958,7 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Cùng tỉ số đó với buffer host phân trang: thời gian tuần tự chia cho thời gian phân tầng, cả hai từ bộ nhớ kiểu{' '}
+                Cùng tỉ số đó với buffer host phân trang: thời gian tuần tự chia cho thời gian chia giai đoạn, cả hai từ bộ nhớ kiểu{' '}
                 <code>malloc</code>.
               </>
             }
@@ -976,8 +976,8 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Đặt con số này cạnh tỉ số với bộ nhớ ghim ở trên. Từ bộ nhớ phân trang, mỗi lần chép bất đồng bộ có thể bắt host
-                chờ, và khi đó công việc của khúc tiếp theo không thể được đưa vào hàng đợi cho tới khi lần chép xong. Công tắc
+                Đặt con số này cạnh tỉ số với bộ nhớ ghim ở trên. Từ bộ nhớ phân trang, mỗi lần sao chép bất đồng bộ có thể bắt host
+                chờ, và khi đó công việc của chunk tiếp theo không thể được đưa vào hàng đợi cho tới khi lần sao chép xong. Công tắc
                 pageable của trình chạy từng bước cho thấy lịch chạy kéo theo.
               </>
             }
@@ -996,7 +996,7 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Metal: thời gian in-flight với 1 buffer chia cho thời gian in-flight với 3 buffer, ở 16 khúc. Dùng chế độ xem
+                Metal: thời gian in-flight với 1 buffer chia cho thời gian in-flight với 3 buffer, ở 16 chunk. Dùng chế độ xem
                 Metal của trình chạy từng bước, nơi S trở thành K.
               </>
             }
@@ -1028,8 +1028,8 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Với một buffer, CPU chờ từng command buffer rồi mới nạp được khúc tiếp theo, nên việc nạp, các kernel và việc rút
-                lần lượt thay phiên nhau. Với ba, CPU nạp một khúc trong khi GPU tính một khúc khác. Cột &ldquo;Thấy chồng
+                Với một buffer, CPU chờ từng command buffer rồi mới nạp được chunk tiếp theo, nên việc nạp, các kernel và việc rút
+                lần lượt thay phiên nhau. Với ba, CPU nạp một chunk trong khi GPU tính một chunk khác. Cột &ldquo;Thấy chồng
                 lấp&rdquo; bên dưới cho biết điều đó có xảy ra ở từng hàng hay không. Sau đó so hàng 3 buffer với hàng tuần tự:
                 khi làn của CPU, nạp + rút, dài bằng kernel, sự chồng lấp chỉ có thể giảm thời gian tuần tự đi tối đa một nửa, và
                 bất cứ thứ gì làm dài thêm một trong hai làn đều lấy bớt từ đó.
@@ -1050,7 +1050,7 @@ export function Labs() {
         vi={
           <p>
             Thêm một câu nữa, không có con số: trên GPU của bạn, theo chiều rộng có khác theo chiều sâu không? Trình chạy từng
-            bước nói là có thể, với một copy engine, nếu engine đó phục vụ các lần chép theo thứ tự chúng được phát lệnh. NVIDIA
+            bước nói là có thể, với một copy engine, nếu engine đó phục vụ các lần sao chép theo thứ tự chúng được phát lệnh. NVIDIA
             không ghi trong tài liệu cả thứ tự đó lẫn cách các hàng đợi chép của họ thay đổi nó, nên câu này là câu hỏi dành cho
             thiết bị của bạn.
           </p>
@@ -1087,7 +1087,7 @@ export function Labs() {
             Benchmark trước hết đo riêng từng phần trên toàn bộ mảng. Nó chọn kích thước mảng từ dung lượng bộ nhớ mà thiết bị
             báo cáo: số float vừa trong một phần mười sáu của dung lượng đó, tối đa 64 Mi float mỗi mảng. Mức trần này là một
             tham số của lab, đặt ra để giữ cho lần chạy ngắn, không phải một sự thật về thiết bị nào. Sau đó nó hiệu chỉnh: nó
-            đo kernel ở các bậc 1, 2, 4 và cứ thế, và giữ bậc có thời gian kernel gần với lần chép vào nhất. Trên Metal là gần
+            đo kernel ở các bậc 1, 2, 4 và cứ thế, và giữ bậc có thời gian kernel gần với lần sao chép vào nhất. Trên Metal là gần
             với nạp + rút nhất, toàn bộ làn của CPU, và kernel được đo bên trong đường tuần tự được cung cấp, đúng như hàng
             tuần tự được đo.
           </p>
@@ -1109,8 +1109,8 @@ export function Labs() {
             Mỗi thời gian bên dưới là một lần gọi trọn vẹn, đã gồm việc tạo stream, là kết quả tốt nhất trong vài lần chạy sau
             một lần khởi động không đo giờ mà đầu ra được kiểm tra. &ldquo;Tuần tự / hàng này&rdquo; chia thời gian của đường cơ
             sở, với cùng loại bộ nhớ host, cho thời gian của hàng đó. Trên Metal, &ldquo;GPU&rdquo; cộng thời gian GPU của các
-            command buffer mà lệnh gọi đã chờ, và &ldquo;Thấy chồng lấp&rdquo; cho biết CPU có encode một khúc trong khi GPU
-            đang chạy command buffer của một khúc khác hay không. Cột cuối đó là một quan sát trên máy của bạn: Apple ghi trong
+            command buffer mà lệnh gọi đã chờ, và &ldquo;Thấy chồng lấp&rdquo; cho biết CPU có encode một chunk trong khi GPU
+            đang chạy command buffer của một chunk khác hay không. Cột cuối đó là một quan sát trên máy của bạn: Apple ghi trong
             tài liệu cái mẫu, chứ không ghi kết quả.
           </p>
         }
@@ -1145,7 +1145,7 @@ export function Labs() {
         vi={
           <p>
             Dự đoán bạn không ghi lại, từ cùng các hàng đó: thời gian theo chiều rộng chia cho thời gian theo chiều sâu, bộ nhớ
-            ghim, 16 khúc.
+            ghim, 16 chunk.
           </p>
         }
       >
@@ -1156,7 +1156,7 @@ export function Labs() {
         vi={
           <p>
             Khi bạn đã chạy, trình chạy từng bước ở trang <a href={href('ch23', '23.3')}>23.3</a> cung cấp các phần đo được trên
-            thiết bị của bạn dưới dạng một thiết lập sẵn và vẽ các hàng phân tầng cạnh mô hình của nó.
+            thiết bị của bạn dưới dạng một thiết lập sẵn và vẽ các hàng chia giai đoạn cạnh mô hình của nó.
           </p>
         }
       >
@@ -1176,7 +1176,7 @@ export function Labs() {
             <code>tensor.to(&quot;cuda&quot;, non_blocking=True)</code> của PyTorch là một <code>cudaMemcpyAsync</code>, và từ
             bộ nhớ phân trang, theo chính ghi chú của PyTorch, &ldquo;the call may block the host&rdquo; (lệnh gọi có thể chặn
             host). Đó là hàng pageable của benchmark này. Một data loader với <code>pin_memory=True</code> đưa cho bạn các tensor
-            đã nằm sẵn trong bộ nhớ ghim, nên lần chép có thể chồng lấp với các kernel của batch trước.
+            đã nằm sẵn trong bộ nhớ ghim, nên lần sao chép có thể chồng lấp với các kernel của batch trước.
           </p>
         }
       >
@@ -1211,7 +1211,7 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Cho <code>runStaged</code> một thứ tự thứ ba: chép vào khúc j + 1 trước khi khởi chạy khúc j. Trên GPU của bạn,
+                Cho <code>runStaged</code> một thứ tự thứ ba: chép vào chunk j + 1 trước khi khởi chạy chunk j. Trên GPU của bạn,
                 nó rơi vào đâu giữa theo chiều sâu và theo chiều rộng?
               </>
             }

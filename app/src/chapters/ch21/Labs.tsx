@@ -509,10 +509,10 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Trên Metal không có symbol nào để chép vào. Mọi nguyên tử nằm trong một bộ đệm <code>float4</code>, và một chunk là
-            bộ đệm đó được gắn lại tại nguyên tử đầu tiên của chunk, 16 byte mỗi nguyên tử. Kernel scatter khai báo lưới là{' '}
+            Trên Metal không có symbol nào để chép vào. Mọi nguyên tử nằm trong một buffer <code>float4</code>, và một chunk là
+            buffer đó được gắn lại tại nguyên tử đầu tiên của chunk, 16 byte mỗi nguyên tử. Kernel scatter khai báo lưới là{' '}
             <code>device atomic_float*</code> và cộng bằng <code>atomic_fetch_add_explicit</code>; hai kernel còn lại nhận cùng
-            bộ đệm đó dưới dạng <code>device float*</code>. Khởi chạy kernel đã gộp việc bằng <code>dispatchThreadgroups</code>,
+            buffer đó dưới dạng <code>device float*</code>. Khởi chạy kernel đã gộp việc bằng <code>dispatchThreadgroups</code>,
             các threadgroup trọn vẹn <code>BLOCK_X × BLOCK_Y</code>, và đọc bước nhảy của nó từ{' '}
             <code>[[dispatch_threads_per_threadgroup]]</code>: <code>dispatchThreads</code> sẽ cắt bớt các threadgroup ở mép,
             và các luồng bị thiếu của một nhóm bị cắt sở hữu những điểm không ai tính. Một nhóm bị cắt cũng báo kích thước nhỏ

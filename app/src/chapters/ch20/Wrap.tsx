@@ -188,7 +188,7 @@ export const questionsWrap: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Một đồng nghiệp dùng bộ đệm đôi (double buffering) cho các ô K<sup>T</sup> và V của lab 20.2, mỗi loại hai ô, chọn
+            Một đồng nghiệp dùng buffer đôi (double buffering) cho các ô K<sup>T</sup> và V của lab 20.2, mỗi loại hai ô, chọn
             bằng <code>j &amp; 1</code>, và xóa rào chắn sau vòng lặp warp, giữ lại rào chắn sau mỗi lần nạp. Trên một thiết bị
             có 32 KB bộ nhớ threadgroup từng chạy kernel của bạn ở B_c = 16, chuyện gì xảy ra?
           </>
@@ -204,7 +204,7 @@ export const questionsWrap: Record<string, Question> = {
     options: [
       {
         label: <Translated vi="Kết quả sai: một warp nhanh nạp vào một ô mà các warp chậm vẫn đang đọc.">{'Wrong results: a fast warp loads into a tile that slow warps are still reading from.'}</Translated>,
-        why: <Translated vi="Ô j + 1 được nạp vào bộ đệm được đọc lần cuối ở vòng j − 1, và một warp chỉ vượt qua rào chắn nạp của vòng j sau khi mọi warp đã xong vòng j − 1.">{'Tile j + 1 goes into the buffer last read in iteration j − 1, and a warp passes iteration j\'s load barrier only after every warp has finished iteration j − 1.'}</Translated>,
+        why: <Translated vi="Ô j + 1 được nạp vào buffer được đọc lần cuối ở vòng j − 1, và một warp chỉ vượt qua rào chắn nạp của vòng j sau khi mọi warp đã xong vòng j − 1.">{'Tile j + 1 goes into the buffer last read in iteration j − 1, and a warp passes iteration j\'s load barrier only after every warp has finished iteration j − 1.'}</Translated>,
       },
       {
         label: <Translated vi="Đúng, nhưng các ô vượt quá 32 KB ở B_c = 16; host phải chọn B_c = 8.">{'Correct, but the tiles outgrow 32 KB at B_c = 16; the host must pick B_c = 8.'}</Translated>,
@@ -223,8 +223,8 @@ export const questionsWrap: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Rào chắn nạp của vòng j đã chứng minh rằng mọi warp xong vòng j − 1, vốn là lần đọc cuối cùng của bộ đệm mà vòng j + 1
-            ghi đè: cùng lập luận như bộ đệm đôi của lab 15.5. Mỗi warp chỉ chạm vào các hàng của riêng nó trong S_i, nên ô đó
+            Rào chắn nạp của vòng j đã chứng minh rằng mọi warp xong vòng j − 1, vốn là lần đọc cuối cùng của buffer mà vòng j + 1
+            ghi đè: cùng lập luận như buffer đôi của lab 15.5. Mỗi warp chỉ chạm vào các hàng của riêng nó trong S_i, nên ô đó
             không cần bản sao thứ hai. Cái giá là không gian: ở B_c = 16 các ô tăng từ{' '}
             {DOUBLE.bc16.single.toLocaleString('en-US')} lên {DOUBLE.bc16.double.toLocaleString('en-US')} byte, vượt quá{' '}
             {DOUBLE.limit.toLocaleString('en-US')}; ở B_c = 8 chúng chiếm {DOUBLE.bc8.double.toLocaleString('en-US')}. Mã host
@@ -313,7 +313,7 @@ export function Wrap() {
       <Translated
         vi={
           <p>
-            Phần tóm tắt của sách chỉ là một đoạn: attention không hợp nhất, rồi KV cache, rồi flash attention, rồi cache tốn bao
+            Phần tóm tắt của sách chỉ là một đoạn: attention không gộp, rồi KV cache, rồi flash attention, rồi cache tốn bao
             nhiêu bộ nhớ và các mô hình thu nhỏ nó thế nào. Những phần cần giữ:
           </p>
         }
@@ -328,7 +328,7 @@ export function Wrap() {
         <Translated
           vi={
             <li>
-              Attention là hai GEMM với một softmax theo hàng ở giữa. Khi không hợp nhất, S và P là các ma trận N × N được ghi vào
+              Attention là hai GEMM với một softmax theo hàng ở giữa. Khi không gộp, S và P là các ma trận N × N được ghi vào
               rồi đọc lại từ bộ nhớ thiết bị; kernel softmax là một phép rút gọn mỗi khối một hàng với mặt nạ làm cận của vòng lặp.
             </li>
           }
@@ -927,7 +927,7 @@ export function Wrap() {
       <Translated
         vi={
           <p>
-            Lab 20.1 và 20.2 là mốc dự án M6: attention nhân quả cho một lượt prefill, không hợp nhất và hợp nhất, cả hai đều ghi
+            Lab 20.1 và 20.2 là mốc dự án M6: attention nhân quả cho một lượt prefill, không gộp và gộp, cả hai đều ghi
             cùng một logsumexp. Lab 20.4 và 20.5 là mốc dự án M7: một bước decode với KV cache, theo từng head và theo nhóm.{' '}
             <span data-milestones={loading ? 'loading' : `m6:${m6.join(',') || 'none'};m7:${m7.join(',') || 'none'}`}>
               {loading

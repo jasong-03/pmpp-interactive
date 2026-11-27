@@ -22,7 +22,7 @@ import {
   type WarpSchedule,
 } from '../../sim/flashkernel';
 import { FlashBlockView } from './FlashBlockView';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 
 // "Step one block": the flash kernel of Figs. 20.8–20.16 as lab 20.2 corrects it, at a toy
 // size, with its barriers and the book's slips switchable. Every value comes from
@@ -97,7 +97,8 @@ export function FlashStepper() {
   const prob = useMemo(() => makeProblem(n, TOY.d), [n]);
   const nPanels = panels(cfg);
   const p = Math.min(panel, nPanels - 1);
-  const trace = useMemo(() => runBlock(cfg, prob, p, lanes, warps), [cfg, prob, p, lanes, warps]);
+  const locale = useLocale();
+  const trace = useMemo(() => runBlock(cfg, prob, p, lanes, warps), [cfg, prob, p, lanes, warps, locale]);
   const total = trace.steps.length;
   const k = Math.min(at, total);
   const cur = k > 0 ? trace.steps[k - 1] : undefined;

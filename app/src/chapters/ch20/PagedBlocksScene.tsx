@@ -123,7 +123,7 @@ function Stage({ f, headline, show, hot, tables }: { f: number; headline: string
       <text x={460} y={86} fontSize="11"><Translated vi={<>phân trang: {frame.paged.waiting.map((id) => 'r' + id).join(' ') || 'trống'}</>}>paged: {frame.paged.waiting.map((id) => 'r' + id).join(' ') || 'empty'}</Translated></text>
       {frame.paged.events.length || frame.contiguous.events.length ? (
         <text x={12} y={300} fontSize="11.5" data-events="">
-          <Translated vi={<>bước này, phân trang: {frame.paged.events.join(', ') || 'không có gì'}; liên tục: {frame.contiguous.events.join(', ') || 'không có gì'}</>}>
+          <Translated vi={<>bước này, phân trang: {frame.paged.events.map((e) => e.replace(/ swapped back in$/, ' được đưa vào lại').replace(/ swapped out$/, ' bị đẩy ra').replace(/ admitted$/, ' được nhận').replace(/ finished$/, ' đã xong')).join(', ') || 'không có gì'}; liên tục: {frame.contiguous.events.map((e) => e.replace(/ admitted$/, ' được nhận').replace(/ finished$/, ' đã xong')).join(', ') || 'không có gì'}</>}>
             this step, paged: {frame.paged.events.join(', ') || 'nothing'}; contiguous: {frame.contiguous.events.join(', ') || 'nothing'}
           </Translated>
         </text>

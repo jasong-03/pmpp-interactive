@@ -163,7 +163,7 @@ export const questionsWrap: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Trong khi host chờ bản sao thì không có gì khác được xếp hàng, nên độ ưu tiên, một gợi ý về các kernel đang chờ, chẳng có gì để ưu tiên.">
+          <Translated vi="Trong khi host chờ lần sao chép thì không có gì khác được xếp hàng, nên độ ưu tiên, một gợi ý về các kernel đang chờ, chẳng có gì để ưu tiên.">
             While the host waits for the copy nothing else is queued, so a priority, a hint about pending kernels, has nothing to prefer.
           </Translated>
         ),
@@ -183,7 +183,7 @@ export const questionsWrap: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Host vẫn chờ bản sao trước khi xếp hàng bất cứ thứ gì, và từ bộ nhớ pageable bản sao có thể hoàn toàn không bất đồng bộ.">
+          <Translated vi="Host vẫn chờ lần sao chép trước khi xếp hàng bất cứ thứ gì, và từ bộ nhớ phân trang (pageable) lần sao chép có thể hoàn toàn không bất đồng bộ.">
             The host still waits for the copy before it queues anything, and from pageable memory the copy may not be asynchronous at all.
           </Translated>
         ),
@@ -205,10 +205,10 @@ export const questionsWrap: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Thời gian rảnh là một vòng khứ hồi: GPU xong, bản sao tới nơi, host đọc token, và chỉ khi đó bước tiếp theo mới được
+            Thời gian rảnh là một vòng khứ hồi: GPU xong, lần sao chép tới nơi, host đọc token, và chỉ khi đó bước tiếp theo mới được
             xếp hàng. Nếu các kernel của bước n + 1 đọc token từ bộ nhớ device, host không cần giá trị của nó để khởi chạy
             chúng. Hãy xếp hàng chúng trước, sao chép token vào bộ nhớ ghim bằng <code>cudaMemcpyAsync</code>, và chỉ chờ ở nơi
-            bạn đọc nó. Nếu token đó kết thúc chuỗi, một bước thừa bị bỏ đi. Đó là bản sao của chuẩn trong chương này, được xếp hàng sớm
+            bạn đọc nó. Nếu token đó kết thúc chuỗi, một bước thừa bị bỏ đi. Đó là lần sao chép của chuẩn trong chương này, được xếp hàng sớm
             và chờ một lần, áp dụng cho decode; vòng lặp generate của mlx-lm làm điều tương tự trên Metal, xếp hàng bước tiếp
             theo bằng <code>async_eval</code> trước khi đọc token hiện tại.
           </p>
@@ -225,7 +225,7 @@ export const questionsWrap: Record<string, Question> = {
       </Translated>
     ),
     source: 'the norm copy of §23.3, pp. 560–561; notes/today/ch23-facts.md, A2, A6 and D6 (mlx-lm); the mapping to decoding is ours',
-    vi: { source: 'bản sao của chuẩn ở §23.3, pp. 560–561; notes/today/ch23-facts.md, A2, A6 và D6 (mlx-lm); việc đối chiếu sang decode là của khóa học này' },
+    vi: { source: 'lần sao chép của chuẩn ở §23.3, pp. 560–561; notes/today/ch23-facts.md, A2, A6 và D6 (mlx-lm); việc đối chiếu sang decode là của khóa học này' },
   },
   'ch23/wrap/q-pp': {
     kind: 'numeric',
@@ -257,7 +257,7 @@ export const questionsWrap: Record<string, Question> = {
             copy-out. Micro-batch đầu tiên cần {PP.gpu} + {PP.link} + {PP.gpu} = {PP_RESULT.fill} đơn vị để đi hết; sau đó giai
             đoạn chậm nhất cho ra một micro-batch mỗi {PP.gpu}: {PP_RESULT.fill} + {PP.micro - 1} × {PP.gpu} ={' '}
             {PP_RESULT.total}, so với {PP_RESULT.serial} khi làm lần lượt. Đường kết nối được giấu vì nó nhanh hơn cả hai GPU.
-            Mỗi GPU vẫn rảnh {PP_RESULT.bubble} đơn vị trong lúc pipeline được lấp đầy hoặc rút cạn, dù có bao nhiêu
+            Mỗi GPU vẫn rảnh {PP_RESULT.bubble} đơn vị trong lúc pipeline được nạp hoặc rút, dù có bao nhiêu
             micro-batch: càng nhiều micro-batch thì tỉ lệ của bong bóng đó càng nhỏ, chứ không phải kích thước của nó.
           </p>
         }
@@ -434,17 +434,17 @@ export function Wrap() {
         vi={
           <ul data-carry>
             <li>
-              Một lần khởi chạy, một bản sao bất đồng bộ và một lời gọi NCCL trả về khi công việc đã được xếp hàng. Việc công
+              Một lần khởi chạy, một lần sao chép bất đồng bộ và một lời gọi NCCL trả về khi công việc đã được xếp hàng. Việc công
               việc đã xong là điều chỉ một lần đồng bộ hoặc một event mới cho bạn biết.
             </li>
             <li>
-              Một stream là một hàng đợi có thứ tự; công việc ở các stream khác nhau có thể chồng lấp. Để giấu các bản sao, hãy
-              cắt công việc thành các chunk trên nhiều stream: tổng thời gian trở thành thời gian lấp đầy pipeline cộng với giai
-              đoạn chậm nhất của một chunk cho mỗi chunk tiếp theo. Chunk nhỏ hơn thu nhỏ bong bóng lấp đầy và rút cạn, nhưng
+              Một stream là một hàng đợi có thứ tự; công việc ở các stream khác nhau có thể chồng lấp. Để giấu các lần sao chép, hãy
+              cắt công việc thành các chunk trên nhiều stream: tổng thời gian trở thành thời gian nạp pipeline cộng với giai
+              đoạn chậm nhất của một chunk cho mỗi chunk tiếp theo. Chunk nhỏ hơn thu nhỏ bong bóng nạp và rút, nhưng
               mỗi chunk thêm chi phí cố định, nên có một số chunk tốt nhất cần đo.
             </li>
             <li>
-              Một bản sao bất đồng bộ chỉ chồng lấp khi đi từ bộ nhớ host được ghim (pinned memory). Từ bộ nhớ pageable nó vẫn
+              Một lần sao chép bất đồng bộ chỉ chồng lấp khi đi từ bộ nhớ host được ghim (pinned memory). Từ bộ nhớ phân trang nó vẫn
               hợp lệ, và lặng lẽ thôi bất đồng bộ.
             </li>
             <li>
@@ -460,8 +460,8 @@ export function Wrap() {
               từ bên trong kernel và cần một rào chắn (barrier) để biết dữ liệu đã tới.
             </li>
             <li>
-              Trên Apple silicon không có bản sao nào để giấu. Chồng lấp ở đó là CPU nạp và rút các bộ đệm dùng chung trong khi
-              GPU tính, với nhiều bộ đệm đang dùng.
+              Trên Apple silicon không có lần sao chép nào để giấu. Chồng lấp ở đó là CPU nạp và rút các buffer dùng chung trong khi
+              GPU tính, với nhiều buffer đang dùng.
             </li>
           </ul>
         }
@@ -782,12 +782,12 @@ export function Wrap() {
             </li>
             <li>
               &ldquo;<code>cudaMemcpyAsync()</code> requires&rdquo; bộ nhớ ghim (p. 563): tài liệu tham khảo của NVIDIA nói một
-              bản sao từ bộ nhớ pageable vẫn hoạt động nhưng quay về hành vi đồng bộ. Trên các hệ thống mà GPU đọc bảng trang
+              lần sao chép từ bộ nhớ phân trang vẫn hoạt động nhưng quay về hành vi đồng bộ. Trên các hệ thống mà GPU đọc bảng trang
               của host, <code>cudaMallocHost</code> có thể hoàn toàn không khóa trang.
             </li>
             <li>
               Độ ưu tiên như cách chữa cho một kernel chiếm GPU (p. 558): NVIDIA gọi độ ưu tiên là một gợi ý không chiếm quyền
-              công việc đang chạy, không bảo đảm thứ tự nào và không chạm vào bản sao.
+              công việc đang chạy, không bảo đảm thứ tự nào và không chạm vào lần sao chép.
             </li>
             <li>
               &ldquo;Most MPI implementations ... are built with&rdquo; khả năng hỗ trợ CUDA &ldquo;enabled&rdquo; (p. 552): chỉ
@@ -973,7 +973,7 @@ export function Wrap() {
         vi={
           <p>
             Thứ thực sự đi vào dự án là thói quen từ trang <a href={href('ch23', '23.3')}>23.3</a>: khi mô hình của bạn sao
-            chép một token về mỗi bước, hãy xếp hàng bản sao sớm, giữ bộ đệm host được ghim, và chỉ chờ ở nơi cần giá trị.
+            chép một token về mỗi bước, hãy xếp hàng lần sao chép sớm, giữ buffer host được ghim, và chỉ chờ ở nơi cần giá trị.
           </p>
         }
       >

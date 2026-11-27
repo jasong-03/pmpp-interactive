@@ -261,7 +261,7 @@ export const questionsS200: Record<string, Question> = {
             1/√d phải đặt ở chỗ khác; <code>launchSoftmaxRows</code> của lab 10.3 đã nhận một hệ số như thế. P V thì ngược lại
             (V là [N × d], toán hạng thứ hai đúng như được lưu), tức là <code>launchGemm</code> của lab 5.3. Được dạy ở{' '}
             <a href={href('ch15', '15.1')}>ch. 15 §15.1</a> và <a href={href('ch15', 'labs')}>lab 15.6</a>; mục 20.3 xây
-            pipeline không hợp nhất từ hai lời gọi này.
+            pipeline không gộp từ hai lời gọi này.
           </p>
         }
       >
@@ -480,8 +480,8 @@ function Readiness() {
         {loading
           ? tr('Reading reports/runs.', 'Đang đọc reports/runs.')
           : any
-            ? tr('Lab 20.1\'s benchmark builds the unfused pipeline from the reference solutions of M3 (Q K^T) and M2 (P V); your own M4 reduction is what you reuse in its kernel.', 'Benchmark của lab 20.1 xây pipeline không hợp nhất từ lời giải tham chiếu của M3 (Q K^T) và M2 (P V); phép rút gọn M4 của chính bạn là thứ bạn dùng lại trong kernel của nó.')
-            : tr('No runs on this machine yet. Lab 20.1\'s benchmark builds the unfused pipeline from the reference solutions of M3 (Q K^T) and M2 (P V); your own M4 reduction is what you reuse in its kernel.', 'Máy này chưa có lần chạy nào. Benchmark của lab 20.1 xây pipeline không hợp nhất từ lời giải tham chiếu của M3 (Q K^T) và M2 (P V); phép rút gọn M4 của chính bạn là thứ bạn dùng lại trong kernel của nó.')}
+            ? tr('Lab 20.1\'s benchmark builds the unfused pipeline from the reference solutions of M3 (Q K^T) and M2 (P V); your own M4 reduction is what you reuse in its kernel.', 'Benchmark của lab 20.1 xây pipeline không gộp từ lời giải tham chiếu của M3 (Q K^T) và M2 (P V); phép rút gọn M4 của chính bạn là thứ bạn dùng lại trong kernel của nó.')
+            : tr('No runs on this machine yet. Lab 20.1\'s benchmark builds the unfused pipeline from the reference solutions of M3 (Q K^T) and M2 (P V); your own M4 reduction is what you reuse in its kernel.', 'Máy này chưa có lần chạy nào. Benchmark của lab 20.1 xây pipeline không gộp từ lời giải tham chiếu của M3 (Q K^T) và M2 (P V); phép rút gọn M4 của chính bạn là thứ bạn dùng lại trong kernel của nó.')}
       </p>
     </Bench>
   );
@@ -489,9 +489,9 @@ function Readiness() {
 
 const ROADMAP: { sec: string; what: string; lab: string }[] = [
   { sec: '20.1, 20.2', get what() { return tr('Every block of a decoder layer as a kernel; the shape of every matrix in one head.', 'Mọi khối của một lớp decoder dưới dạng kernel; kích thước của mọi ma trận trong một head.'); }, lab: '' },
-  { sec: '20.3', get what() { return tr('Mask and softmax with one block per row; what the unfused pipeline moves.', 'Mặt nạ và softmax với một khối cho mỗi hàng; những gì pipeline không hợp nhất di chuyển.'); }, get lab() { return tr('Lab 20.1 (M6, part one)', 'Lab 20.1 (M6, phần một)'); } },
+  { sec: '20.3', get what() { return tr('Mask and softmax with one block per row; what the unfused pipeline moves.', 'Mặt nạ và softmax với một khối cho mỗi hàng; những gì pipeline không gộp di chuyển.'); }, get lab() { return tr('Lab 20.1 (M6, part one)', 'Lab 20.1 (M6, phần một)'); } },
   { sec: '20.4', get what() { return tr('KV caching: a decode step is a matrix-vector pass over the whole cache.', 'KV caching: một bước decode là một lượt nhân ma trận-vectơ trên toàn bộ cache.'); }, lab: '' },
-  { sec: '20.5', get what() { return tr('Flash attention: one fused kernel; S and P never reach memory.', 'Flash attention: một kernel hợp nhất; S và P không bao giờ chạm tới bộ nhớ.'); }, get lab() { return tr('Labs 20.2 (M6, part two) and 20.3 (race hunt)', 'Lab 20.2 (M6, phần hai) và 20.3 (săn race condition)'); } },
+  { sec: '20.5', get what() { return tr('Flash attention: one fused kernel; S and P never reach memory.', 'Flash attention: một kernel gộp; S và P không bao giờ chạm tới bộ nhớ.'); }, get lab() { return tr('Labs 20.2 (M6, part two) and 20.3 (race hunt)', 'Lab 20.2 (M6, phần hai) và 20.3 (săn race condition)'); } },
   { sec: '20.6, 20.7', get what() { return tr('Cache size, decode intensity, and MQA, GQA and MLA, which shrink the cache.', 'Kích thước cache, cường độ khi decode, và MQA, GQA và MLA, những cách thu nhỏ cache.'); }, get lab() { return tr('Labs 20.4 (M7) and 20.5', 'Lab 20.4 (M7) và 20.5'); } },
 ];
 
@@ -521,7 +521,7 @@ export function S200() {
           <p>
             Sách kể lịch sử trong một đoạn văn (transformer năm 2017, BERT năm 2018, các hướng thay thế như mô hình không gian
             trạng thái đang được khám phá). Phần còn lại của chương là kernel: một softmax, đại số của một cache, và một kernel
-            attention hợp nhất mà bạn sẽ viết. Chương này không in một con số thời gian nào, nên mọi con số trên các trang này
+            attention gộp mà bạn sẽ viết. Chương này không in một con số thời gian nào, nên mọi con số trên các trang này
             không phải từ phép tính số học đều đến từ chính các lab của bạn.
           </p>
         }
@@ -681,7 +681,7 @@ export function S200() {
       <Translated
         vi={
           <p>
-            Lab 20.1 không bắt đầu từ con số không. Benchmark của nó xây pipeline không hợp nhất từ các mốc dự án trước của bạn,
+            Lab 20.1 không bắt đầu từ con số không. Benchmark của nó xây pipeline không gộp từ các mốc dự án trước của bạn,
             và kernel của nó phát triển từ softmax ở chương 10 của bạn.
           </p>
         }
@@ -700,7 +700,7 @@ export function S200() {
             <code>torch.nn.functional.scaled_dot_product_attention(q, k, v, is_causal=True)</code>, trên các tensor có số chiều
             head nằm thứ ba tính từ cuối, chính là Eq. 20.1 của chương này. Mã tham chiếu trong tài liệu của nó dựng một mặt nạ
             tam giác dưới, điền âm vô cực vào các logits bị che, lấy softmax và nhân với V: đúng từng bước của mục 20.2. Thứ
-            thường chạy thực tế là một kernel hợp nhất: trên CUDA, FlashAttention-2 hoặc một kernel tiết kiệm bộ nhớ, với một
+            thường chạy thực tế là một kernel gộp: trên CUDA, FlashAttention-2 hoặc một kernel tiết kiệm bộ nhớ, với một
             cài đặt C++ làm phương án dự phòng; trên GPU Apple, các kernel decode và prefill Metal của chính PyTorch, chuyển thể
             từ MLX.
           </p>

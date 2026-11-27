@@ -84,7 +84,7 @@ export const questionsS230: Record<string, Question> = {
           <Translated
             vi={
               <>
-                Bản sao <code>d</code> lên GPU mà lần khởi chạy thực hiện trước khi kernel bắt đầu.
+                Lần sao chép <code>d</code> lên GPU mà lần khởi chạy thực hiện trước khi kernel bắt đầu.
               </>
             }
           >
@@ -104,7 +104,7 @@ export const questionsS230: Record<string, Question> = {
           <p>
             Trả về từ một lần khởi chạy nghĩa là kernel đã được đưa vào hàng đợi của một stream, và không hơn: nó có thể còn
             chưa bắt đầu (p. 556). Host được tự do xếp thêm việc, và phần{' '}
-            <a href={href('ch23', '23.3')}>23.3</a> được xây trên điều đó: một bản sao hay một kernel khác có thể được xếp
+            <a href={href('ch23', '23.3')}>23.3</a> được xây trên điều đó: một lần sao chép hay một kernel khác có thể được xếp
             hàng trong khi kernel này chạy. Để đo thời gian một kernel, hãy chờ nó bên trong vùng được đo, như <code>t2</code>{' '}
             làm, hoặc ghi event quanh nó và đọc khoảng thời gian giữa chúng (trang{' '}
             <a href={href('ch23', '23.4')}>23.3–23.5</a> chỉ dùng event để sắp thứ tự). Đã học ở{' '}
@@ -343,7 +343,7 @@ export const questionsS230: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Việc ghim là thứ cho bộ đệm một địa chỉ mà kernel có thể dùng.">
+          <Translated vi="Việc ghim là thứ cho buffer một địa chỉ mà kernel có thể dùng.">
             Pinning is what gives the buffer an address that a kernel is able to use.
           </Translated>
         ),
@@ -360,8 +360,8 @@ export const questionsS230: Record<string, Question> = {
           <p>
             Hệ điều hành có thể di chuyển một trang bộ nhớ thường, hoặc ghi nó ra đĩa, vào bất cứ lúc nào. Một GPU đang dùng
             vùng nhớ đó đúng lúc ấy sẽ đọc hoặc ghi vào bất cứ thứ gì đang nằm ở đó. Chương 23 đưa ra cùng lý do cho các
-            bản sao: phần cứng DMA phía sau <code>cudaMemcpy</code> làm việc trên địa chỉ vật lý (pp. 562–563). Phần{' '}
-            <a href={href('ch23', '23.3')}>23.3</a> đi tiếp từ đó: vì sao một bản sao bất đồng bộ cần bộ đệm host được
+            lần sao chép: phần cứng DMA phía sau <code>cudaMemcpy</code> làm việc trên địa chỉ vật lý (pp. 562–563). Phần{' '}
+            <a href={href('ch23', '23.3')}>23.3</a> đi tiếp từ đó: vì sao một lần sao chép bất đồng bộ cần buffer host được
             ghim. Đã học ở <a href={href('appC', 'C.2')}>phụ lục C §C.2</a>.
           </p>
         }
@@ -1311,7 +1311,7 @@ export function S230() {
         vi={
           <ul>
             <li>
-              một lần khởi chạy hay một bản sao bất đồng bộ được <b>xếp hàng, chưa xong</b>: khi lời gọi trả về, công việc
+              một lần khởi chạy hay một lần sao chép bất đồng bộ được <b>xếp hàng, chưa xong</b>: khi lời gọi trả về, công việc
               có thể còn chưa bắt đầu;
             </li>
             <li>
@@ -1321,7 +1321,7 @@ export function S230() {
               <b>event</b>, cho phép một hàng đợi chờ một điểm trong hàng đợi khác mà không chặn host;
             </li>
             <li>
-              <b>bản sao bất đồng bộ</b> và bộ nhớ host <b>được ghim</b> (pinned memory) mà chúng phụ thuộc vào;
+              <b>lần sao chép bất đồng bộ</b> và bộ nhớ host <b>được ghim</b> (pinned memory) mà chúng phụ thuộc vào;
             </li>
             <li>
               và khuôn mẫu gắn kết tất cả: tính trước thứ người khác đang chờ, rồi chồng lấp việc truyền nó với phần còn lại
@@ -1369,13 +1369,13 @@ export function S230() {
         vi={
           <p>
             Đó là phần 23.3 của sách, ở đây được chia thành hai trang. Trang <a href={href('ch23', '23.3')}>23.3</a>{' '}
-            bao quát nửa đầu (chồng lấp, stream, bản sao bất đồng bộ, bộ nhớ ghim, pp. 553–556 và 560–563); trang{' '}
+            bao quát nửa đầu (chồng lấp, stream, lần sao chép bất đồng bộ, bộ nhớ ghim, pp. 553–556 và 560–563); trang{' '}
             <a href={href('ch23', '23.4')}>23.3–23.5</a> bao quát nửa sau (ba lần khởi chạy, độ ưu tiên, event, pp.
             556–562). MPI, NCCL và NVSHMEM, các phần 23.2, 23.4 và 23.5 của sách, mỗi thứ có một đoạn trên trang đó và một
             bảng duy nhất so sánh nơi vòng lặp của chúng phải chờ, kèm số trang trong sách cho khi bạn cần. Các trình khám
             phá chỉ mô hình hóa hai vòng lặp MPI, và không câu hỏi nào về NCCL hay NVSHMEM vào phần ôn tập của bạn. Chương
             này không có mốc dự án. Lab duy nhất của nó,{' '}
-            <a href={href('ch23', 'labs')}>Giấu các lần chép sau kernel</a>, đo mức chồng lấp trên GPU của chính bạn.
+            <a href={href('ch23', 'labs')}>Giấu các lần sao chép sau kernel</a>, đo mức chồng lấp trên GPU của chính bạn.
           </p>
         }
       >
@@ -1645,7 +1645,7 @@ export function S230() {
             các GPU tính, đường kết nối giữa chúng không mang gì, và trong khi các hàng đang truyền, các GPU không có việc
             gì làm. Phần <a href={href('ch23', '23.3')}>23.3</a> bắt đầu từ ba lần khởi chạy của trình khám phá: tính hai
             hàng rìa trước, bắt đầu gửi chúng, và tính các hàng bên trong trong khi chúng đang truyền. Điều đó cần những
-            lần khởi chạy không chờ nhau và những bản sao không chặn host, chính là thứ stream, event và bộ nhớ ghim cung
+            lần khởi chạy không chờ nhau và những lần sao chép không chặn host, chính là thứ stream, event và bộ nhớ ghim cung
             cấp.
           </p>
         }

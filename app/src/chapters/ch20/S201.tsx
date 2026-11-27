@@ -125,9 +125,9 @@ export const questionsS201: Record<string, Question> = {
         vi={
           <p>
             Mọi thứ khác là một GEMM hoặc GEMV, một phép rút gọn theo hàng, việc theo từng phần tử hoặc một phép gather. Ngay cả
-            ba bước attention cũng chạy được ở dạng không hợp nhất trên các kernel cũ (hai GEMM và một softmax); cái mới là mặt nạ
-            nhân quả và, ở mục 20.5, việc hợp nhất chúng để các ma trận N × N không bao giờ tồn tại. Sách cũng nói vậy về phiên
-            bản không hợp nhất của nó: softmax là mảnh mới duy nhất (p. 486).
+            ba bước attention cũng chạy được ở dạng không gộp trên các kernel cũ (hai GEMM và một softmax); cái mới là mặt nạ
+            nhân quả và, ở mục 20.5, việc gộp chúng để các ma trận N × N không bao giờ tồn tại. Sách cũng nói vậy về phiên
+            bản không gộp của nó: softmax là mảnh mới duy nhất (p. 486).
           </p>
         }
       >
@@ -752,7 +752,7 @@ export function S201() {
             Tỷ lệ của chúng là N / (6 d_model): ở d_model = 4096, các phép nhân chỉ ngang bằng khi vượt quá 24,000 token, và
             bỏ qua nửa bị che đẩy con số đó lên khoảng 49,000. Decode có cùng tỷ lệ, vì một token gặp N key. Vậy ở độ dài thông
             thường, vấn đề của attention không phải là FLOP. Ở chỗ nó là vấn đề, đó là{' '}
-            <b>byte</b>, ở hai nơi. Trong prefill không hợp nhất, các ma trận N × N S và P mà pipeline ghi rồi đọc (mục 20.3)
+            <b>byte</b>, ở hai nơi. Trong prefill không gộp, các ma trận N × N S và P mà pipeline ghi rồi đọc (mục 20.3)
             chiếm phần lớn lưu lượng. Trong decode, một chuỗi đọc 2 N d_model phần tử cache mỗi lớp so với 12 d_model² trọng số:
             vẫn là N / (6 d_model), nên với một chuỗi ở độ dài thông thường, trọng số vẫn chiếm phần lớn. Nhưng một batch dùng
             chung trọng số chứ không dùng chung cache, nên lượng đọc cache thắng khi b × N vượt quá 6 d_model, điều mà batching

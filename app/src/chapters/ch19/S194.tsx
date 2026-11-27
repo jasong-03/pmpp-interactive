@@ -199,7 +199,7 @@ export const questionsS194: Record<string, Question> = {
       { label: <Translated vi="Cả hai đều chọn bố cục dữ liệu của các tensor.">Both choose the data layout of the tensors.</Translated>, why: <Translated vi="Bố cục nằm trong các tensor descriptor bạn truyền vào. Hai thứ này chọn thuật toán.">The layout is in the tensor descriptors you pass. These choose the algorithm.</Translated> },
     ],
     explain: (
-      <Translated vi={<p>Khi đặt <code>benchmark</code>, cuDNN đo benchmark vài thuật toán tích chập cho mỗi bộ kích thước mới và chọn cái nhanh nhất. <code>miopenFindConvolutionForwardAlgorithm</code> của MIOpen biên dịch và đo thời gian các solver của nó rồi trả về chúng đã sắp xếp; nó là bắt buộc trước <code>miopenConvolutionForward</code>, và nó lưu kết quả vào bộ đệm trên đĩa để các phiên sau khởi động nhanh hơn. Immediate mode bỏ qua Find và tra cứu câu trả lời thay vào đó.</p>}>
+      <Translated vi={<p>Khi đặt <code>benchmark</code>, cuDNN đo benchmark vài thuật toán tích chập cho mỗi bộ kích thước mới và chọn cái nhanh nhất. <code>miopenFindConvolutionForwardAlgorithm</code> của MIOpen biên dịch và đo thời gian các solver của nó rồi trả về chúng đã sắp xếp; nó là bắt buộc trước <code>miopenConvolutionForward</code>, và nó lưu kết quả vào bộ nhớ đệm (cache) trên đĩa để các phiên sau khởi động nhanh hơn. Immediate mode bỏ qua Find và tra cứu câu trả lời thay vào đó.</p>}>
       <p>
         With <code>benchmark</code> set, cuDNN benchmarks several convolution algorithms for each new set of sizes and
         selects the fastest. MIOpen&rsquo;s <code>miopenFindConvolutionForwardAlgorithm</code> compiles and times its
@@ -531,13 +531,13 @@ function Flashcards() {
       <div className="row" style={{ marginBottom: '0.7rem' }}>
         {card.options.map((o) => (
           <button key={o} aria-pressed={pick === o} disabled={pick != null && pick !== o} onClick={() => choose(o)} data-option={o}>
-            {o}
+            {tr(o, ({ 'no counterpart': 'không có tương ứng', 'R and S': 'R và S', 'P and Q': 'P và Q', 'u and v': 'u và v' } as Record<string, string>)[o] ?? o)}
           </button>
         ))}
       </div>
       {pick != null ? (
         <p style={{ margin: '0 0 0.7rem' }} data-verdict={ok ? 'right' : 'wrong'}>
-          <span className={'chip ' + (ok ? 'ok' : 'fail')}>{ok ? tr('Right', 'Đúng') : tr(`No: ${card.answer}`, `Không: ${card.answer}`)}</span> {card.why}
+          <span className={'chip ' + (ok ? 'ok' : 'fail')}>{ok ? tr('Right', 'Đúng') : tr(`No: ${card.answer}`, `Không: ${({ 'no counterpart': 'không có tương ứng', 'R and S': 'R và S', 'P and Q': 'P và Q', 'u and v': 'u và v' } as Record<string, string>)[card.answer] ?? card.answer}`)}</span> {card.why}
         </p>
       ) : null}
       <button className="primary" onClick={next} disabled={pick == null}>
@@ -932,7 +932,7 @@ const DIFFER: [() => string, () => string, () => string, () => string][] = [
   [
     () => tr('Choosing one', 'Chọn một thuật toán'),
     () => tr('The caller passes algo (legacy) or heuristics pick an engine; PyTorch’s cudnn.benchmark times several', 'Người gọi truyền algo (legacy) hoặc heuristic chọn một engine; cudnn.benchmark của PyTorch đo thời gian vài cái'),
-    () => tr('Find times solvers and caches on disk; immediate mode uses a database and heuristics', 'Find đo thời gian các solver và lưu bộ đệm trên đĩa; immediate mode dùng một cơ sở dữ liệu và heuristic'),
+    () => tr('Find times solvers and caches on disk; immediate mode uses a database and heuristics', 'Find đo thời gian các solver và lưu vào bộ nhớ đệm trên đĩa; immediate mode dùng một cơ sở dữ liệu và heuristic'),
     () => tr('Not exposed', 'Không được công khai'),
   ],
   [() => tr('Explicit im2col as an API', 'im2col tường minh dưới dạng API'), () => tr('cudnnIm2Col (deprecated in 9.0), one row per output pixel', 'cudnnIm2Col (bị ngừng khuyến nghị từ 9.0), mỗi pixel đầu ra một hàng'), () => tr('None in miopen.h', 'Không có trong miopen.h'), () => tr('MPSGraph imToCol (macOS 14 and later)', 'MPSGraph imToCol (macOS 14 trở về sau)')],
@@ -1269,7 +1269,7 @@ export function S194() {
       <Ask q={q['ch19/19.4/q-tf32']} />
 
       <h2><Translated vi="Trên AMD: MIOpen">On AMD: MIOpen</Translated></h2>
-      <Translated vi={<p>Thư viện tương ứng của AMD có hình dáng của API legacy của cuDNN: một handle, các descriptor mờ, và một lời gọi forward nhận một thuật toán và một workspace. MIOpen 3.6.2 có năm thuật toán forward, GEMM, direct, FFT, Winograd và implicit GEMM, và nó tính tương quan chéo, như sách. Hai khác biệt quan trọng trong thực tế. Một bước Find, biên dịch và đo thời gian một tập solver cho bài toán của bạn, là bắt buộc trước{' '}<code>miopenConvolutionForward</code>; nó lưu kết quả vào bộ đệm trên đĩa để các phiên sau chạy nhanh hơn, và immediate mode thay nó bằng một lần tra cứu trong cơ sở dữ liệu. Và trong ba bố cục của Bài tập 2, NCHW và NHWC được hỗ trợ đầy đủ còn CHWN hoàn toàn không được hỗ trợ.</p>}>
+      <Translated vi={<p>Thư viện tương ứng của AMD có hình dáng của API legacy của cuDNN: một handle, các descriptor mờ, và một lời gọi forward nhận một thuật toán và một workspace. MIOpen 3.6.2 có năm thuật toán forward, GEMM, direct, FFT, Winograd và implicit GEMM, và nó tính tương quan chéo, như sách. Hai khác biệt quan trọng trong thực tế. Một bước Find, biên dịch và đo thời gian một tập solver cho bài toán của bạn, là bắt buộc trước{' '}<code>miopenConvolutionForward</code>; nó lưu kết quả vào bộ nhớ đệm (cache) trên đĩa để các phiên sau chạy nhanh hơn, và immediate mode thay nó bằng một lần tra cứu trong cơ sở dữ liệu. Và trong ba bố cục của Bài tập 2, NCHW và NHWC được hỗ trợ đầy đủ còn CHWN hoàn toàn không được hỗ trợ.</p>}>
       <p>
         AMD&rsquo;s counterpart has the shape of cuDNN&rsquo;s legacy API: a handle, opaque descriptors, and a forward
         call that takes an algorithm and a workspace. MIOpen 3.6.2 has five forward algorithms, GEMM, direct, FFT,

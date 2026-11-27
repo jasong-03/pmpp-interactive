@@ -1276,7 +1276,7 @@ export function S204() {
           vi={
             <p>
               Chỉ lưu lượng bắt buộc: mỗi toán hạng đọc một lần và kết quả ghi một lần, không có bộ nhớ đệm, các phép nhân
-              của một head. Q Kᵀ của prefill ghi N × N điểm số của nó, như bản cơ sở không hợp nhất của mục 20.3.
+              của một head. Q Kᵀ của prefill ghi N × N điểm số của nó, như bản cơ sở không gộp của mục 20.3.
             </p>
           }
         >

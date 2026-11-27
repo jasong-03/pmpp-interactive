@@ -4,7 +4,7 @@ import { Aside, Bench, Beyond, Simplification, Source, Today } from '../../compo
 import { useNarrow } from '../../lib/narrow';
 import { useProgress } from '../../lib/progress';
 import { fmt, useReports } from '../../lib/reports';
-import { Translated, localized, tr } from '../../lib/i18n';
+import { Translated, localized, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import { PLAN, useAllChapters } from '../registry';
 import { GOALS, STEPS, goal, lanes, rollup, stepOf, stepsOf, type GoalId, type Step } from '../../sim/booksteps';
@@ -314,20 +314,30 @@ const limitQuestion = (qid: string): ChoiceQ => {
   return {
     kind: 'choice',
     id: qid,
-    prompt: (
-      <Translated vi={<>Hàng nào trong bảng cuối cùng của sách giới hạn việc này? {c.card}</>}>
-        <>Which row of the book's last table limits this? {c.card}</>
-      </Translated>
-    ),
-    options: LIMIT_ROWS.map((r) => ({
-      label: r.name,
-      correct: r.id === c.row,
-      get why() {
-        return r.id === c.row ? undefined : NOT_THIS[qid][r.id];
-      },
-    })),
-    explain: <p>{c.why}</p>,
-    source: c.source,
+    // Getters: the card, row names, explanation and source come from hwtable getters, so they are
+    // read in the selected language when the question renders, not once when this module loads.
+    get prompt() {
+      return (
+        <Translated vi={<>Hàng nào trong bảng cuối cùng của sách giới hạn việc này? {c.card}</>}>
+          <>Which row of the book's last table limits this? {c.card}</>
+        </Translated>
+      );
+    },
+    get options() {
+      return LIMIT_ROWS.map((r) => ({
+        label: r.name,
+        correct: r.id === c.row,
+        get why() {
+          return r.id === c.row ? undefined : NOT_THIS[qid][r.id];
+        },
+      }));
+    },
+    get explain() {
+      return <p>{c.why}</p>;
+    },
+    get source() {
+      return c.source;
+    },
   };
 };
 
@@ -703,7 +713,8 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
 function TableAudit({ onCheck }: { onCheck: () => void }) {
   const { progress } = useProgress();
   const committed = typeof progress.answers[P_HOSTLINK]?.value === 'number';
-  const cells = useMemo(printedCells, []);
+  const locale = useLocale();
+  const cells = useMemo(printedCells, [locale]);
   const byId = useMemo(() => Object.fromEntries(cells.map((c) => [c.id, c])), [cells]);
   const [ticks, setTicks] = useState<string[]>([]);
   // The ticks as they stood at the last press of Check.

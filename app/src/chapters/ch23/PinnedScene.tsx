@@ -178,7 +178,7 @@ function Pages({ moving, dma }: { moving: number; dma?: { k: number; broken: boo
   const used = new Set(M.frames);
   return (
     <g>
-      <text x={PX} y={26} fontSize="12" fontWeight="600"><Translated vi={<>Một vùng đệm từ malloc: {M.pages} trang ảo, nối tiếp nhau</>}>A buffer from malloc: {M.pages} virtual pages, one after another</Translated></text>
+      <text x={PX} y={26} fontSize="12" fontWeight="600"><Translated vi={<>Một buffer từ malloc: {M.pages} trang ảo, nối tiếp nhau</>}>A buffer from malloc: {M.pages} virtual pages, one after another</Translated></text>
       {Array.from({ length: M.pages }, (_, i) => (
         <g key={'p' + i} data-page={i}>
           <rect x={pageX(i)} y={36} width={PW} height={34} rx="3" fill="var(--cell)" stroke="var(--ink)"
@@ -253,7 +253,7 @@ function StagingBeat({ p }: { p: number }) {
         <Translated
           vi={
             <>
-              Sao chép {M.pages} trang pageable: {plan.pieces.length} phần qua {2} vùng đệm trung chuyển được ghim, mỗi vùng {M.staging} trang
+              Sao chép {M.pages} trang pageable: {plan.pieces.length} phần qua {2} buffer trung chuyển được ghim, mỗi vùng {M.staging} trang
             </>
           }
         >
@@ -266,7 +266,7 @@ function StagingBeat({ p }: { p: number }) {
           <g key={b} data-buffer={b}>
             <rect x={L + b * 190} y={52} width={170} height={36} rx="3" fill={holding ? 'var(--ink)' : 'var(--cell)'} fillOpacity={holding ? 0.18 : 1} stroke="var(--ink)" />
             <text x={L + b * 190 + 85} y={74} fontSize="11" textAnchor="middle">
-              <Translated vi={<>vùng đệm trung chuyển {b} (được ghim){holding ? `: phần ${holding.k}` : ''}</>}>
+              <Translated vi={<>buffer trung chuyển {b} (được ghim){holding ? `: phần ${holding.k}` : ''}</>}>
                 staging buffer {b} (pinned){holding ? `: piece ${holding.k}` : ''}
               </Translated>
             </text>
@@ -318,7 +318,7 @@ function TimelineBeat({ p, which }: { p: number; which: 'pageable' | 'pinned' })
         <Translated
           vi={
             <>
-              Bốn chunk gồm copy-in 1, kernel 2, copy-out 1, mỗi chunk một stream, vùng đệm host {which === 'pageable' ? 'pageable' : 'được ghim'}
+              Bốn chunk gồm copy-in 1, kernel 2, copy-out 1, mỗi chunk một stream, buffer host {which === 'pageable' ? 'pageable' : 'được ghim'}
             </>
           }
         >
@@ -426,7 +426,7 @@ const beats: Beat[] = [
       return tr('Staging', 'Trung chuyển');
     },
     draw: (p) => (
-      <Stage label={tr('A pageable copy staged through pinned buffers', 'Một phép sao chép pageable đi qua các vùng đệm được ghim')}>
+      <Stage label={tr('A pageable copy staged through pinned buffers', 'Một phép sao chép từ bộ nhớ phân trang (pageable) đi qua các buffer được ghim')}>
         <StagingBeat p={p} />
         <Headline>{tr(`the host takes part in every piece and is held until ${M.plan.returnsAt}`, `host tham gia vào mọi phần và bị giữ đến ${M.plan.returnsAt}`)}</Headline>
       </Stage>
@@ -438,7 +438,7 @@ const beats: Beat[] = [
       return tr('Pageable', 'Pageable');
     },
     draw: (p) => (
-      <Stage label={tr('The four-chunk pipeline with pageable buffers', 'Pipeline bốn chunk với vùng đệm pageable')}>
+      <Stage label={tr('The four-chunk pipeline with pageable buffers', 'Pipeline bốn chunk với buffer pageable')}>
         <TimelineBeat p={p} which="pageable" />{/* i18n-ignore: schedule key */}
         <Headline>
           {p > 0.86
@@ -453,7 +453,7 @@ const beats: Beat[] = [
       return tr('Pinned', 'Ghim');
     },
     draw: (p) => (
-      <Stage label={tr('The four-chunk pipeline with pinned buffers', 'Pipeline bốn chunk với vùng đệm được ghim')}>
+      <Stage label={tr('The four-chunk pipeline with pinned buffers', 'Pipeline bốn chunk với buffer được ghim')}>
         <TimelineBeat p={p} which="pinned" />{/* i18n-ignore: schedule key */}
         <Headline>
           {p > 0.86
@@ -471,7 +471,7 @@ const beats: Beat[] = [
       <Stage label={tr('Pinned memory on CUDA, HIP and Apple silicon', 'Bộ nhớ ghim (pinned memory) trên CUDA, HIP và Apple silicon')}>
         <TodayBeat p={p} />
         <Headline>
-          <Translated vi="một phép sao chép async từ bộ nhớ pageable là hợp lệ nhưng âm thầm chạy đồng bộ">a pageable async copy is legal and silently synchronous</Translated>
+          <Translated vi="một phép sao chép async từ bộ nhớ phân trang là hợp lệ nhưng âm thầm chạy đồng bộ">a pageable async copy is legal and silently synchronous</Translated>
         </Headline>
       </Stage>
     ),

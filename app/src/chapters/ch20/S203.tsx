@@ -396,7 +396,7 @@ export const questionsS203: Record<string, Question> = {
     kind: 'numeric',
     id: 'ch20/20.3/q-sp-bytes',
     prompt: (
-      <Translated vi={<>32 head, N = 4096, fp32: S và P cùng nhau chiếm bao nhiêu bộ nhớ cho một lớp của pipeline không hợp nhất?</>}>
+      <Translated vi={<>32 head, N = 4096, fp32: S và P cùng nhau chiếm bao nhiêu bộ nhớ cho một lớp của pipeline không gộp?</>}>
         <>32 heads, N = 4096, fp32: how much memory do S and P together take for one layer of the unfused pipeline?</>
       </Translated>
     ),
@@ -1204,7 +1204,7 @@ function Traffic() {
   const ratio = t.total / t.irreducible;
   return (
     <Bench
-      title={tr('What the unfused pipeline moves', 'Pipeline không hợp nhất di chuyển những gì')}
+      title={tr('What the unfused pipeline moves', 'Pipeline không gộp di chuyển những gì')}
       task={
         <Translated vi="Đặt 32 head ở N = 4096 với fp32 và đọc dung lượng bộ nhớ mà S và P chiếm. Rồi nhân đôi N.">
           Set 32 heads at N = 4096 in fp32 and read the memory S and P hold. Then double N.
@@ -1798,7 +1798,7 @@ export function S203() {
       <Ask q={questionsS203['ch20/20.3/q-cub']} />
 
       <h2>
-        <Translated vi="Pipeline không hợp nhất di chuyển những gì">What the unfused pipeline moves</Translated>
+        <Translated vi="Pipeline không gộp di chuyển những gì">What the unfused pipeline moves</Translated>
       </h2>
       <Translated
         vi={

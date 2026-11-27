@@ -283,7 +283,7 @@ export const questionsS212: Record<string, Question> = {
         correct: true,
       },
       { label: <Translated vi="Metal không có phép toán nguyên tử float, nên backend MPS lùi về một kernel CPU, điều mà chế độ tất định không cho phép.">Metal has no float atomics, so the MPS backend falls back to a CPU kernel, which deterministic mode does not allow.</Translated>, why: <Translated vi="Nó có (atomic_float, Apple7 trở lên), và kernel MPS dùng chúng; đó là lý do nó không tất định.">It has them (atomic_float, Apple7 and later), and the MPS kernel uses them; that is why it is not deterministic.</Translated> },
-      { label: <Translated vi="CUDA bảo đảm thứ tự các phép cộng nguyên tử vào một địa chỉ, nên đường nguyên tử của nó tất định; Metal không hứa như vậy.">CUDA guarantees the order of atomic additions to one address, so its atomic path is deterministic; Metal makes no such promise.</Translated>, why: <Translated vi="NVIDIA ghi rằng thứ tự đó là không xác định. Vì thế PyTorch bỏ qua đường nguyên tử hợp nhất của nó ở chế độ tất định.">NVIDIA documents that order as undefined. PyTorch skips its fused atomic path in deterministic mode for that reason.</Translated> },
+      { label: <Translated vi="CUDA bảo đảm thứ tự các phép cộng nguyên tử vào một địa chỉ, nên đường nguyên tử của nó tất định; Metal không hứa như vậy.">CUDA guarantees the order of atomic additions to one address, so its atomic path is deterministic; Metal makes no such promise.</Translated>, why: <Translated vi="NVIDIA ghi rằng thứ tự đó là không xác định. Vì thế PyTorch bỏ qua đường nguyên tử gộp của nó ở chế độ tất định.">NVIDIA documents that order as undefined. PyTorch skips its fused atomic path in deterministic mode for that reason.</Translated> },
       { label: <Translated vi="Backend MPS tích lũy gradient ở độ chính xác một nửa, và tổng độ chính xác một nửa không thể làm cho lặp lại được trên bất kỳ GPU nào.">The MPS backend accumulates the gradient in half precision, and half-precision sums cannot be made repeatable on any GPU.</Translated>, why: <Translated vi="Vấn đề không phải độ chính xác; mà là thứ tự các phép cộng.">Precision is not the issue; the order of the additions is.</Translated> },
     ],
     explain: (
@@ -577,7 +577,7 @@ export const questionsS212: Record<string, Question> = {
     ),
     options: [
       { label: <Translated vi="Mọi hàng phải bắt đầu tại một ranh giới 16 byte: grid.x là bội số của 4, hoặc các hàng được cấp phát với một pitch.">Every row must start on a 16-byte boundary: grid.x a multiple of 4, or rows allocated with a pitch.</Translated>, correct: true },
-      { label: <Translated vi="Không gì cả: mọi bộ đệm float đều có thể truy cập như float4 tại bất kỳ địa chỉ nào; một bộ đệm lệch căn chỉ chậm hơn.">Nothing: any float buffer can be accessed as float4 at any address; a misaligned one is only slower.</Translated>, why: <Translated vi="Một truy cập 16 byte cần một địa chỉ căn theo 16 byte; hướng dẫn của NVIDIA nói như vậy.">A 16-byte access needs a 16-byte-aligned address; NVIDIA's guidance says so.</Translated> },
+      { label: <Translated vi="Không gì cả: mọi buffer float đều có thể truy cập như float4 tại bất kỳ địa chỉ nào; một buffer lệch căn chỉ chậm hơn.">Nothing: any float buffer can be accessed as float4 at any address; a misaligned one is only slower.</Translated>, why: <Translated vi="Một truy cập 16 byte cần một địa chỉ căn theo 16 byte; hướng dẫn của NVIDIA nói như vậy.">A 16-byte access needs a 16-byte-aligned address; NVIDIA's guidance says so.</Translated> },
       { label: <Translated vi="blockDim.x phải là bội số của 4, để mọi luồng của khối nhận được trọn một float4.">blockDim.x must be a multiple of 4, so that every thread of the block gets a whole float4.</Translated>, why: <Translated vi="Căn chỉnh là chuyện của địa chỉ, không phải chuyện một khối có bao nhiêu luồng.">Alignment is about addresses, not about how many threads a block has.</Translated> },
       { label: <Translated vi="Khối phải đưa các đầu ra của nó vào bộ nhớ chia sẻ trước rồi lưu chúng từ đó như một ô (tile).">The block must first stage its outputs in shared memory and store them from there as one tile.</Translated>, why: <Translated vi="Không cần: mỗi luồng đã sở hữu bốn float liền kề trong thanh ghi.">Not needed: each thread already owns four adjacent floats in registers.</Translated> },
     ],
@@ -589,7 +589,7 @@ export const questionsS212: Record<string, Question> = {
             hàng. Nếu <code>grid.x</code> không phải bội số của 4, các float4 của hàng thứ hai bị lệch căn. Với các hàng được
             căn chỉnh, một warp khi đó ghi 512 byte liên tục trong một yêu cầu: 16 sector, mức tối ưu của NVIDIA cho truy
             cập 128 bit. Việc ép kiểu <code>float*</code> thành <code>float4*</code> của sách là thực hành từ blog của
-            NVIDIA, không có trong các hướng dẫn của hãng; trên Metal, cách được ghi nhận trong tài liệu là khai báo bộ đệm
+            NVIDIA, không có trong các hướng dẫn của hãng; trên Metal, cách được ghi nhận trong tài liệu là khai báo buffer
             là <code>device float4*</code>.
           </p>
         }

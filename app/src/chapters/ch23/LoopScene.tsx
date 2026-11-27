@@ -205,7 +205,7 @@ export function Timeline(p: TimelineProps) {
           <title>
             {tr(
               `${s.lane === 'host' ? 'line ' + s.line + ': ' + s.label : label}, ${r2(s.start)} to ${r2(s.end)}`,
-              `${s.lane === 'host' ? 'dòng ' + s.line + ': ' + s.label : label}, từ ${r2(s.start)} đến ${r2(s.end)}`,
+              `${s.lane === 'host' ? 'dòng ' + s.line + ': ' + s.label.replace(/^MPI_Sendrecv \(top\)$/, 'MPI_Sendrecv (trên)').replace(/^MPI_Sendrecv \(bottom\)$/, 'MPI_Sendrecv (dưới)') : label}, từ ${r2(s.start)} đến ${r2(s.end)}`,
             )}
           </title>
         </g>,
@@ -331,10 +331,11 @@ export function Timeline(p: TimelineProps) {
 
 // ---------------------------------------------------------------- the scene
 
+// Getters, not stored runs: each run carries host-call labels, which must be read in the selected language.
 export const SCENE_RUNS: Record<'streams' | 'nccl' | 'nvshmem', LoopResult> = {
-  streams: simulate({ ...DEFAULTS, version: 'streams' }),
-  nccl: simulate({ ...DEFAULTS, version: 'nccl' }),
-  nvshmem: simulate({ ...DEFAULTS, version: 'nvshmem' }),
+  get streams() { return simulate({ ...DEFAULTS, version: 'streams' }); },
+  get nccl() { return simulate({ ...DEFAULTS, version: 'nccl' }); },
+  get nvshmem() { return simulate({ ...DEFAULTS, version: 'nvshmem' }); },
 };
 const S = SCENE_RUNS.streams;
 const S1 = S.iters[0];
@@ -435,7 +436,7 @@ const beats: Beat[] = [
             'lines 04 to 22 of Fig. 23.14, zoomed in: each call returns once its operation is queued',
             'các dòng 04 đến 22 của Hình 23.14, phóng to: mỗi lời gọi trả về ngay khi thao tác của nó đã vào hàng đợi',
           )}>
-          <Timeline r={S} y={Y} t1={INS_T1} cursor={cur} iters={[1]} insertions rows={['host', ...ALL_STREAMS]} />
+          <Timeline r={SCENE_RUNS.streams} y={Y} t1={INS_T1} cursor={cur} iters={[1]} insertions rows={['host', ...ALL_STREAMS]} />
         </Frame>
       );
     },
@@ -449,7 +450,7 @@ const beats: Beat[] = [
       const cur = ramp(p, 0.04, 0.92) * S1.internal.end;
       return (
         <Frame beat={2} h={H6} headline={cur < S1.top.end ? tr('The reset, then both boundary kernels', 'Bước đặt lại, rồi đến cả hai kernel biên') : tr(`Boundary kernels done by ${r2(S1.bottom.end)}; the internal kernel runs to ${r2(S1.internal.end)}`, `Các kernel biên xong lúc ${r2(S1.bottom.end)}; kernel bên trong chạy đến ${r2(S1.internal.end)}`)} sub={SUB()}>
-          <Timeline r={S} y={Y} t1={T1} cursor={cur} iters={[1]} host="calls" content={['host', ...ALL_STREAMS]} slots />{/* i18n-ignore: prop value */}
+          <Timeline r={SCENE_RUNS.streams} y={Y} t1={T1} cursor={cur} iters={[1]} host="calls" content={['host', ...ALL_STREAMS]} slots />{/* i18n-ignore: prop value */}
         </Frame>
       );
     },
@@ -463,7 +464,7 @@ const beats: Beat[] = [
       const cur = S1.internal.end * 0.55 + ramp(p, 0.1, 0.9) * (S1.copy.end - S1.internal.end * 0.55);
       return (
         <Frame beat={3} h={H6} headline={cur < S1.copy.start ? tr('computeTop and computeBottom are reached; the copy waits', 'Đã đạt tới computeTop và computeBottom; phép sao chép phải chờ') : tr(`The copy runs at ${r2(S1.copy.start)}, after both events and its own kernel`, `Phép sao chép chạy lúc ${r2(S1.copy.start)}, sau cả hai event và kernel của chính nó`)} sub={SUB()}>
-          <Timeline r={S} y={Y} t1={T1} cursor={cur} iters={[1]} host="calls" content={['host', ...ALL_STREAMS]} slots arrows />{/* i18n-ignore: prop value */}
+          <Timeline r={SCENE_RUNS.streams} y={Y} t1={T1} cursor={cur} iters={[1]} host="calls" content={['host', ...ALL_STREAMS]} slots arrows />{/* i18n-ignore: prop value */}
         </Frame>
       );
     },
@@ -477,7 +478,7 @@ const beats: Beat[] = [
       const cur = ramp(p, 0.04, 0.9) * S1.hostEnd;
       return (
         <Frame beat={4} h={H6} headline={cur < S1.exBottom.start ? tr(`The host sits in the top exchange until ${r2(S1.exTop.end)}`, `Host nằm chờ trong trao đổi phía trên đến ${r2(S1.exTop.end)}`) : tr(`Bottom rows ready at ${r2(S1.bottom.end)}, sent at ${r2(S1.exBottom.start)}: ${r2(S1.bottomGap)} lost`, `Các hàng dưới sẵn sàng lúc ${r2(S1.bottom.end)}, được gửi lúc ${r2(S1.exBottom.start)}: mất ${r2(S1.bottomGap)}`)} sub={SUB()}>
-          <Timeline r={S} y={Y} t1={T1} cursor={cur} iters={[1]} slots gap />
+          <Timeline r={SCENE_RUNS.streams} y={Y} t1={T1} cursor={cur} iters={[1]} slots gap />
         </Frame>
       );
     },

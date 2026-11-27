@@ -3,7 +3,7 @@ import { Ask, Predict, type Question } from '../../components/Ask';
 import { Aside, Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
 import { fmt, useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   BOOK_DEVICE,
   M8_DEFAULT,
@@ -548,7 +548,8 @@ function DecodeRoofline({ st }: { st: SetupState }) {
   const { setup, set, options, option, shape, prec, reports, m8 } = st;
   const dev = option.dev;
   const T = thresholdOf(dev);
-  const curve = useMemo(() => stepCurve(shape, prec, setup.pad, dev, batchRange()), [shape, prec, setup.pad, dev]);
+  const locale = useLocale();
+  const curve = useMemo(() => stepCurve(shape, prec, setup.pad, dev, batchRange()), [shape, prec, setup.pad, dev, locale]);
   const r = curve[setup.batch - 1];
   const bstar = stepBStar(shape, prec, dev);
   const modelKnee = kneeOf(curve.map((c) => ({ batch: c.batch, seconds: c.seconds })));

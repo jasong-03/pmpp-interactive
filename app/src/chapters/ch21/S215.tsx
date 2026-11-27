@@ -241,7 +241,7 @@ export const questionsS215: Record<string, Question> = {
       <Translated
         vi={
           <>
-            <code>moe_align_block_size</code> của vLLM định kích thước bộ đệm đã đệm của nó là{' '}
+            <code>moe_align_block_size</code> của vLLM định kích thước buffer đã đệm của nó là{' '}
             <code>topk_ids.numel() + num_experts * (block_size - 1)</code>. Với 512 token được định tuyến tới top 2 trong 8
             expert với <code>block_size</code> 64, con số đó là bao nhiêu ô?
           </>

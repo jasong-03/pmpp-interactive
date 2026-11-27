@@ -201,7 +201,7 @@ const flashRatio4096 = (reports: Reports) =>
       value: f / u,
       detail: tr(
         `flash ${fmt(f * 1000)} ms against unfused ${fmt(u * 1000)} ms, n = 4096, B_c = ${String(r.b_c)}`,
-        `flash ${fmt(f * 1000)} ms so với bản không hợp nhất ${fmt(u * 1000)} ms, n = 4096, B_c = ${String(r.b_c)}`,
+        `flash ${fmt(f * 1000)} ms so với bản không gộp ${fmt(u * 1000)} ms, n = 4096, B_c = ${String(r.b_c)}`,
       ),
     };
   });
@@ -268,11 +268,11 @@ const flashCols: () => Col[] = () => [
   rawCol('n', 'n'),
   rawCol('B_c', 'b_c'),
   sec('flash_seconds', tr('Flash, ms', 'Flash, ms')),
-  sec('unfused_seconds', tr('Unfused, ms', 'Không hợp nhất, ms')),
-  numCol(tr('Flash / unfused', 'Flash / không hợp nhất'), 'flash_over_unfused'),
+  sec('unfused_seconds', tr('Unfused, ms', 'Không gộp, ms')),
+  numCol(tr('Flash / unfused', 'Flash / không gộp'), 'flash_over_unfused'),
   numCol(tr('Flash GFLOP/s', 'Flash GFLOP/s'), 'flash_gflops'),
-  numCol(tr('Unfused GFLOP/s', 'Không hợp nhất GFLOP/s'), 'unfused_gflops'),
-  { head: tr('Unfused S and P', 'S và P của bản không hợp nhất'), num: true, cell: (r) => mib(num(r.unfused_score_bytes)) },
+  numCol(tr('Unfused GFLOP/s', 'Không gộp GFLOP/s'), 'unfused_gflops'),
+  { head: tr('Unfused S and P', 'S và P của bản không gộp'), num: true, cell: (r) => mib(num(r.unfused_score_bytes)) },
 ];
 const decodeCols: () => Col[] = () => [
   {
@@ -521,11 +521,11 @@ export function Labs() {
           vi={
             <>
               Năm lab, mỗi lab trong một thư mục riêng dưới <code>labs/ch20/</code>. Lab 20.1 và 20.2 là mốc dự án M6,
-              attention nhân quả cho một lượt prefill: đầu tiên là chặng giữa của pipeline không hợp nhất, rồi toàn bộ
+              attention nhân quả cho một lượt prefill: đầu tiên là chặng giữa của pipeline không gộp, rồi toàn bộ
               trong một kernel. Lab 20.3 giấu ba lỗi trong kernel đó, một trong số đó là rào chắn mà đoạn mã của sách bỏ
               sót. Lab 20.4 và 20.5 là mốc dự án M7, một bước decode với KV cache: nối thêm và tính attention, rồi làm
               điều tương tự cho các head grouped-query. Mã bạn không sửa nằm trong <code>labs/ch20/shared-g11/</code>{' '}
-              (các bài kiểm thử flash và pipeline không hợp nhất), <code>labs/ch20/shared-g12/</code> (các bài kiểm thử
+              (các bài kiểm thử flash và pipeline không gộp), <code>labs/ch20/shared-g12/</code> (các bài kiểm thử
               decode) và thư mục <code>provided/</code> của lab 20.5.
             </>
           }
@@ -608,7 +608,7 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Bạn viết chặng giữa của attention không hợp nhất:{' '}
+            Bạn viết chặng giữa của attention không gộp:{' '}
             <code>launchCausalSoftmax(S, P, L, batch, nq, nk, scale)</code> biến các điểm số <code>[batch, nq, nk]</code>{' '}
             thành <code>P = softmax(scale · S + M)</code> và ghi logsumexp <code>L = m + log(sum)</code> của mọi hàng vào{' '}
             <code>[batch, nq]</code>. Thiết kế là của Fig. 20.4: một khối 256 luồng cho mỗi hàng, các cột theo bước nhảy,
@@ -737,7 +737,7 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Với <code>--bench</code>, chương trình điều khiển (driver) chạy toàn bộ pipeline không hợp nhất ở 8 head, d =
+            Với <code>--bench</code>, chương trình điều khiển (driver) chạy toàn bộ pipeline không gộp ở 8 head, d =
             128 và N = 1024, 2048 và 4096: S = Q Kᵀ bằng M3 của dự án của bạn (bản tham chiếu của lab 15.6), softmax của
             bạn, rồi O = P V bằng M2 (bản tham chiếu của lab 5.3). Nó đo thời gian từng chặng và tính GB/s của softmax
             trên lưu lượng tối thiểu của nó.
@@ -946,9 +946,9 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Với <code>--bench</code>, kernel của bạn chạy đối chọi với pipeline không hợp nhất của lab 20.1 (M3, softmax
+            Với <code>--bench</code>, kernel của bạn chạy đối chọi với pipeline không gộp của lab 20.1 (M3, softmax
             nhân quả tham chiếu, M2) ở 8 head, d = 128, n = 512 đến 4096. GFLOP/s đếm 2n²d mỗi head, một nửa của hai phép
-            nhân đầy đủ, vì một nửa S bị che; đường không hợp nhất vẫn tính cả nửa bị che. Trên CUDA và HIP, một bản build
+            nhân đầy đủ, vì một nửa S bị che; đường không gộp vẫn tính cả nửa bị che. Trên CUDA và HIP, một bản build
             B_c = 16 chạy bên cạnh bản mặc định 32.
           </p>
         }
@@ -983,10 +983,10 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Ở n = 4096, thời gian flash của bạn chia cho thời gian của pipeline không hợp nhất. Dưới 1 nghĩa là flash
-                nhanh hơn. Hãy cân hai lực. Flash không bao giờ ghi S và P: mỗi head, đường không hợp nhất ghi và đọc lại
+                Ở n = 4096, thời gian flash của bạn chia cho thời gian của pipeline không gộp. Dưới 1 nghĩa là flash
+                nhanh hơn. Hãy cân hai lực. Flash không bao giờ ghi S và P: mỗi head, đường không gộp ghi và đọc lại
                 ít nhất 2n² × 4 byte, 128 MiB ở n = 4096. Nhưng hai phép nhân của flash là các vòng lặp warp đơn giản của
-                sách, một shuffle cho mỗi phép nhân-cộng khi tính điểm số, trong khi đường không hợp nhất chạy M3 và M2 đã
+                sách, một shuffle cho mỗi phép nhân-cộng khi tính điểm số, trong khi đường không gộp chạy M3 và M2 đã
                 tinh chỉnh của bạn.
               </>
             }
@@ -999,7 +999,7 @@ export function Labs() {
             </>
           </Translated>
         }
-        unit={tr('× the unfused time', '× thời gian bản không hợp nhất')}
+        unit={tr('× the unfused time', '× thời gian bản không gộp')}
         measure={flashRatio4096}
         reading={
           <Translated
@@ -1148,7 +1148,7 @@ export function Labs() {
           <p>
             M6 là attention nhân quả cho một lượt prefill theo các quy ước của dự án: tensor <code>float</code> theo thứ
             tự hàng (row-major), batch đứng đầu, con trỏ device thô và kích thước tường minh, và một hàm{' '}
-            <code>launch</code> bên cạnh mỗi kernel. Hai dạng, cả hai cùng một L: pipeline không hợp nhất (M3,{' '}
+            <code>launch</code> bên cạnh mỗi kernel. Hai dạng, cả hai cùng một L: pipeline không gộp (M3,{' '}
             <code>launchCausalSoftmax</code>, M2) và <code>launchFlashAttention</code>. Gọi dạng nào ở một n cho trước là
             câu trả lời của benchmark của bạn.
           </p>

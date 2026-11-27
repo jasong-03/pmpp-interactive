@@ -26,7 +26,7 @@ export const chapter: Chapter = {
       lede: 'Split a job that copies in, computes and copies out across streams so the copies hide behind the kernel, predict how long it takes and what idle time remains, and say why the host buffer must be pinned.',
       vi: {
         title: 'Stream, chép bất đồng bộ và bộ nhớ ghim',
-        lede: 'Chia một công việc gồm chép vào, tính toán và chép ra cho nhiều stream để các lần chép ẩn sau kernel, dự đoán nó mất bao lâu và còn lại bao nhiêu thời gian rảnh, và nói vì sao buffer phía host phải được ghim.',
+        lede: 'Chia một công việc gồm chép vào, tính toán và chép ra cho nhiều stream để các lần sao chép ẩn sau kernel, dự đoán nó mất bao lâu và còn lại bao nhiêu thời gian rảnh, và nói vì sao buffer phía host phải được ghim.',
       },
       load: () => import('./S233').then((m) => ({ Component: m.S233, questions: m.questionsS233 })),
     },
@@ -44,7 +44,7 @@ export const chapter: Chapter = {
       lede: 'One optional lab: split a copy-in, compute, copy-out job across streams and measure what the overlap buys on your GPU against a prediction; on a Mac, keep several buffers in flight so the CPU fills the next chunk while the GPU computes.',
       vi: {
         title: 'Lab',
-        lede: 'Một lab không bắt buộc: chia một công việc chép vào, tính toán, chép ra cho nhiều stream và đo xem sự chồng lấp mang lại bao nhiêu trên GPU của bạn so với một dự đoán; trên Mac, giữ nhiều buffer đang được dùng cùng lúc để CPU nạp khúc tiếp theo trong khi GPU tính toán.',
+        lede: 'Một lab không bắt buộc: chia một công việc chép vào, tính toán, chép ra cho nhiều stream và đo xem sự chồng lấp mang lại bao nhiêu trên GPU của bạn so với một dự đoán; trên Mac, giữ nhiều buffer đang được dùng cùng lúc để CPU nạp chunk tiếp theo trong khi GPU tính toán.',
       },
       load: () => import('./Labs').then((m) => ({ Component: m.Labs, questions: m.questionsLabs })),
     },

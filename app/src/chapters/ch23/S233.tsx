@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { benchRows, realBackends, useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -179,7 +179,7 @@ function DeviceCompare({ cfg, d }: { cfg: PipeConfig; d: DeviceData }) {
           <p style={{ margin: '0 0 0.4rem' }}>
             <b>{d.device}</b> ({d.backend}): các phần đo được của lab 23.1 quyết định các tổng, phần lớn nhất được quy về 24
             đơn vị (1 đơn vị = {fmtN(d.parts.unit * 1000)} ms). Đường: mô hình tại {k} = {cfg.streams}
-            {d.view === 'metal' ? '' : `, ${cfg.order === 'depth' ? 'từng chunk một' : 'mọi copy-in trước'}, ${cfg.host === 'pinned' ? 'ghim' : 'pageable'}`}. Chấm: những gì lab
+            {d.view === 'metal' ? '' : `, ${cfg.order === 'depth' ? 'từng chunk một' : 'mọi copy-in trước'}, ${cfg.host === 'pinned' ? 'ghim' : 'phân trang'}`}. Chấm: những gì lab
             đo được với cùng thiết lập.
           </p>
         }
@@ -317,7 +317,8 @@ function FormBox({ f, kind, total }: { f: ClosedForm; kind: 'e1' | 'nv'; total: 
 function Stepper({ cfg, setCfg, devices }: { cfg: PipeConfig; setCfg: (c: PipeConfig) => void; devices: DeviceData[] }) {
   const cu = useLabFile(SNIPPET.cuda);
   const mm = useLabFile(SNIPPET.metal);
-  const s: Schedule = useMemo(() => simulate(cfg), [cfg]);
+  const locale = useLocale();
+  const s: Schedule = useMemo(() => simulate(cfg), [cfg, locale]);
   const best = useMemo(() => bestChunks(cfg), [cfg]);
   const [t, setT] = useState<number | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -416,14 +417,14 @@ function Stepper({ cfg, setCfg, devices }: { cfg: PipeConfig; setCfg: (c: PipeCo
       <div data-stepper data-total={s.total} data-view={cfg.view}>
         <div className="row" style={{ marginBottom: '0.6rem', alignItems: 'flex-end' }}>
           <Range label={tr('Chunks n', 'Số chunk n')} value={cfg.n} min={1} max={MAX_CHUNKS} step={1} out="n" aria={tr('Number of chunks', 'Số chunk')} onChange={(v) => set({ n: v })} />
-          <Range label={metal ? tr('Buffers in flight K', 'Số bộ đệm đang dùng K') : tr('Streams S', 'Số stream S')} value={cfg.streams} min={1} max={MAX_STREAMS} step={1}
+          <Range label={metal ? tr('Buffers in flight K', 'Số buffer đang dùng K') : tr('Streams S', 'Số stream S')} value={cfg.streams} min={1} max={MAX_STREAMS} step={1}
             out="streams" // i18n-ignore: data key
-            aria={metal ? tr('Buffers in flight', 'Số bộ đệm đang dùng') : tr('Number of streams', 'Số stream')} onChange={(v) => set({ streams: v })} />
+            aria={metal ? tr('Buffers in flight', 'Số buffer đang dùng') : tr('Number of streams', 'Số stream')} onChange={(v) => set({ streams: v })} />
           <Range label={metal ? tr('Fill (copy-in)', 'Nạp (copy-in)') : tr('Copy-in', 'Copy-in')} value={cfg.a} min={0} max={32} step={0.5} out="a" aria={tr('Total copy-in time', 'Tổng thời gian copy-in')} onChange={(v) => set({ a: v })} />
           <Range label={tr('Kernel', 'Kernel')} value={cfg.b} min={0} max={32} step={0.5} out="b" aria={tr('Total kernel time', 'Tổng thời gian kernel')} onChange={(v) => set({ b: v })} />
           <Range label={metal ? tr('Drain (copy-out)', 'Rút (copy-out)') : tr('Copy-out', 'Copy-out')} value={cfg.c} min={0} max={32} step={0.5} out="c" aria={tr('Total copy-out time', 'Tổng thời gian copy-out')} onChange={(v) => set({ c: v })} />
           <span className="muted" data-out="chunk-size">
-            <Translated vi={<>mỗi chunk {cfg.items == null ? `1/${cfg.n}` : 'khoảng 1/' + cfg.n} dữ liệu; chunk j vào {metal ? 'bộ đệm' : 'stream'} j mod {cfg.streams}</>}>
+            <Translated vi={<>mỗi chunk {cfg.items == null ? `1/${cfg.n}` : 'khoảng 1/' + cfg.n} dữ liệu; chunk j vào {metal ? 'buffer' : 'stream'} j mod {cfg.streams}</>}>
               each chunk {cfg.items == null ? `1/${cfg.n}` : 'about 1/' + cfg.n} of the data; chunk j goes to {metal ? 'buffer' : 'stream'} j mod {cfg.streams}
             </Translated>
           </span>
@@ -460,7 +461,7 @@ function Stepper({ cfg, setCfg, devices }: { cfg: PipeConfig; setCfg: (c: PipeCo
             vi={
               <p className="muted" style={{ margin: '0 0 0.6rem' }}>
                 Chế độ xem Metal: không áp dụng copy engine, thứ tự phát lệnh, bộ nhớ ghim hay hàng đợi phần cứng. CPU rút dữ
-                liệu khỏi một bộ đệm, nạp lại nó và commit; GPU chạy các command buffer theo thứ tự commit.
+                liệu khỏi một buffer, nạp lại nó và commit; GPU chạy các command buffer theo thứ tự commit.
               </p>
             }
           >
@@ -592,7 +593,7 @@ export const questionsS233: Record<string, Question> = {
       { label: <Translated vi="Khoảng 1×, hoặc tệ hơn một chút khi tính chi phí cố định của mỗi chunk.">About 1×, or a little worse once each chunk's fixed cost counts.</Translated>, correct: true },
       { label: <Translated vi="Khoảng 3×: mỗi làn một việc, cho copy-in, kernel và copy-out.">About 3×: one lane each for the copy-in, the kernel and the copy-out.</Translated>, why: <Translated vi="Đó là điều ba làn bận rộn có thể đem lại; một stream không bao giờ cho hai thao tác của nó chạy cùng lúc.">That is what three busy lanes could give; one stream never lets two of its operations run at once.</Translated> },
       { label: <Translated vi="Khoảng 8×: mỗi chunk là một phần tám công việc, nên mỗi chunk xong sớm hơn.">About 8×: each chunk is an eighth of the work, so each finishes sooner.</Translated>, why: <Translated vi="Cắt nhỏ công việc không làm tổng thể nhanh hơn. Chỉ chồng lấp mới làm được, và một stream thì không có chồng lấp.">Cutting the work does not make the whole faster. Only overlap can, and one stream has none.</Translated> },
-      { label: <Translated vi="Tùy vào occupancy (mức chiếm dụng) của kernel, thứ quyết định có bao nhiêu việc sao chép vừa chạy bên cạnh nó.">It depends on the kernel's occupancy, which sets how much copying fits beside it.</Translated>, why: <Translated vi="Occupancy quyết định mỗi kernel chạy nhanh thế nào, không quyết định một bản sao có chạy bên dưới nó được không. Trong một stream thì không được.">Occupancy decides how fast each kernel runs, not whether a copy can run under it. In one stream it cannot.</Translated> },
+      { label: <Translated vi="Tùy vào occupancy (mức chiếm dụng) của kernel, thứ quyết định có bao nhiêu việc sao chép vừa chạy bên cạnh nó.">It depends on the kernel's occupancy, which sets how much copying fits beside it.</Translated>, why: <Translated vi="Occupancy quyết định mỗi kernel chạy nhanh thế nào, không quyết định một lần sao chép có chạy bên dưới nó được không. Trong một stream thì không được.">Occupancy decides how fast each kernel runs, not whether a copy can run under it. In one stream it cannot.</Translated> },
     ],
     explain: (
       <Translated
@@ -622,7 +623,7 @@ export const questionsS233: Record<string, Question> = {
         vi={
           <>
             Vòng lặp chia chunk của bạn không nhanh hơn vòng lặp tuần tự, và một bản trace cho thấy mỗi{' '}
-            <code>cudaMemcpyAsync</code> chỉ trả về sau khi bản sao của nó xong. Nguyên nhân và cách sửa?
+            <code>cudaMemcpyAsync</code> chỉ trả về sau khi lần sao chép của nó xong. Nguyên nhân và cách sửa?
           </>
         }
       >
@@ -633,7 +634,7 @@ export const questionsS233: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi={<>Bộ đệm host đến từ <code>malloc</code>, nên mỗi bản sao chạy đồng bộ. Hãy cấp phát chúng bằng <code>cudaMallocHost</code>.</>}>
+          <Translated vi={<>Buffer host đến từ <code>malloc</code>, nên mỗi lần sao chép chạy đồng bộ. Hãy cấp phát chúng bằng <code>cudaMallocHost</code>.</>}>
             <>The host buffers came from <code>malloc</code>, so each copy ran synchronously. Allocate them with <code>cudaMallocHost</code>.</>
           </Translated>
         ),
@@ -641,7 +642,7 @@ export const questionsS233: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi={<>Các stream được tạo với <code>cudaStreamNonBlocking</code>, khiến mỗi bản sao của chúng chờ host.</>}>
+          <Translated vi={<>Các stream được tạo với <code>cudaStreamNonBlocking</code>, khiến mỗi lần sao chép của chúng chờ host.</>}>
             <>The streams were created with <code>cudaStreamNonBlocking</code>, which makes each of their copies wait for the host.</>
           </Translated>
         ),
@@ -649,23 +650,23 @@ export const questionsS233: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi={<><code>cudaMemcpyAsync</code> cần <code>cudaMemcpyDefault</code> làm chiều sao chép, nếu không nó quay về bản sao đồng bộ.</>}>
+          <Translated vi={<><code>cudaMemcpyAsync</code> cần <code>cudaMemcpyDefault</code> làm chiều sao chép, nếu không nó quay về lần sao chép đồng bộ.</>}>
             <><code>cudaMemcpyAsync</code> needs <code>cudaMemcpyDefault</code> as its direction, or it falls back to a synchronous copy.</>
           </Translated>
         ),
         why: <Translated vi="Đối số chiều sao chép không liên quan gì đến lúc lời gọi trả về.">The direction argument has nothing to do with when the call returns.</Translated>,
       },
       {
-        label: <Translated vi="Lần khởi chạy kernel cần tham số thứ tư bằng 1, nếu không các bản sao quanh nó đi vào default stream.">The kernel launch needs a fourth parameter of 1, or the copies around it go to the default stream.</Translated>,
-        why: <Translated vi="Tham số thứ tư là một stream, không phải một con số, và triệu chứng nằm ở các bản sao.">The fourth parameter is a stream, not a number, and the symptom is in the copies.</Translated>,
+        label: <Translated vi="Lần khởi chạy kernel cần tham số thứ tư bằng 1, nếu không các lần sao chép quanh nó đi vào default stream.">The kernel launch needs a fourth parameter of 1, or the copies around it go to the default stream.</Translated>,
+        why: <Translated vi="Tham số thứ tư là một stream, không phải một con số, và triệu chứng nằm ở các lần sao chép.">The fourth parameter is a stream, not a number, and the symptom is in the copies.</Translated>,
       },
     ],
     explain: (
       <Translated
         vi={
           <p>
-            Từ bộ nhớ pageable, runtime trung chuyển bản sao qua một bộ đệm được ghim, và host phải tham gia (pp. 562–563).
-            Tài liệu tham khảo của NVIDIA: bản sao như vậy "will revert to a synchronous behavior which will not overlap with
+            Từ bộ nhớ phân trang, runtime trung chuyển lần sao chép qua một buffer được ghim, và host phải tham gia (pp. 562–563).
+            Tài liệu tham khảo của NVIDIA: lần sao chép như vậy "will revert to a synchronous behavior which will not overlap with
             other work" (A6). Header của AMD: "the memory copy will be performed synchronously" (B4); ở đó cấp phát ghim là{' '}
             <code>hipHostMalloc</code>. Công tắc pageable của trình chạy từng bước cho thấy kết quả.
           </p>
@@ -778,12 +779,12 @@ export const questionsS233: Record<string, Question> = {
     ),
     options: [
       {
-        label: <Translated vi="Mỗi chunk thêm một chi phí cố định vào mỗi bản sao và mỗi kernel, còn bong bóng mà nó thu nhỏ vốn đã nhỏ.">Each chunk adds a fixed cost to every copy and kernel, and the bubble it shrinks was small.</Translated>,
+        label: <Translated vi="Mỗi chunk thêm một chi phí cố định vào mỗi lần sao chép và mỗi kernel, còn bong bóng mà nó thu nhỏ vốn đã nhỏ.">Each chunk adds a fixed cost to every copy and kernel, and the bubble it shrinks was small.</Translated>,
         correct: true,
       },
-      { label: <Translated vi="Các bản sao nhỏ hơn dùng được tỉ lệ đường truyền cao hơn, làm kernel thiếu băng thông bộ nhớ.">Smaller copies reach a higher share of the link, which starves the kernels of memory bandwidth.</Translated>, why: <Translated vi="Không tài liệu nào được kiểm tra ở đây nói vậy, và mô hình vẫn chậm đi mà không cần hiệu ứng nào như thế.">Nothing in the documentation checked here says so, and the model slows down without any such effect.</Translated> },
+      { label: <Translated vi="Các lần sao chép nhỏ hơn dùng được tỉ lệ đường truyền cao hơn, làm kernel thiếu băng thông bộ nhớ.">Smaller copies reach a higher share of the link, which starves the kernels of memory bandwidth.</Translated>, why: <Translated vi="Không tài liệu nào được kiểm tra ở đây nói vậy, và mô hình vẫn chậm đi mà không cần hiệu ứng nào như thế.">Nothing in the documentation checked here says so, and the model slows down without any such effect.</Translated> },
       { label: <Translated vi="256 chunk vượt quá giới hạn được ghi trong tài liệu của một stream là 64 thao tác xếp hàng, nên host phải chờ chỗ trống.">256 chunks exceed a stream's documented limit of 64 queued operations, so the host waits for room.</Translated>, why: <Translated vi="Không có giới hạn nào như vậy trong tài liệu được kiểm tra cho chương này. Con số 64 bạn có thể nhớ là mặc định của Metal cho số command buffer chưa hoàn tất trên một hàng đợi (C1).">No such limit appears in the documentation checked for this chapter. The 64 you may remember is Metal's default for uncompleted command buffers on one queue (C1).</Translated> },
-      { label: <Translated vi="Kernel nhỏ hơn có occupancy cao hơn, làm chậm các bản sao chạy bên cạnh.">Smaller kernels have higher occupancy, which slows the copies running beside them.</Translated>, why: <Translated vi="Một lưới nhỏ có khi còn không lấp đầy GPU; occupancy không tăng chỉ vì kernel ngắn hơn.">A small grid may not even fill the GPU; occupancy does not rise because a kernel is shorter.</Translated> },
+      { label: <Translated vi="Kernel nhỏ hơn có occupancy cao hơn, làm chậm các lần sao chép chạy bên cạnh.">Smaller kernels have higher occupancy, which slows the copies running beside them.</Translated>, why: <Translated vi="Một lưới nhỏ có khi còn không lấp đầy GPU; occupancy không tăng chỉ vì kernel ngắn hơn.">A small grid may not even fill the GPU; occupancy does not rise because a kernel is shorter.</Translated> },
     ],
     explain: (
       <Translated
@@ -810,22 +811,22 @@ export const questionsS233: Record<string, Question> = {
     kind: 'choice',
     id: 'ch23/23.3/q-hip-engines',
     prompt: (
-      <Translated vi={<>Trên ROCm 10.2, chương trình của bạn đọc được <code>asyncEngineCount</code> = 8. Điều đó cho bạn biết gì về việc các bản sao hai chiều chồng lấp nhau?</>}>
+      <Translated vi={<>Trên ROCm 10.2, chương trình của bạn đọc được <code>asyncEngineCount</code> = 8. Điều đó cho bạn biết gì về việc các lần sao chép hai chiều chồng lấp nhau?</>}>
         <>On ROCm 10.2 your program reads <code>asyncEngineCount</code> = 8. What does that tell you about copies in both directions overlapping?</>
       </Translated>
     ),
     options: [
       { label: <Translated vi="Không gì cả: ROCm đặt nó bằng một hằng số runtime, 8, trên mọi thiết bị. Hãy đo thay vì đọc.">Nothing: ROCm sets it to a runtime constant, 8, on every device. Measure instead.</Translated>, correct: true },
-      { label: <Translated vi="Tám bản sao có thể chạy cùng lúc, bốn mỗi chiều, nếu chúng ở các stream khác nhau.">Eight copies can run at once, four in each direction, if they are in different streams.</Translated>, why: <Translated vi="Giá trị đó giống nhau trên mọi thiết bị AMD, bất kể phần cứng.">The value is the same on every AMD device, whatever its hardware.</Translated> },
-      { label: <Translated vi="Các bản sao chồng lấp theo cả hai chiều, như trên CUDA khi trường này bằng 2.">Copies overlap in both directions, as they do on CUDA when the field reads 2.</Translated>, why: <Translated vi="Cách đọc đó là của CUDA (A7). Trên ROCm trường này là một hằng số (B3).">That reading is CUDA's (A7). On ROCm the field is a constant (B3).</Translated> },
-      { label: <Translated vi="GPU có tám DMA engine, và mỗi stream nhận một engine cho các bản sao của nó.">The GPU has eight DMA engines, and each stream gets one of them for its copies.</Translated>, why: <Translated vi="Trường này không nói gì như vậy; nó được đặt từ một hằng số trong runtime.">Nothing in the field says so; it is set from a constant in the runtime.</Translated> },
+      { label: <Translated vi="Tám lần sao chép có thể chạy cùng lúc, bốn mỗi chiều, nếu chúng ở các stream khác nhau.">Eight copies can run at once, four in each direction, if they are in different streams.</Translated>, why: <Translated vi="Giá trị đó giống nhau trên mọi thiết bị AMD, bất kể phần cứng.">The value is the same on every AMD device, whatever its hardware.</Translated> },
+      { label: <Translated vi="Các lần sao chép chồng lấp theo cả hai chiều, như trên CUDA khi trường này bằng 2.">Copies overlap in both directions, as they do on CUDA when the field reads 2.</Translated>, why: <Translated vi="Cách đọc đó là của CUDA (A7). Trên ROCm trường này là một hằng số (B3).">That reading is CUDA's (A7). On ROCm the field is a constant (B3).</Translated> },
+      { label: <Translated vi="GPU có tám DMA engine, và mỗi stream nhận một engine cho các lần sao chép của nó.">The GPU has eight DMA engines, and each stream gets one of them for its copies.</Translated>, why: <Translated vi="Trường này không nói gì như vậy; nó được đặt từ một hằng số trong runtime.">Nothing in the field says so; it is set from a constant in the runtime.</Translated> },
     ],
     explain: (
       <Translated
         vi={
           <p>
             Trong runtime ROCm, thuộc tính này được đặt từ <code>kMaxAsyncQueues</code>, một hằng số 8 (B3). Hướng dẫn của AMD chỉ
-            nói rằng giá trị lớn hơn 0 nghĩa là thiết bị hỗ trợ truyền đồng thời. Lab 23.1 đo xem các bản sao của bạn có chồng
+            nói rằng giá trị lớn hơn 0 nghĩa là thiết bị hỗ trợ truyền đồng thời. Lab 23.1 đo xem các lần sao chép của bạn có chồng
             lấp hay không.
           </p>
         }
@@ -848,20 +849,20 @@ export const questionsS233: Record<string, Question> = {
     ),
     options: [
       {
-        label: <Translated vi="CPU ghi chunk i + 1 vào một trong K bộ đệm dùng chung trong khi GPU tính chunk i từ một bộ đệm khác.">The CPU writing chunk i + 1 into one of K shared buffers while the GPU computes chunk i from another.</Translated>,
+        label: <Translated vi="CPU ghi chunk i + 1 vào một trong K buffer dùng chung trong khi GPU tính chunk i từ một buffer khác.">The CPU writing chunk i + 1 into one of K shared buffers while the GPU computes chunk i from another.</Translated>,
         correct: true,
       },
       { label: <Translated vi="Một blit pass trên một copy engine riêng, chạy bên cạnh compute pass như copy-in của CUDA.">A blit pass on a dedicated copy engine, which runs beside the compute pass the way a CUDA copy-in does.</Translated>, why: <Translated vi="Apple mô tả blit là một loại pass, không phải phần cứng sao chép riêng (C4), và với bộ nhớ dùng chung thì không có gì để sao chép.">Apple documents a blit as a kind of pass, not as separate copy hardware (C4), and with shared memory there is nothing to copy.</Translated> },
       { label: <Translated vi="cudaMemcpyAsync, qua một lớp tương thích ánh xạ lời gọi CUDA sang Metal.">cudaMemcpyAsync, through a compatibility layer that maps CUDA calls onto Metal.</Translated>, why: <Translated vi="Không có lớp nào như vậy.">There is no such layer.</Translated> },
-      { label: <Translated vi="Một bộ đệm private mà GPU nạp từ bộ nhớ host trước mỗi compute pass.">A private buffer that the GPU fills from host memory before each compute pass.</Translated>, why: <Translated vi="Vẫn phải có thứ gì đó đặt đầu vào vào đó. Một bộ đệm dùng chung do CPU ghi thì không cần sao chép gì (C4).">Something still has to put the input there. A shared buffer the CPU writes needs no copy at all (C4).</Translated> },
+      { label: <Translated vi="Một buffer private mà GPU nạp từ bộ nhớ host trước mỗi compute pass.">A private buffer that the GPU fills from host memory before each compute pass.</Translated>, why: <Translated vi="Vẫn phải có thứ gì đó đặt đầu vào vào đó. Một buffer dùng chung do CPU ghi thì không cần sao chép gì (C4).">Something still has to put the input there. A shared buffer the CPU writes needs no copy at all (C4).</Translated> },
     ],
     explain: (
       <Translated
         vi={
           <p>
-            Một bộ đệm dùng chung chính là bộ nhớ của GPU (C4). Cách chồng lấp được Apple ghi trong tài liệu là nhiều bản thể
-            bộ đệm đang dùng, với quy tắc "finalize all CPU writes to one buffer instance before you commit a command buffer
-            that references it" (C5). Với K = 1 không có gì chồng lấp, và ghi vào một bộ đệm mà command buffer của nó chưa hoàn
+            Một buffer dùng chung chính là bộ nhớ của GPU (C4). Cách chồng lấp được Apple ghi trong tài liệu là nhiều bản thể
+            buffer đang dùng, với quy tắc "finalize all CPU writes to one buffer instance before you commit a command buffer
+            that references it" (C5). Với K = 1 không có gì chồng lấp, và ghi vào một buffer mà command buffer của nó chưa hoàn
             tất là race condition (tranh chấp dữ liệu). Trong chế độ xem Metal của trình chạy từng bước, đặt K bằng 1, rồi 2.
           </p>
         }
@@ -902,8 +903,8 @@ export function S233() {
           <p>
             Vòng lặp của phần 23.2 có một khuyết điểm mà sách chỉ ra ngay: tại bất kỳ thời điểm nào chỉ một phần cỗ máy làm
             việc. Trong khi mọi GPU tính, mạng rảnh; trong khi các GPU trao đổi hàng vùng biên (halo), các GPU phần lớn ngồi
-            không. Trang này lấy cách chữa của sách cùng ba công cụ nó cần, stream, bản sao bất đồng bộ và bộ nhớ ghim (pinned
-            memory), và áp dụng chúng ở nơi bạn sẽ dùng đến đầu tiên: trên một GPU, giấu các bản sao giữa host và device sau
+            không. Trang này lấy cách chữa của sách cùng ba công cụ nó cần, stream, lần sao chép bất đồng bộ và bộ nhớ ghim (pinned
+            memory), và áp dụng chúng ở nơi bạn sẽ dùng đến đầu tiên: trên một GPU, giấu các lần sao chép giữa host và device sau
             một kernel.
           </p>
         }
@@ -993,7 +994,7 @@ export function S233() {
       <Translated
         vi={
           <p>
-            Một stream là một hàng đợi các thao tác GPU: các lần khởi chạy kernel, các bản sao và vài loại khác. Bên trong một
+            Một stream là một hàng đợi các thao tác GPU: các lần khởi chạy kernel, các lần sao chép và vài loại khác. Bên trong một
             stream, chúng chạy theo thứ tự bạn đưa vào. Giữa hai stream thì không có thứ tự nào cả, và GPU có thể chạy công
             việc của chúng cùng lúc.
           </p>
@@ -1061,7 +1062,7 @@ export function S233() {
         vi={
           <p>
             Chương 22 đã gửi bạn đến đây để học stream như một cách chạy các tác vụ nhỏ song song (
-            <a href={href('ch22', '22.3')}>§22.3</a>). Phần còn lại của trang này dùng cùng công cụ đó cho các bản sao.
+            <a href={href('ch22', '22.3')}>§22.3</a>). Phần còn lại của trang này dùng cùng công cụ đó cho các lần sao chép.
           </p>
         }
       >
@@ -1073,12 +1074,12 @@ export function S233() {
       <Ask q={questionsS233['ch23/23.3/q-onestream']} />
 
       <h2>
-        <Translated vi="Bản sao bất đồng bộ cần bộ nhớ ghim">Asynchronous copies need pinned memory</Translated>
+        <Translated vi="Lần sao chép bất đồng bộ cần bộ nhớ ghim">Asynchronous copies need pinned memory</Translated>
       </h2>
       <Translated
         vi={
           <p>
-            Bản sao cũng có dạng bất đồng bộ: <code>cudaMemcpyAsync</code> nhận một stream và trả về ngay. Có một điểm vướng, và
+            Lần sao chép cũng có dạng bất đồng bộ: <code>cudaMemcpyAsync</code> nhận một stream và trả về ngay. Có một điểm vướng, và
             sách giải thích nó từ dưới lên.
           </p>
         }
@@ -1095,7 +1096,7 @@ export function S233() {
             Tiến trình của bạn thấy một không gian địa chỉ ảo lớn, liền mạch, được cắt thành các trang. Hệ điều hành ánh xạ mỗi
             trang lên một khung bộ nhớ vật lý, và nó có thể di chuyển một trang, hoặc ghi nó ra đĩa, bất cứ lúc nào: đó là cách
             nó giữ các tiến trình tách biệt và phục vụ nhiều bộ nhớ hơn lượng nó có. Bộ nhớ từ <code>malloc</code> là như vậy.
-            Nó là pageable.
+            Nó là bộ nhớ phân trang (pageable).
           </p>
         }
       >
@@ -1109,9 +1110,9 @@ export function S233() {
         vi={
           <p>
             Phần cứng sao chép không thấy địa chỉ ảo. Một DMA engine chuyển dữ liệu theo địa chỉ vật lý, không cần CPU. Nếu hệ
-            điều hành di chuyển một trang giữa chừng một bản sao, engine sẽ đọc hoặc ghi vào một khung (frame) nay đang chứa thứ khác.
-            Vì vậy runtime không trao bộ nhớ pageable cho engine. Thay vào đó nó sao chép hai bước: từ bộ đệm của bạn vào một
-            bộ đệm trung chuyển mà hệ điều hành sẽ không di chuyển, rồi bằng DMA sang device, và ngược lại cho chiều về. Bản sao
+            điều hành di chuyển một trang giữa chừng một lần sao chép, engine sẽ đọc hoặc ghi vào một khung (frame) nay đang chứa thứ khác.
+            Vì vậy runtime không trao bộ nhớ phân trang cho engine. Thay vào đó nó sao chép hai bước: từ buffer của bạn vào một
+            buffer trung chuyển mà hệ điều hành sẽ không di chuyển, rồi bằng DMA sang device, và ngược lại cho chiều về. Lần sao chép
             thêm đó tốn thời gian, và vì CPU làm nó, lời gọi không thể trả về cho đến khi nó xong.
           </p>
         }
@@ -1129,7 +1130,7 @@ export function S233() {
           <p>
             Bộ nhớ mà hệ điều hành sẽ không di chuyển được gọi là bộ nhớ ghim, hay page-locked.{' '}
             <code>cudaMallocHost(&amp;h, bytes)</code> cấp phát nó. Engine đọc nó trực tiếp, và luồng host được tự do ngay khi
-            bản sao được xếp hàng.
+            lần sao chép được xếp hàng.
           </p>
         }
       >
@@ -1143,8 +1144,8 @@ export function S233() {
         <Translated
           vi={
             <p>
-              Cảnh bên dưới trung chuyển bản sao thành từng mảnh qua hai bộ đệm và trả về sau mảnh cuối. NVIDIA không ghi trong
-              tài liệu cả các bộ đệm lẫn chính xác lúc lời gọi trả về ("might be synchronous", A6).
+              Cảnh bên dưới trung chuyển lần sao chép thành từng mảnh qua hai buffer và trả về sau mảnh cuối. NVIDIA không ghi trong
+              tài liệu cả các buffer lẫn chính xác lúc lời gọi trả về ("might be synchronous", A6).
             </p>
           }
         >
@@ -1159,7 +1160,7 @@ export function S233() {
         vi={
           <p>
             Một hiệu chỉnh cho sách. Sách nói <code>cudaMemcpyAsync</code> <em>đòi hỏi</em> bộ nhớ ghim, và Best Practices
-            Guide của NVIDIA cũng dùng chữ đó. Tài liệu tham khảo runtime chính xác hơn: từ bộ nhớ pageable lời gọi vẫn hoạt
+            Guide của NVIDIA cũng dùng chữ đó. Tài liệu tham khảo runtime chính xác hơn: từ bộ nhớ phân trang lời gọi vẫn hoạt
             động, nhưng nó "will revert to a synchronous behavior which will not overlap with other work". Lỗi này im lặng: kết
             quả đúng, không chồng lấp.
           </p>
@@ -1210,7 +1211,7 @@ export function S233() {
           <p>
             Giờ các mảnh ghép khớp với nhau. Chia dữ liệu thành n chunk. Với mỗi chunk, xếp ba thao tác vào một stream: sao chép
             đầu vào của nó lên, chạy kernel trên nó, sao chép kết quả về. Rải các chunk ra S stream. Trong một stream, ba bước
-            của một chunk giữ đúng thứ tự; giữa các stream, bản sao của một chunk có thể chạy trong khi kernel của chunk khác
+            của một chunk giữ đúng thứ tự; giữa các stream, lần sao chép của một chunk có thể chạy trong khi kernel của chunk khác
             chạy. Đây là vòng lặp viết theo hai cách, phát lần lượt ba thao tác của từng chunk (theo chiều sâu) hoặc mọi copy-in
             trước (theo chiều rộng), và cùng công việc đó trên Metal.
           </p>
@@ -1322,7 +1323,7 @@ export function S233() {
           vi={
             <p>
               Mỗi lúc một kernel. Mỗi làn phục vụ các thao tác của nó theo thứ tự phát lệnh, điều NVIDIA không ghi trong tài
-              liệu cho trường hợp một copy engine (E2). Một bản sao pageable chờ stream của nó, rồi giữ host (trường hợp xấu
+              liệu cho trường hợp một copy engine (E2). Một lần sao chép từ bộ nhớ phân trang chờ stream của nó, rồi giữ host (trường hợp xấu
               nhất được phép). Các stream được ánh xạ xoay vòng lên các hàng đợi theo thứ tự. Không có cache, không chia sẻ băng
               thông. Không có đơn vị.
             </p>
@@ -1402,7 +1403,7 @@ export function S233() {
       <Translated
         vi={
           <p>
-            Có bao nhiêu bản sao chạy cùng lúc phụ thuộc vào số copy engine. Một GPU có một copy engine có thể chạy một lần
+            Có bao nhiêu lần sao chép chạy cùng lúc phụ thuộc vào số copy engine. Một GPU có một copy engine có thể chạy một lần
             truyền bất đồng bộ bên cạnh các kernel; có hai thì mỗi chiều một lần cùng lúc. CUDA báo con số này là{' '}
             <code>asyncEngineCount</code>.
           </p>
@@ -1467,7 +1468,7 @@ export function S233() {
         vi={
           <p>
             Vậy với một engine, thứ tự phát lệnh quyết định kết quả. Điều đó dựa trên một giả định mà mô hình nêu rõ: engine
-            phục vụ các bản sao theo thứ tự chúng được phát. NVIDIA không ghi thứ tự nào cho trường hợp này, nên hãy coi nó là
+            phục vụ các lần sao chép theo thứ tự chúng được phát. NVIDIA không ghi thứ tự nào cho trường hợp này, nên hãy coi nó là
             một giả thuyết cần kiểm tra trên một thiết bị có <code>asyncEngineCount</code> bằng 1. (Các trường hợp một engine là
             phép tính của khóa học này, ch23-facts E2.)
           </p>
@@ -1508,7 +1509,7 @@ export function S233() {
       <Translated
         vi={
           <p>
-            Và mỗi thao tác có một chi phí cố định, để thiết lập một bản sao hay khởi chạy một kernel, mà không nhà cung cấp nào
+            Và mỗi thao tác có một chi phí cố định, để thiết lập một lần sao chép hay khởi chạy một kernel, mà không nhà cung cấp nào
             công bố. Cắt quá nhỏ thì chi phí vượt quá bong bóng bạn đang thu nhỏ. Vì lý do đó, chi phí trong trình chạy từng bước
             là một núm vặn, không phải một con số; lab 23.1 tìm số chunk tốt nhất cho thiết bị của bạn bằng cách đo.
           </p>
@@ -1526,8 +1527,7 @@ export function S233() {
       <Translated
         vi={
           <p>
-            <a href={href('ch23', 'labs')}>Lab 23.1, Giấu các lần chép sau kernel</a>, chạy vòng lặp này trên GPU của bạn với bộ
-            đệm ghim và pageable, cả hai thứ tự phát lệnh và vài số stream. Khi bạn đã chạy nó, trình chạy từng bước cung cấp các
+            <a href={href('ch23', 'labs')}>Lab 23.1, Giấu các lần sao chép sau kernel</a>, chạy vòng lặp này trên GPU của bạn với buffer ghim và buffer phân trang, cả hai thứ tự phát lệnh và vài số stream. Khi bạn đã chạy nó, trình chạy từng bước cung cấp các
             phần đo được trên thiết bị của bạn làm một thiết lập sẵn và vẽ những gì lab đo được bên cạnh mô hình.
           </p>
         }
@@ -1548,7 +1548,7 @@ export function S233() {
             Trên HIP, cùng mã nguồn đi qua header của khóa học, header này ánh xạ mọi lời gọi mà trang này dùng (cho đến nay
             unverified trên phần cứng AMD). Hai lần đổi tên không chỉ là đổi tiền tố: <code>cudaMallocHost</code> thành{' '}
             <code>hipHostMalloc</code>, và <code>cudaFreeHost</code> thành <code>hipHostFree</code>. Cái bẫy giống như trên
-            CUDA: header của AMD nói rằng nếu một bộ đệm không được ghim, "the memory copy will be performed synchronously". Một
+            CUDA: header của AMD nói rằng nếu một buffer không được ghim, "the memory copy will be performed synchronously". Một
             khác biệt cần biết trước khi đo: ROCm đặt <code>asyncEngineCount</code> bằng hằng số 8 trên mọi thiết bị, nên nó
             không đếm phần cứng sao chép nào. Công tắc engine của trình chạy từng bước là một ý tưởng của CUDA; trên AMD, hãy đo.
           </p>
@@ -1582,9 +1582,9 @@ export function S233() {
       <Translated
         vi={
           <p>
-            Trên Apple silicon không có gì để sao chép: một bộ đệm dùng chung chính là bộ nhớ của GPU. Thứ còn lại của pipeline
-            là việc của CPU, ghi đầu vào của chunk tiếp theo vào một bộ đệm và đọc đầu ra của một chunk đã xong. Cách Apple ghi
-            trong tài liệu để chồng lấp điều đó với GPU là nhiều bản thể của một bộ đệm đang dùng: CPU nạp một bản trong khi GPU
+            Trên Apple silicon không có gì để sao chép: một buffer dùng chung chính là bộ nhớ của GPU. Thứ còn lại của pipeline
+            là việc của CPU, ghi đầu vào của chunk tiếp theo vào một buffer và đọc đầu ra của một chunk đã xong. Cách Apple ghi
+            trong tài liệu để chồng lấp điều đó với GPU là nhiều bản thể của một buffer đang dùng: CPU nạp một bản trong khi GPU
             đọc bản khác, một semaphore ngăn CPU chạy vượt lên, và một completion handler giải phóng một bản thể khi command
             buffer của nó xong. Quy tắc giữ cho nó đúng: "finalize all CPU writes to one buffer instance before you commit a
             command buffer that references it".
@@ -1604,10 +1604,10 @@ export function S233() {
         vi={
           <p>
             Chuyển trình chạy từng bước sang chế độ xem Metal. Các làn trở thành "CPU: rút ra, rồi nạp vào" và
-            "GPU", và S trở thành K, số bộ đệm đang dùng. Với K = 1 không có gì chồng lấp; với 2, các lần nạp và rút của CPU có
-            thể chạy bên dưới các kernel của GPU. Tệp Metal của chúng tôi chờ command buffer cuối của một bộ đệm bằng{' '}
+            "GPU", và S trở thành K, số buffer đang dùng. Với K = 1 không có gì chồng lấp; với 2, các lần nạp và rút của CPU có
+            thể chạy bên dưới các kernel của GPU. Tệp Metal của chúng tôi chờ command buffer cuối của một buffer bằng{' '}
             <code>waitUntilCompleted</code> thay vì semaphore và completion handler của Apple; cách nào thì CPU cũng chỉ bị chặn
-            khi bộ đệm nó cần vẫn đang được dùng.
+            khi buffer nó cần vẫn đang được dùng.
           </p>
         }
       >
@@ -1666,7 +1666,7 @@ export function S233() {
             một giai đoạn làm việc trên một batch, activation của batch trước chuyển sang giai đoạn tiếp theo. Chế độ nhiều GPU
             mặc định của llama.cpp, <code>--split-mode layer</code>, được mô tả là "pipelined": bộ lập lịch của nó giữ tối đa 4
             bản sao của mỗi đầu vào, ghi một event sau mỗi lần chia và bắt lần chia tiếp theo chờ nó. Tài liệu pipelining của
-            PyTorch gọi khoảng rảnh lúc đầu là "pipeline startup bubble", phần lấp đầy bạn đã xem trong trình chạy từng bước.
+            PyTorch gọi khoảng rảnh lúc đầu là "pipeline startup bubble", phần nạp (fill) bạn đã xem trong trình chạy từng bước.
             vLLM dùng song song pipeline giữa các node.
           </p>
         }

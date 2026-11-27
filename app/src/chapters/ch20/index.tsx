@@ -30,7 +30,7 @@ export const chapter: Chapter = {
     {
       id: '20.3', num: '20.3', title: 'Implementing attention in CUDA', pages: '486–488',
       lede: 'Write a causal mask-and-softmax kernel with one block per row, say what each of its barriers protects, and count the global traffic the unfused pipeline pays for S and P.',
-      vi: { title: 'Cài đặt attention bằng CUDA', lede: 'Viết một kernel che mặt nạ nhân quả và softmax với một khối cho mỗi hàng, nói được mỗi rào chắn của nó bảo vệ điều gì, và đếm lưu lượng bộ nhớ toàn cục mà pipeline không hợp nhất phải trả cho S và P.' },
+      vi: { title: 'Cài đặt attention bằng CUDA', lede: 'Viết một kernel che mặt nạ nhân quả và softmax với một khối cho mỗi hàng, nói được mỗi rào chắn của nó bảo vệ điều gì, và đếm lưu lượng bộ nhớ toàn cục mà pipeline không gộp phải trả cho S và P.' },
       load: () => import('./S203').then((m) => ({ Component: m.S203, questions: m.questionsS203 })),
     },
     {

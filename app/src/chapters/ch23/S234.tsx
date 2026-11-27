@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code } from '../../components/Code';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import {
   DEFAULTS, DEFECTS, VERSIONS, changedEdges, defectsFor, edges, simulate,
@@ -146,16 +146,16 @@ const ENDS: Record<EdgeId, Ends> = {
     done: <Translated vi={<>Cả hai đều ở trong <code>internalStream</code>, memset đi trước (dòng 04, rồi dòng 15): thứ tự stream là đủ.</>}><>Both are in <code>internalStream</code>, the memset first (line 04, then line 15): stream order is enough.</></Translated>,
   },
   'top-copy': {
-    get a() { return tr('the top kernel (line 10, topStream)', 'kernel trên (dòng 10, topStream)'); }, get b() { return tr('the copy (line 21, internalStream)', 'bản sao (dòng 21, internalStream)'); }, same: false, hostSide: false, get look() { return tr('11 and 19', '11 và 19'); },
-    done: <Translated vi={<><code>computeTop</code> được ghi sau kernel trên (dòng 11); <code>internalStream</code> chờ nó ở dòng 19, trước bản sao.</>}><><code>computeTop</code> is recorded after the top kernel (line 11); <code>internalStream</code> waits for it at line 19, before the copy.</></Translated>,
+    get a() { return tr('the top kernel (line 10, topStream)', 'kernel trên (dòng 10, topStream)'); }, get b() { return tr('the copy (line 21, internalStream)', 'lần sao chép (dòng 21, internalStream)'); }, same: false, hostSide: false, get look() { return tr('11 and 19', '11 và 19'); },
+    done: <Translated vi={<><code>computeTop</code> được ghi sau kernel trên (dòng 11); <code>internalStream</code> chờ nó ở dòng 19, trước lần sao chép.</>}><><code>computeTop</code> is recorded after the top kernel (line 11); <code>internalStream</code> waits for it at line 19, before the copy.</></Translated>,
   },
   'bottom-copy': {
-    get a() { return tr('the bottom kernel (line 12, bottomStream)', 'kernel dưới (dòng 12, bottomStream)'); }, get b() { return tr('the copy (line 21, internalStream)', 'bản sao (dòng 21, internalStream)'); }, same: false, hostSide: false, get look() { return tr('14 and 20', '14 và 20'); },
+    get a() { return tr('the bottom kernel (line 12, bottomStream)', 'kernel dưới (dòng 12, bottomStream)'); }, get b() { return tr('the copy (line 21, internalStream)', 'lần sao chép (dòng 21, internalStream)'); }, same: false, hostSide: false, get look() { return tr('14 and 20', '14 và 20'); },
     done: <Translated vi={<><code>computeBottom</code>, được ghi ở dòng 14 và được chờ ở dòng 20.</>}><><code>computeBottom</code>, recorded at line 14 and waited for at line 20.</></Translated>,
   },
   'internal-copy': {
-    get a() { return tr('the internal kernel (line 15)', 'kernel bên trong (dòng 15)'); }, get b() { return tr('the copy (line 21)', 'bản sao (dòng 21)'); }, same: true, hostSide: false,
-    done: <Translated vi={<>Cùng stream: kernel bên trong đứng trước bản sao trong <code>internalStream</code>.</>}><>Same stream: the internal kernel is ahead of the copy in <code>internalStream</code>.</></Translated>,
+    get a() { return tr('the internal kernel (line 15)', 'kernel bên trong (dòng 15)'); }, get b() { return tr('the copy (line 21)', 'lần sao chép (dòng 21)'); }, same: true, hostSide: false,
+    done: <Translated vi={<>Cùng stream: kernel bên trong đứng trước lần sao chép trong <code>internalStream</code>.</>}><>Same stream: the internal kernel is ahead of the copy in <code>internalStream</code>.</></Translated>,
   },
   'top-exchange': {
     get a() { return tr('the top kernel (line 10, topStream)', 'kernel trên (dòng 10, topStream)'); }, get b() { return tr('MPI_Sendrecv (line 28)', 'MPI_Sendrecv (dòng 28)'); }, same: false, hostSide: true,
@@ -166,7 +166,7 @@ const ENDS: Record<EdgeId, Ends> = {
     done: <Translated vi={<>Dòng 31 làm điều tương tự cho <code>bottomStream</code>, khi phép trao đổi phía trên đã trả về.</>}><>Line 31 does the same for <code>bottomStream</code>, once the top exchange has returned.</></Translated>,
   },
   'copy-allreduce': {
-    get a() { return tr('the copy (line 21, internalStream)', 'bản sao (dòng 21, internalStream)'); }, get b() { return tr('MPI_Allreduce (line 38)', 'MPI_Allreduce (dòng 38)'); }, same: false, hostSide: true,
+    get a() { return tr('the copy (line 21, internalStream)', 'lần sao chép (dòng 21, internalStream)'); }, get b() { return tr('MPI_Allreduce (line 38)', 'MPI_Allreduce (dòng 38)'); }, same: false, hostSide: true,
     done: <Translated vi={<><code>MPI_Allreduce</code> đọc <code>l2norm_h</code> trên host, nên host chờ <code>internalStream</code> ở dòng 37.</>}><><code>MPI_Allreduce</code> reads <code>l2norm_h</code> on the host, so the host waits for <code>internalStream</code> at line 37.</></Translated>,
   },
   'exchange-next': {
@@ -199,7 +199,7 @@ function hint(id: EdgeId, pick: Mechanism, right: Mechanism): ReactNode {
   if (id === 'top-exchange' || id === 'bottom-exchange')
     return <Translated vi={<><code>MPI_Sendrecv</code> có chặn, nhưng chỉ sau khi nó đã bắt đầu gửi bất cứ thứ gì đang nằm trong hàng. Phải có thứ gì đó chặn host lại trước khi nó gọi hàm này.</>}><><code>MPI_Sendrecv</code> does block, but only after it has started sending whatever is in the row. Something must stop the host before it calls it.</></Translated>;
   if (id === 'copy-allreduce')
-    return <Translated vi={<><code>MPI_Allreduce</code> chặn cho đến khi phép rút gọn xong, nhưng nó sẽ đọc <code>l2norm_h</code> trước khi bản sao tới nơi. Host phải chờ trước.</>}><><code>MPI_Allreduce</code> blocks until the reduction is done, but it would read <code>l2norm_h</code> before the copy lands. The host has to wait first.</></Translated>;
+    return <Translated vi={<><code>MPI_Allreduce</code> chặn cho đến khi phép rút gọn xong, nhưng nó sẽ đọc <code>l2norm_h</code> trước khi lần sao chép tới nơi. Host phải chờ trước.</>}><><code>MPI_Allreduce</code> blocks until the reduction is done, but it would read <code>l2norm_h</code> before the copy lands. The host has to wait first.</></Translated>;
   return <Translated vi={<>Lời gọi nào sẽ chặn? Các lần khởi chạy kernel, <code>cudaMemsetAsync</code>, <code>cudaMemcpyAsync</code> và <code>cudaEventRecord</code> đều trả về ngay.</>}><>Which call would block? Kernel launches, <code>cudaMemsetAsync</code>, <code>cudaMemcpyAsync</code> and <code>cudaEventRecord</code> all return at once.</></Translated>;
 }
 
@@ -243,7 +243,7 @@ function CompareTable() {
                 'reset-top': 'chuẩn được đặt về 0', 'reset-bottom': 'chuẩn được đặt về 0', 'reset-internal': 'chuẩn được đặt về 0',
                 'top-copy': 'kernel trên đã cộng phần của nó', 'bottom-copy': 'kernel dưới đã cộng phần của nó', 'internal-copy': 'kernel bên trong đã cộng phần của nó',
                 'top-exchange': 'kernel trên đã tính xong hàng 1', 'bottom-exchange': 'kernel dưới đã tính xong hàng ny − 2',
-                'copy-allreduce': 'bản sao của chuẩn đã tới l2norm_h', 'exchange-next': 'cả hai phép trao đổi đã giao xong vùng biên',
+                'copy-allreduce': 'lần sao chép của chuẩn đã tới l2norm_h', 'exchange-next': 'cả hai phép trao đổi đã giao xong vùng biên',
               }) as Record<string, string>)[e.id] ?? e.first)} <span className="muted"><Translated vi="trước khi">before</Translated></span> {tr(e.then, (({
                 'reset-top': 'kernel trên cộng vào nó', 'reset-bottom': 'kernel dưới cộng vào nó', 'reset-internal': 'kernel bên trong cộng vào nó',
                 'top-copy': 'chuẩn được sao chép về host', 'bottom-copy': 'chuẩn được sao chép về host', 'internal-copy': 'chuẩn được sao chép về host',
@@ -333,7 +333,7 @@ function DependencyPuzzle() {
                       'reset-top': 'chuẩn được đặt về 0', 'reset-bottom': 'chuẩn được đặt về 0', 'reset-internal': 'chuẩn được đặt về 0',
                       'top-copy': 'kernel trên đã cộng phần của nó', 'bottom-copy': 'kernel dưới đã cộng phần của nó', 'internal-copy': 'kernel bên trong đã cộng phần của nó',
                       'top-exchange': 'kernel trên đã tính xong hàng 1', 'bottom-exchange': 'kernel dưới đã tính xong hàng ny − 2',
-                      'copy-allreduce': 'bản sao của chuẩn đã tới l2norm_h', 'exchange-next': 'cả hai phép trao đổi đã giao xong vùng biên',
+                      'copy-allreduce': 'lần sao chép của chuẩn đã tới l2norm_h', 'exchange-next': 'cả hai phép trao đổi đã giao xong vùng biên',
                     }) as Record<string, string>)[e.id] ?? e.first)} <span className="muted"><Translated vi="trước khi">before</Translated></span> {tr(e.then, (({
                       'reset-top': 'kernel trên cộng vào nó', 'reset-bottom': 'kernel dưới cộng vào nó', 'reset-internal': 'kernel bên trong cộng vào nó',
                       'top-copy': 'chuẩn được sao chép về host', 'bottom-copy': 'chuẩn được sao chép về host', 'internal-copy': 'chuẩn được sao chép về host',
@@ -461,7 +461,8 @@ function WhoWaits() {
   const [issue, setIssue] = useState<Issue>('boundary-first');
   const [defect, setDefect] = useState<Defect>('none');
   const one = version === 'mpi' || version === 'nvshmem';
-  const r = useMemo(() => simulate({ ...d, version, priority, issue, defect }), [d, version, priority, issue, defect]);
+  const locale = useLocale();
+  const r = useMemo(() => simulate({ ...d, version, priority, issue, defect }), [d, version, priority, issue, defect, locale]);
   const others = useMemo(() => ALL_VERSIONS.map((v) => simulate({ ...d, version: v, priority, issue })), [d, priority, issue]);
   const t1 = Math.max(4, Math.ceil(r.end + 0.2));
   const svgH = 18 + timelineHeight(r.lanes.length, true) + 4;
@@ -596,9 +597,9 @@ function WhoWaits() {
                         .replace(/^Iteration (\d+): the (\w+) (rows start|kernel starts) at ([\d.]+) and reads? the \w+ halo, which arrives only at ([\d.]+) \(with the (\w+) exchange of iteration (\d+)\)\. (They read|It reads) stale values\.$/,
                           (_m, i: string, w: string, k: string, a: string, b: string, w2: string, j: string) => `Vòng lặp ${i}: ${k === 'rows start' ? 'các hàng' : 'kernel'} ${P[w] ?? w} bắt đầu ở ${a} và đọc vùng biên ${P[w] ?? w}, vốn chỉ tới ở ${b} (cùng phép trao đổi phía ${P[w2] ?? w2} của vòng lặp ${j}). Nó đọc giá trị cũ.`)
                         .replace(/^Iteration (\d+): MPI_Allreduce starts at ([\d.]+), before the copy of the norm ends at ([\d.]+)\.$/,
-                          (_m, i: string, a: string, b: string) => `Vòng lặp ${i}: MPI_Allreduce bắt đầu ở ${a}, trước khi bản sao của chuẩn kết thúc ở ${b}.`)
+                          (_m, i: string, a: string, b: string) => `Vòng lặp ${i}: MPI_Allreduce bắt đầu ở ${a}, trước khi lần sao chép của chuẩn kết thúc ở ${b}.`)
                         .replace(/^Iteration (\d+): cudaMemcpyAsync into pageable memory is synchronous: the host waits in it from ([\d.]+) to ([\d.]+), and nothing after it can be issued until then\.$/,
-                          (_m, i: string, a: string, b: string) => `Vòng lặp ${i}: cudaMemcpyAsync vào bộ nhớ pageable là đồng bộ: host chờ trong đó từ ${a} đến ${b}, và không gì sau nó được phát lệnh cho đến lúc đó.`);
+                          (_m, i: string, a: string, b: string) => `Vòng lặp ${i}: cudaMemcpyAsync vào bộ nhớ phân trang là đồng bộ: host chờ trong đó từ ${a} đến ${b}, và không gì sau nó được phát lệnh cho đến lúc đó.`);
                     })(v.text))}</li>
                   ))}
                 </ul>
@@ -780,7 +781,7 @@ export const questionsS234: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Có, nhưng chỉ cho các bản sao: AMD áp dụng độ ưu tiên stream cho các lần truyền bộ nhớ trong một stream thay vì cho các lần khởi chạy kernel.">
+          <Translated vi="Có, nhưng chỉ cho các lần sao chép: AMD áp dụng độ ưu tiên stream cho các lần truyền bộ nhớ trong một stream thay vì cho các lần khởi chạy kernel.">
             Yes, but only their copies: AMD applies stream priorities to the memory transfers in a stream rather than to its kernel launches.
           </Translated>
         ),
@@ -868,7 +869,7 @@ export const questionsS234: Record<string, Question> = {
             Fail with an error, because l2norm_d lives in pinned host memory, which only the Async form is able to write.
           </Translated>
         ),
-        why: <Translated vi="l2norm_d là bộ nhớ device. Bộ đệm được ghim là l2norm_h.">l2norm_d is device memory. The pinned buffer is l2norm_h.</Translated>,
+        why: <Translated vi="l2norm_d là bộ nhớ device. Buffer được ghim là l2norm_h.">l2norm_d is device memory. The pinned buffer is l2norm_h.</Translated>,
       },
     ],
     explain: (
@@ -902,7 +903,7 @@ export const questionsS234: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Trong Fig. 23.14, bản sao của chuẩn, xếp hàng trong <code>internalStream</code>, phải chờ kernel trên trong{' '}
+            Trong Fig. 23.14, lần sao chép của chuẩn, xếp hàng trong <code>internalStream</code>, phải chờ kernel trên trong{' '}
             <code>topStream</code>. Thứ gì bảo đảm điều đó, và vì sao thứ tự các lời gọi của host là không đủ?
           </>
         }
@@ -934,15 +935,15 @@ export const questionsS234: Record<string, Question> = {
             cudaMemcpyAsync itself waits for all earlier work on the device, in every stream, before it starts copying the norm.
           </Translated>
         ),
-        why: <Translated vi="Đó là hành vi của default stream kiểu cũ (A3), không phải của một bản sao xếp hàng trong một stream có tên.">That is the legacy default stream’s behaviour (A3), not that of a copy queued in a named stream.</Translated>,
+        why: <Translated vi="Đó là hành vi của default stream kiểu cũ (A3), không phải của một lần sao chép xếp hàng trong một stream có tên.">That is the legacy default stream’s behaviour (A3), not that of a copy queued in a named stream.</Translated>,
       },
       {
         label: (
-          <Translated vi="Các stream biên có độ ưu tiên cao hơn, nên bộ lập lịch cho kernel của chúng xong trước khi bắt đầu bản sao.">
+          <Translated vi="Các stream biên có độ ưu tiên cao hơn, nên bộ lập lịch cho kernel của chúng xong trước khi bắt đầu lần sao chép.">
             The boundary streams have the higher priority, so the scheduler finishes their kernels before it starts the copy.
           </Translated>
         ),
-        why: <Translated vi="Độ ưu tiên là một gợi ý cho các kernel đang chờ. Nó không sắp thứ tự gì, và hoàn toàn không áp dụng cho bản sao (A2).">A priority is a hint for pending kernels. It orders nothing, and it does not apply to copies at all (A2).</Translated>,
+        why: <Translated vi="Độ ưu tiên là một gợi ý cho các kernel đang chờ. Nó không sắp thứ tự gì, và hoàn toàn không áp dụng cho lần sao chép (A2).">A priority is a hint for pending kernels. It orders nothing, and it does not apply to copies at all (A2).</Translated>,
       },
     ],
     explain: (
@@ -976,7 +977,7 @@ export const questionsS234: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Bạn chuyển Fig. 23.14 sang Metal. Dòng 19 và 20 bắt bản sao chờ hai nguồn tạo, mỗi pass biên một nguồn. Một{' '}
+            Bạn chuyển Fig. 23.14 sang Metal. Dòng 19 và 20 bắt lần sao chép chờ hai nguồn tạo, mỗi pass biên một nguồn. Một{' '}
             <code>MTLEvent</code> mà cả hai pass biên cùng báo hiệu có làm được việc đó không?
           </>
         }
@@ -996,7 +997,7 @@ export const questionsS234: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Có: Metal đếm số tín hiệu một event nhận được, như một semaphore, nên bản sao có thể chờ đến khi số đếm đạt hai.">
+          <Translated vi="Có: Metal đếm số tín hiệu một event nhận được, như một semaphore, nên lần sao chép có thể chờ đến khi số đếm đạt hai.">
             Yes: Metal counts the signals an event receives, like a semaphore, so the copy can wait until the count reaches two.
           </Translated>
         ),
@@ -1177,7 +1178,7 @@ export const questionsS234: Record<string, Question> = {
             Trong song song tensor, mỗi GPU tính một phần của mọi lớp, và các phần phải được cộng lại trước khi lớp tiếp theo có
             thể bắt đầu. Đó là phép trao đổi vùng biên của chương này mà không có các hàng bên trong để giấu sau. Song song
             pipeline gửi activation một lần mỗi ranh giới giai đoạn và có thể giấu lần truyền đó sau các micro-batch khác, với
-            cái giá là một bong bóng trong lúc pipeline được lấp đầy và rút cạn.
+            cái giá là một bong bóng trong lúc pipeline được nạp và rút.
           </p>
         }
       >
@@ -1202,7 +1203,7 @@ export function S234() {
       <Translated
         vi={
           <p>
-            Phần <a href={href('ch23', '23.3')}>23.3</a> đã cho bạn các bộ phận: stream, bản sao bất đồng bộ, bộ nhớ ghim
+            Phần <a href={href('ch23', '23.3')}>23.3</a> đã cho bạn các bộ phận: stream, lần sao chép bất đồng bộ, bộ nhớ ghim
             (pinned memory). Trang này lắp chúng thành vòng lặp của sách và đặt câu hỏi mà mọi chương trình có nhiều hơn một
             stream phải trả lời: khi một thao tác phải chờ một thao tác khác, ai là người chờ? Host, một stream, hay không ai cả.
             Câu trả lời cũng là thứ phân biệt ba thư viện của chương.
@@ -1306,7 +1307,7 @@ export function S234() {
         vi={
           <p>
             Thứ hai là độ ưu tiên làm gì. NVIDIA gọi nó là một gợi ý: nó áp dụng cho các kernel còn đang chờ bắt đầu, không
-            chiếm quyền công việc đang chạy, không bảo đảm thứ tự nào, và không ảnh hưởng gì đến bản sao. Trong tình huống nguy
+            chiếm quyền công việc đang chạy, không bảo đảm thứ tự nào, và không ảnh hưởng gì đến lần sao chép. Trong tình huống nguy
             hiểm sách mô tả, khi kernel bên trong đã lấp đầy GPU, độ ưu tiên cao hơn không thể tạo chỗ. Nó chỉ cho các kernel
             biên quyền lấy trước những chỗ được giải phóng khi các khối của kernel bên trong xong. Vậy hãy giữ cả hai biện pháp
             của sách, thứ tự khởi chạy và độ ưu tiên, rồi đo: không biện pháp nào là một sự bảo đảm.
@@ -1323,7 +1324,7 @@ export function S234() {
         </p>
       </Translated>
       <Today checked="2026-11-20, CUDA 13.5 (ch23-facts A2)">{/* i18n-ignore: date and citation */}
-        <Translated vi={<p>Độ ưu tiên &ldquo;do not preempt already-running work&rdquo; và không áp dụng cho bản sao.</p>}>
+        <Translated vi={<p>Độ ưu tiên &ldquo;do not preempt already-running work&rdquo; và không áp dụng cho lần sao chép.</p>}>
           <p>Priorities &ldquo;do not preempt already-running work&rdquo; and do not apply to copies.</p>
         </Translated>
       </Today>
@@ -1373,7 +1374,7 @@ export function S234() {
             Ba kernel dùng chung một thứ: chuẩn. Mỗi kernel cộng bình phương phần dư của các khối của nó vào{' '}
             <code>l2norm_d</code> bằng một phép toán nguyên tử (atomic). Điều đó tạo ra hai thứ tự cắt ngang các stream. Phép
             đặt lại phải xảy ra trước khi bất kỳ kernel nào trong ba kernel cộng vào chuẩn, và cả ba phải xong trước khi chuẩn
-            được sao chép về host. Nhưng phép đặt lại và bản sao mỗi thứ chỉ có thể nằm trong một stream.
+            được sao chép về host. Nhưng phép đặt lại và lần sao chép mỗi thứ chỉ có thể nằm trong một stream.
           </p>
         }
       >
@@ -1558,9 +1559,9 @@ export function S234() {
       <Translated
         vi={
           <p>
-            Dòng 21 xếp hàng bản sao của chuẩn về host ngay sau các lần chờ, trước phép trao đổi vùng biên. Vì{' '}
-            <code>cudaMemcpyAsync</code> trả về ngay, bản sao có thể chạy trong khi các phép trao đổi đang diễn ra, ngay khi
-            kernel bên trong xong. Host không được đọc <code>l2norm_h</code> trước khi bản sao tới nơi, và đó là việc của dòng
+            Dòng 21 xếp hàng lần sao chép của chuẩn về host ngay sau các lần chờ, trước phép trao đổi vùng biên. Vì{' '}
+            <code>cudaMemcpyAsync</code> trả về ngay, lần sao chép có thể chạy trong khi các phép trao đổi đang diễn ra, ngay khi
+            kernel bên trong xong. Host không được đọc <code>l2norm_h</code> trước khi lần sao chép tới nơi, và đó là việc của dòng
             37: một lần chờ trên <code>internalStream</code>, ngay trước <code>MPI_Allreduce</code>.
           </p>
         }
@@ -1577,7 +1578,7 @@ export function S234() {
         vi={
           <p>
             Điều đó chỉ hoạt động nếu <code>l2norm_h</code> được ghim. Phần <a href={href('ch23', '23.3')}>23.3</a> đã cho
-            thấy vì sao: từ bộ nhớ pageable, runtime trung chuyển bản sao qua một bộ đệm ghim của riêng nó, với host tham gia,
+            thấy vì sao: từ bộ nhớ phân trang, runtime trung chuyển lần sao chép qua một buffer ghim của riêng nó, với host tham gia,
             và lời gọi thôi bất đồng bộ. Trong vòng lặp này, điều đó sẽ chặn host ở dòng 21 cho đến khi kernel bên trong xong,
             và cả hai phép trao đổi chỉ bắt đầu sau đó. Trình khám phá bên dưới cho bạn thử điều đó.
           </p>
@@ -1594,7 +1595,7 @@ export function S234() {
         <Translated
           vi={
             <p>
-              Không phải lỗi: <code>cudaMemcpyAsync</code> &ldquo;will function correctly&rdquo; với bộ nhớ pageable,
+              Không phải lỗi: <code>cudaMemcpyAsync</code> &ldquo;will function correctly&rdquo; với bộ nhớ phân trang,
               &ldquo;but it will revert to a synchronous behavior which will not overlap with other work.&rdquo;
             </p>
           }
@@ -1741,7 +1742,7 @@ export function S234() {
             <p>
               Một rank mà các lân cận hành xử y hệt nó. Một GPU có 8 chỗ cho khối; một kernel gồm các khối dài bằng nhau và
               không gì bị chiếm quyền. Mỗi phép trao đổi có đường kết nối riêng. Các lời gọi MPI giữ host cho đến khi phép trao
-              đổi của chúng kết thúc. Một bản sao pageable là hoàn toàn đồng bộ. Mọi lời gọi API tốn cùng một khoảng thời gian
+              đổi của chúng kết thúc. Một lần sao chép từ bộ nhớ phân trang là hoàn toàn đồng bộ. Mọi lời gọi API tốn cùng một khoảng thời gian
               nhỏ. Kernel riêng của NCCL không chiếm chỗ khối nào. Một lần put của NVSHMEM đi ngay khi các khối của hàng nó xong,
               và rào chắn trên stream kết thúc sau một khoảng nhỏ cố định kể từ khi lần put cuối tới nơi. Thời gian không có
               đơn vị.
@@ -1882,7 +1883,7 @@ export function S234() {
         vi={
           <p>
             <b>NCCL</b> cung cấp các primitive giao tiếp chạy trên GPU và được xếp hàng trong stream, nên host thôi làm người
-            trung gian. Một lần gửi và một lần nhận chạy như một thao tác hợp nhất khi bạn đặt chúng giữa{' '}
+            trung gian. Một lần gửi và một lần nhận chạy như một thao tác gộp khi bạn đặt chúng giữa{' '}
             <code>ncclGroupStart</code> và <code>ncclGroupEnd</code>. Hãy để ý <code>ncclGroupEnd</code> hứa gì: các thao tác
             đã được xếp hàng, chưa hoàn tất. Đó là lý do dòng 31 và 36 bên dưới ghi event, và dòng 43–44 bắt stream bên trong
             chờ chúng trước vòng lặp tiếp theo.
@@ -2107,7 +2108,7 @@ export function S234() {
         vi={
           <p>
             Bạn cũng sẽ gặp các cơ chế của trang này trên một GPU. Backend CUDA của llama.cpp tạo các stream non-blocking và các
-            event với <code>cudaEventDisableTiming</code>. Sau một bản sao giữa hai device, nó ghi một event trong stream nguồn
+            event với <code>cudaEventDisableTiming</code>. Sau một lần sao chép giữa hai device, nó ghi một event trong stream nguồn
             và bắt stream đích chờ nó: khuôn mẫu của Fig. 23.14, trải qua các device. Với <code>GGML_CUDA_GRAPH_OPT=1</code>, và
             khi dùng CUDA graph, nó có thể chạy các phép chiếu Q, K và V trên các stream riêng, rẽ nhánh bằng một event và hợp
             lại bằng các event khác. <code>stream.wait_stream(other)</code> của PyTorch là ghi-rồi-chờ trong một lời gọi. MLX
@@ -2144,8 +2145,7 @@ export function S234() {
       <Translated
         vi={
           <p>
-            <a href={href('ch23', 'labs')}>Lab</a> đưa nửa một-GPU của nội dung này lên chính thiết bị của bạn: giấu các bản
-            sao sau một kernel bằng stream và bộ nhớ ghim, và đo xem bao nhiêu thời gian sao chép biến mất.
+            <a href={href('ch23', 'labs')}>Lab</a> đưa nửa một-GPU của nội dung này lên chính thiết bị của bạn: giấu các lần sao chép sau một kernel bằng stream và bộ nhớ ghim, và đo xem bao nhiêu thời gian sao chép biến mất.
           </p>
         }
       >
