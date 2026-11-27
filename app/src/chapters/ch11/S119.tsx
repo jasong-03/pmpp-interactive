@@ -3,7 +3,7 @@ import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { solutionTabStatus } from '../../components/LabKit';
 import { Bench, Beyond, NoteGroup as Notes, Simplification, Source, Today, type Tier } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { fmt, realBackends, useReports, type BackendRun, type Reports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -93,7 +93,8 @@ const SEGMENTS = [256, 512, 1024, 2048, 4096, 8192];
 
 function BytesExplorer() {
   const { reports } = useReports();
-  const devices = useMemo(() => devicesOf(reports), [reports]);
+  const locale = useLocale();
+  const devices = useMemo(() => devicesOf(reports), [reports, locale]);
   const [design, setDesign] = useState<Design>('ssa');
   const [S, setS] = useState(1024);
   const [elem, setElem] = useState(4);
@@ -194,7 +195,7 @@ function BytesExplorer() {
               ));
             return (
               <tr key={k.kernel} data-kernel={k.kernel}>
-                <td>{k.kernel}</td>
+                <td>{tr(k.kernel, k.kernel === 'one kernel' ? 'một kernel' : k.kernel)}</td>
                 <td>{k.does}</td>
                 <td>{list('load')}</td>
                 <td>{list('store')}</td>
@@ -489,8 +490,9 @@ const PRESETS: { readonly label: string; c: Partial<LookbackConfig> }[] = [
 function WaitSimulator() {
   const [c, setC] = useState<LookbackConfig>({ G: 8, R: 4, order: 'reversed', seed: 1, index: 'hardware', scheme: 'single', progress: 'started', even: false });
   const set = (p: Partial<LookbackConfig>) => setC((o) => ({ ...o, ...p }));
-  const run = useMemo(() => simulate(c), [c]);
-  const all = useMemo(() => (['barrier', 'single', 'decoupled'] as Scheme[]).map((s) => simulate({ ...c, scheme: s })), [c]);
+  const locale = useLocale();
+  const run = useMemo(() => simulate(c), [c, locale]);
+  const all = useMemo(() => (['barrier', 'single', 'decoupled'] as Scheme[]).map((s) => simulate({ ...c, scheme: s })), [c, locale]);
   const narrow = useNarrow();
   const short: Record<Scheme, string> = { barrier: 'barrier', single: 'single', decoupled: 'decoupled' };
   const outcomeText: Record<string, ReactNode> = {
@@ -825,7 +827,7 @@ function FlagClassifier() {
           }
         />
         <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.1rem' }}>
-          {METAL_NOTES.map((n) => <li key={n}>{n}</li>)}
+          {METAL_NOTES.map((n) => <li key={n}>{tr(n, ({ 'partialSums must be declared coherent(device): by default device memory is only threadgroup-coherent (MSL 3.2 and later).': 'partialSums phải được khai báo coherent(device): mặc định bộ nhớ device chỉ coherent trong threadgroup (MSL 3.2 trở lên).', 'There is no sleep for the spin, and no documented forward progress between threadgroups: the single-pass scan is still unsafe on Metal.': 'Không có sleep cho vòng quay chờ, và tài liệu không ghi bảo đảm tiến triển nào giữa các threadgroup: phép scan single-pass vẫn không an toàn trên Metal.' } as Record<string, string>)[n] ?? n)}</li>)}
         </ul>
       </div>
     </Bench>

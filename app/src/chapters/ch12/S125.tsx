@@ -1040,7 +1040,7 @@ export function S125() {
             <p>
               <code>DeviceSelect::If</code> và <code>::Flagged</code> của CUB (hàm nhận mảng keep của bài tập 1) và{' '}
               <code>copy_if</code> của Thrust là ổn định. <code>nonzero</code> của PyTorch trên CUDA là một phép rút gọn CUB, một
-              lần chép số đếm về host, rồi <code>DeviceSelect::Flagged</code>; <code>nonzero_static</code> là bài tập 1 có gộp
+              lần sao chép số đếm về host, rồi <code>DeviceSelect::Flagged</code>; <code>nonzero_static</code> là bài tập 1 có gộp
               việc cho luồng và không đồng bộ với host. <code>topk</code> của PyTorch gom bằng ballot và popcount, và tránh{' '}
               <code>atomicAdd</code> để giữ thứ tự chỉ số. hipCUB chuyển tiếp sang rocPRIM, mà tài liệu chỉ cho thấy thứ tự qua
               ví dụ. Trên Apple, thứ tương ứng tìm thấy trong thư viện là <code>nonZeroIndices</code> của MPSGraph.

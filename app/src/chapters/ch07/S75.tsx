@@ -4,7 +4,7 @@ import { Code, useLabFile } from '../../components/Code';
 import { solutionTabStatus } from '../../components/LabKit';
 import { Aside, Bench, Beyond, Simplification, Source, TierLegend, Today, type Tier } from '../../components/notes';
 import { benchRows, fmt, num, realBackends, useReports, type Reports } from '../../lib/reports';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import { SEGMENT_MODELS, type SegmentModelId } from '../../sim/coalesce';
 import {
@@ -725,7 +725,8 @@ function HaloStepper() {
   const cfg: ConvConfig = useMemo(() => ({ inTile: 8, r: 1, barrier, zeroGhost, loadOffset }), [barrier, zeroGhost, loadOffset]);
   const prob = useMemo(() => makeProblem(img, img, 1), [img]);
   const grid = gridOf(cfg, prob);
-  const trace = useMemo(() => runTiledBlock(cfg, prob, bx, by, schedule, 5), [cfg, prob, bx, by, schedule]);
+  const locale = useLocale();
+  const trace = useMemo(() => runTiledBlock(cfg, prob, bx, by, schedule, 5), [cfg, prob, bx, by, schedule, locale]);
   const total = trace.steps.length;
   const at = Math.min(n, total);
   const st = useMemo(() => stateAt(cfg, trace, at), [cfg, trace, at]);

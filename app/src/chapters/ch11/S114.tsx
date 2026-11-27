@@ -645,7 +645,7 @@ function PortIt() {
               {issues.map((p) => (
                 <tr key={p.id} data-issue={p.id}>
                   <td style={{ width: '9.5rem' }}>
-                    <span className={'chip' + (p.kind === 'compile error' || p.kind === 'wrong or limited' ? ' fail' : '')}>{p.kind}</span>
+                    <span className={'chip' + (p.kind === 'compile error' || p.kind === 'wrong or limited' ? ' fail' : '')}>{tr(p.kind, ({ 'compile error': 'lỗi biên dịch', 'wrong or limited': 'sai hoặc bị giới hạn', undocumented: 'không có trong tài liệu', limit: 'giới hạn', rewrite: 'viết lại' } as Record<string, string>)[p.kind] ?? p.kind)}</span>
                     <div className="muted" style={{ fontSize: '0.78rem', marginTop: '0.2rem' }}>{p.where}</div>
                   </td>
                   <td>
@@ -901,7 +901,7 @@ export const questionsS114: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Kernel bộ đệm kép của Fig. 11.5 thực thi bao nhiêu lời gọi <code>__syncthreads()</code> cho một lần scan khối
+            Kernel buffer kép của Fig. 11.5 thực thi bao nhiêu lời gọi <code>__syncthreads()</code> cho một lần scan khối
             trên 1,024 phần tử, mỗi luồng một phần tử?
           </>
         }
@@ -1104,7 +1104,7 @@ export function S114() {
       <Translated
         vi={
           <p>
-            Hãy đếm xem một phép cộng tốn gì trong kernel bộ đệm kép của <a href={href('ch11', '11.3')}>phần 11.3</a>. Mỗi
+            Hãy đếm xem một phép cộng tốn gì trong kernel buffer kép của <a href={href('ch11', '11.3')}>phần 11.3</a>. Mỗi
             lần lặp có một rào chắn (barrier) mà mọi luồng của khối phải đến được, và mỗi phép cộng thực hiện ba lần truy cập
             bộ nhớ chia sẻ (shared memory): hai lần đọc và một lần ghi. Chỉ cho một phép cộng dấu phẩy động. Kernel dành thời
             gian cho việc đồng bộ hóa và di chuyển dữ liệu, chứ không phải cộng.

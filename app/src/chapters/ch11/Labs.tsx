@@ -96,7 +96,7 @@ const warpOverTwo = (reports: Reports) =>
         (prefix ? `; the simd_prefix_inclusive_sum version ${ms(prefix)}` : '') +
         (share != null ? `; the warp-shuffle scan reached ${pct(share)} of the copy kernel's rate` : ''),
         `${ms(a)} cho kernel hai rào chắn và ${ms(b)} cho phép scan warp-shuffle, ${count(num(warp?.n) ?? 0)} số float trong các khối 1,024` +
-        (dbl ? `; bộ đệm kép ${ms(dbl)}` : '') +
+        (dbl ? `; buffer kép ${ms(dbl)}` : '') +
         (prefix ? `; phiên bản simd_prefix_inclusive_sum ${ms(prefix)}` : '') +
         (share != null ? `; phép scan warp-shuffle đạt ${pct(share)} tốc độ của kernel copy` : ''),
       ),
@@ -597,7 +597,7 @@ const KERNEL_1: Record<string, string> = {
     return tr('two barriers (Fig. 11.3, provided)', 'hai rào chắn (Fig. 11.3, có sẵn)');
   },
   get double_buffer() {
-    return tr('double buffer, (a)', 'bộ đệm kép, (a)');
+    return tr('double buffer, (a)', 'buffer kép, (a)');
   },
   get warp_shuffle() {
     return tr('warp shuffle, (b)', 'warp shuffle, (b)');
@@ -864,7 +864,7 @@ export function Labs() {
         vi={
           <p>
             Bạn viết hai phép scan bao gồm mức khối và đo thời gian chúng so với kernel hai rào chắn của sách, Fig. 11.3, được
-            cung cấp sẵn. (a) là Fig. 11.5: hai bộ đệm chia sẻ đổi vai cho nhau, một rào chắn mỗi lần lặp, và bước sao chép cho
+            cung cấp sẵn. (a) là Fig. 11.5: hai buffer chia sẻ đổi vai cho nhau, một rào chắn mỗi lần lặp, và bước sao chép cho
             những luồng không cộng. (b) là phép scan warp-shuffle của Fig. 11.8 đến 11.10, được làm cho biên dịch được trên
             CUDA và HIP và đúng ở mọi kích thước khối. Trên Metal còn có (b2), cùng phép scan khối đó với phép scan của mỗi
             SIMD group được làm bằng một lời gọi <code>simd_prefix_inclusive_sum</code>. Phép scan khối của (b) là thứ mà các
@@ -1030,7 +1030,7 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Phần <a href={href('ch11', '11.3')}>11.3</a> hỏi một dự đoán thứ hai về các dòng này, riêng bộ đệm kép sẽ nhanh
+            Phần <a href={href('ch11', '11.3')}>11.3</a> hỏi một dự đoán thứ hai về các dòng này, riêng buffer kép sẽ nhanh
             gấp bao nhiêu lần. Hãy chốt nó ở đó trước khi bạn chạy benchmark.
           </p>
         }
@@ -1101,7 +1101,7 @@ export function Labs() {
         <Translated
           vi={
             <li>
-              Bộ đệm của đoạn là bộ nhớ chia sẻ động có kích thước định lúc khởi chạy, nên benchmark ở 256 luồng không giữ chỗ
+              Buffer của đoạn là bộ nhớ chia sẻ động có kích thước định lúc khởi chạy, nên benchmark ở 256 luồng không giữ chỗ
               cho lượng mà 1,024 luồng sẽ cần. Một cấu hình có bộ nhớ không vừa sẽ bị bỏ qua, và driver nói lý do.
             </li>
           }

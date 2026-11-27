@@ -3,7 +3,7 @@ import { Ask, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Aside, Bench, Beyond, Simplification, Source, Today, type Tier } from '../../components/notes';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { STATUS, useLabStatus } from './status';
 import {
   EXERCISE_6,
@@ -180,7 +180,8 @@ function Stepper() {
   const parsed = parseValues(own);
   const values = data === 'fig' ? [...FIG_VALUES] : data === 'ex6' ? [...EXERCISE_6] : parsed;
   const key = values ? values.join(',') : '';
-  const run = useMemo(() => (values ? runInPlace('simple', values, { barrier, schedule }) : null), [key, barrier, schedule]); // eslint-disable-line react-hooks/exhaustive-deps
+  const locale = useLocale();
+  const run = useMemo(() => (values ? runInPlace('simple', values, { barrier, schedule }) : null), [key, barrier, schedule, locale]); // eslint-disable-line react-hooks/exhaustive-deps
   const total = run ? run.steps.length : 0;
   const at = Math.min(n, total);
   const cur = run && at > 0 ? run.steps[at - 1] : undefined;
@@ -329,7 +330,7 @@ function Stepper() {
                   <tr key={t} className={cur?.thread === t ? 'cur' : ''} data-thread={t}>
                     <td>{t}</td>
                     <td className="t-global">input[{2 * t}]</td>{/* i18n-ignore: code expression */}
-                    <td>{st!.status[t] === 'waiting' ? tr('waiting at the barrier', 'đang chờ tại rào chắn') : st!.status[t]}</td>
+                    <td>{st!.status[t] === 'waiting' ? tr('waiting at the barrier', 'đang chờ tại rào chắn') : tr(st!.status[t], ({ 'not started': 'chưa bắt đầu', running: 'đang chạy', finished: 'đã xong' } as Record<string, string>)[st!.status[t]] ?? st!.status[t])}</td>
                   </tr>
                 ))}
               </tbody>

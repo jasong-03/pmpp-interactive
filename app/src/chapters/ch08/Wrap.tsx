@@ -206,7 +206,7 @@ export const questionsWrap: Record<string, Question> = {
     options: [
       {
         label: <Translated vi="Sai: một luồng nhanh có thể ghi đè mặt phẳng mà các láng giềng của nó vẫn đang đọc.">{'Wrong: a fast thread can overwrite the plane its neighbours are still reading.'}</Translated>,
-        why: <Translated vi="Nó ghi vào bộ đệm kia. Bộ đệm đang được đọc chỉ được ghi lại ở cuối vòng lặp kế tiếp, sau một rào chắn mà không luồng nào vượt qua cho đến khi mọi luồng đã đọc xong trong vòng lặp này.">{'It writes the other buffer. The buffer being read is written again only at the end of the next iteration, after a barrier that no thread passes until every thread has finished this iteration\'s reads.'}</Translated>,
+        why: <Translated vi="Nó ghi vào buffer kia. Buffer đang được đọc chỉ được ghi lại ở cuối vòng lặp kế tiếp, sau một rào chắn mà không luồng nào vượt qua cho đến khi mọi luồng đã đọc xong trong vòng lặp này.">{'It writes the other buffer. The buffer being read is written again only at the end of the next iteration, after a barrier that no thread passes until every thread has finished this iteration\'s reads.'}</Translated>,
       },
       {
         label: <Translated vi="Đúng, và miễn phí: rào chắn thứ hai của Hình 8.12 vốn không bao giờ cần.">{'Correct, and free: Fig. 8.12\'s second barrier was never needed.'}</Translated>,
@@ -226,7 +226,7 @@ export const questionsWrap: Record<string, Question> = {
         vi={
           <p>
             Rào chắn thứ hai của Hình 8.12 bảo vệ một phụ thuộc giả (ghi sau đọc): mặt phẳng kế tiếp được ghi vào đúng mảng mà các
-            láng giềng vẫn đang đọc. <a href={href('ch06', '6.7')}>Bộ đệm kép của chương 6</a> loại bỏ nó bằng cách ghi vào chỗ khác;
+            láng giềng vẫn đang đọc. <a href={href('ch06', '6.7')}>Buffer kép của chương 6</a> loại bỏ nó bằng cách ghi vào chỗ khác;
             rào chắn còn lại bảo vệ phụ thuộc thật. Cái giá là thêm một mặt phẳng {n(ONE_PLANE)} byte, vẫn để khối thấp hơn ba mặt
             phẳng của Hình 8.10 ({n(THREE_PLANES)} byte). Việc bớt một rào chắn có bù được mặt phẳng thêm hay không là chuyện phải đo,
             không phải điều mô hình nói ra.
@@ -243,7 +243,7 @@ export const questionsWrap: Record<string, Question> = {
       </Translated>
     ),
     source: 'ch. 6 §6.7, pp. 146–147 (double buffering); ch. 8 §8.6, p. 197; the kernel is ours',
-    vi: { source: 'ch. 6 §6.7, pp. 146–147 (bộ đệm kép); ch. 8 §8.6, p. 197; kernel là của chúng tôi' },
+    vi: { source: 'ch. 6 §6.7, pp. 146–147 (buffer kép); ch. 8 §8.6, p. 197; kernel là của chúng tôi' },
   },
   'ch08/wrap/q-decode-placement': {
     kind: 'choice',
@@ -498,9 +498,9 @@ export function Wrap() {
           <Translated
             vi={
               <>
-                Một bộ đệm chia sẻ được dùng lại qua các vòng lặp cần hai rào chắn mỗi vòng: một trước các lần đọc (đọc sau ghi), một
+                Một buffer chia sẻ được dùng lại qua các vòng lặp cần hai rào chắn mỗi vòng: một trước các lần đọc (đọc sau ghi), một
                 trước lần ghi đè (ghi sau đọc). Mọi luồng phải đến được cả hai, nên hãy bọc điều kiện quanh các lần nạp và lưu và đừng
-                bao giờ return sớm. Một bộ đệm thứ hai loại bỏ rào chắn thứ hai.
+                bao giờ return sớm. Một buffer thứ hai loại bỏ rào chắn thứ hai.
               </>
             }
           >

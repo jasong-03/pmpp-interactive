@@ -39,6 +39,8 @@ const SKEW = sceneBins(SKEWED4);
 const SKEW_CACHE = sceneBins(SKEWED4, SCENE.cache);
 const PRIV = scenePrivatised();
 
+// Row labels: the regexes below match atomicrate.ts's two row names, 'thread N' and 'block N commit',
+// and give the Vietnamese; the English name stays the bar's identity.
 type Tone = 'global' | 'shared';
 
 function Bars({ tl, now, tone = (_b: Bar) => 'global' as Tone, label, valuesAt }: {
@@ -61,7 +63,7 @@ function Bars({ tl, now, tone = (_b: Bar) => 'global' as Tone, label, valuesAt }
         const done = now >= b.end;
         return (
           <g key={i} data-row={i} data-start={b.start} data-end={b.end}>
-            <text x={X0 - 8} y={y + 14} fontSize="11" textAnchor="end">{label ? label(b, i) : b.row}</text>
+            <text x={X0 - 8} y={y + 14} fontSize="11" textAnchor="end">{label ? label(b, i) : tr(b.row, b.row.replace(/^thread (\d+)$/, 'luồng $1').replace(/^block (\d+) commit$/, 'khối $1 ghi về'))}</text>
             <line x1={X0} x2={X1} y1={y + ROW - 2} y2={y + ROW - 2} stroke="var(--rule-soft)" />
             {shown && b.start > b.issue ? (
               <line x1={x(b.issue)} x2={x(Math.min(now, b.start))} y1={y + 10} y2={y + 10} stroke="var(--ink-3)" strokeDasharray="3 3" />
@@ -291,7 +293,7 @@ const beats: Beat[] = [
           <Axis rows={rows} />
           <Finish t={ONE.end} rows={rows} show={1} label={tr('all 8 on the global bin', 'cả 8 trên ô toàn cục')} ghost />
           <Bars tl={PRIV} now={now} tone={(b) => (b.address.startsWith('private') ? 'shared' : 'global')}
-            label={(b) => (b.address.startsWith('private') ? tr(`${b.row} → copy ${b.address.slice(-1)}`, `${b.row} → bản sao ${b.address.slice(-1)}`) : b.row)} />
+            label={(b) => (b.address.startsWith('private') ? tr(`${b.row} → copy ${b.address.slice(-1)}`, `${b.row.replace(/^thread (\d+)$/, 'luồng $1').replace(/^block (\d+) commit$/, 'khối $1 ghi về')} → bản sao ${b.address.slice(-1)}`) : tr(b.row, b.row.replace(/^thread (\d+)$/, 'luồng $1').replace(/^block (\d+) commit$/, 'khối $1 ghi về')))} />
           <Now t={now} rows={rows} end={PRIV.end} />
           <Finish t={PRIV.end} rows={rows} show={now >= PRIV.end ? 1 : 0} label={tr(`done at ${fmtInt(PRIV.end)}`, `xong lúc ${fmtInt(PRIV.end)}`)} />
           <Value v={valueAt(PRIV, 'bin', now)} />

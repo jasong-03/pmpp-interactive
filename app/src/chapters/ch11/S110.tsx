@@ -16,7 +16,7 @@ const LEDGER: { what: string; formula: string; pages: string; sec: string; secLa
   },
   {
     get what() {
-      return tr('Barriers in one block scan, Fig. 11.5 (two buffers)', 'Số rào chắn trong một lần scan khối, Fig. 11.5 (hai bộ đệm)');
+      return tr('Barriers in one block scan, Fig. 11.5 (two buffers)', 'Số rào chắn trong một lần scan khối, Fig. 11.5 (hai buffer)');
     },
     formula: 'log₂B', pages: 'pp. 260–261', sec: '11.3', secLabel: '11.3',
   },
@@ -208,8 +208,7 @@ export const questionsS110: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Một vòng lặp đọc ô của láng giềng, chờ ở một rào chắn, ghi vào ô của chính nó, rồi lại chờ. Bạn cho nó hai bộ
-            đệm đổi vai trò mỗi lần lặp. Rào chắn nào có thể bỏ đi?
+            Một vòng lặp đọc ô của láng giềng, chờ ở một rào chắn, ghi vào ô của chính nó, rồi lại chờ. Bạn cho nó hai buffer đổi vai trò mỗi lần lặp. Rào chắn nào có thể bỏ đi?
           </>
         }
       >
@@ -222,7 +221,7 @@ export const questionsS110: Record<string, Question> = {
       {
         label: <Translated vi="Rào chắn sau lần ghi">The one after the write</Translated>,
         why: (
-          <Translated vi="Rào chắn đó bắt người đọc kế tiếp chờ giá trị nó cần. Hai bộ đệm không thay đổi điều đó.">
+          <Translated vi="Rào chắn đó bắt người đọc kế tiếp chờ giá trị nó cần. Hai buffer không thay đổi điều đó.">
             That one makes the next reader wait for the value it needs. Two buffers do not change that.
           </Translated>
         ),
@@ -250,7 +249,7 @@ export const questionsS110: Record<string, Question> = {
           <p>
             Rào chắn sau lần đọc ngăn một luồng ghi phá hủy giá trị mà ai đó vẫn còn phải đọc: một phụ thuộc
             ghi-sau-đọc (write-after-read), hay phụ thuộc giả. Nó tồn tại chỉ vì một ô chứa cả giá trị cũ lẫn giá trị mới.
-            Với hai bộ đệm, giá trị mới đi sang chỗ khác và rào chắn đó không còn gì để bảo vệ. Rào chắn sau lần ghi bảo
+            Với hai buffer, giá trị mới đi sang chỗ khác và rào chắn đó không còn gì để bảo vệ. Rào chắn sau lần ghi bảo
             vệ một phụ thuộc thật (đọc-sau-ghi, read-after-write) và vẫn ở lại. Mục 11.3 làm đúng điều này với kernel scan.
           </p>
         }
@@ -512,7 +511,7 @@ export function S110() {
             suất tích lũy đó là một scan, và việc token vượt qua p có được giữ hay không chính là khác biệt giữa hai loại
             scan được định nghĩa ở mục 11.1. Lab 11.6 xây mặt nạ giữ lại đó; nó là phần top-p của mốc dự án M5 của dự án
             khóa học, vốn bắt đầu từ phần đếm token ở chương 9. Scan cũng biến kích thước thành vị trí bắt đầu (offset): số
-            token của từng chuỗi trong một batch trở thành vị trí bắt đầu của mỗi chuỗi trong một bộ đệm đóng gói, và ở
+            token của từng chuỗi trong một batch trở thành vị trí bắt đầu của mỗi chuỗi trong một buffer đóng gói, và ở
             chương 12 một scan trên các cờ giữ lại 0/1 cho mỗi token được giữ một chỗ trong danh sách đã nén gọn.
           </p>
         }
@@ -714,7 +713,7 @@ export function S110() {
       <Translated
         vi={
           <p>
-            <b>Lab 11.1, một lần scan khối, ba cách.</b> Kernel hai rào chắn của mục 11.2, kernel bộ đệm kép của mục 11.3
+            <b>Lab 11.1, một lần scan khối, ba cách.</b> Kernel hai rào chắn của mục 11.2, kernel buffer kép của mục 11.3
             và kernel scan warp của mục 11.4, trên một khối, được đo so với nhau.
           </p>
         }

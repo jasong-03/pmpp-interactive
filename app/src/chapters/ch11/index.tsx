@@ -32,7 +32,7 @@ export const chapter: Chapter = {
     {
       id: '11.3', num: '11.3', title: 'Double-buffering to reduce synchronization', pages: '258–261',
       lede: 'Tell the true dependence from the false one, remove the false one with two buffers, and say which buffer ends up holding the result.',
-      vi: { title: 'Bộ đệm kép để giảm đồng bộ hóa', lede: 'Phân biệt phụ thuộc thật với phụ thuộc giả, loại bỏ phụ thuộc giả bằng hai bộ đệm, và nói được bộ đệm nào cuối cùng chứa kết quả.' },
+      vi: { title: 'Buffer kép để giảm đồng bộ hóa', lede: 'Phân biệt phụ thuộc thật với phụ thuộc giả, loại bỏ phụ thuộc giả bằng hai buffer, và nói được buffer nào cuối cùng chứa kết quả.' },
       load: () => import('./S113').then((m) => ({ Component: m.S113, questions: m.questionsS113 })),
     },
     {

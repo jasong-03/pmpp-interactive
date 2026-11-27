@@ -982,7 +982,7 @@ export function S102() {
           vi={
             <p>
               Một bộ cộng cho mỗi phép toán và một bước cho mỗi tầng. Các tổng float được làm tròn về float32 sau mỗi phép
-              cộng, không có phép toán hợp nhất (fused). Không có gì mô hình hóa luồng, bộ nhớ hay một bước kéo dài bao lâu.
+              cộng, không có phép toán gộp (fused). Không có gì mô hình hóa luồng, bộ nhớ hay một bước kéo dài bao lâu.
             </p>
           }
         >
@@ -1183,7 +1183,7 @@ export function S102() {
         <Translated
           vi={
             <p>
-              Làm tròn về gần nhất sau mỗi phép cộng: không phép toán hợp nhất, không đẩy về không, không có trình biên dịch
+              Làm tròn về gần nhất sau mỗi phép cộng: không phép toán gộp, không đẩy về không, không có trình biên dịch
               kết hợp lại.
             </p>
           }

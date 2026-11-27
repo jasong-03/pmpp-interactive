@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Ask, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Aside, Bench, NoteGroup, Simplification, Source, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import {
   EXERCISE_1,
@@ -281,7 +281,8 @@ function RaceHunt() {
   const [direct, setDirect] = useState(false);
   const [schedule, setSchedule] = useState<Schedule>('book-race');
   const cfg: Config = useMemo(() => ({ ...FIG_11_3, threads: 8, barrier1: b1, barrier2: b2, temp: !direct }), [b1, b2, direct]);
-  const trace = useMemo(() => run(cfg, EXERCISE_1, schedule), [cfg, schedule]);
+  const locale = useLocale();
+  const trace = useMemo(() => run(cfg, EXERCISE_1, schedule), [cfg, schedule, locale]);
   return (
     <Bench
       title={tr('The race behind barrier 2', 'Race condition đằng sau rào chắn 2')}

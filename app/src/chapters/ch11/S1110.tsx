@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Ask, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Aside, Bench, Beyond, Simplification, Source, Today, type Tier } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { useReports, type Reports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -143,7 +143,8 @@ const twoLines = (r: Range) => (r.lo === r.hi ? [`x${r.lo}`] : [`x${r.lo}..`, `x
 
 // ---------------------------------------------------------------- Fig. 11.20 as a heat map
 function NeedsMap({ n, k, printed, picked, onPick }: { n: number; k: number; printed: boolean; picked: { row: number; pos: number } | null; onPick: (row: number, pos: number) => void }) {
-  const levels = useMemo(() => reverseLevels(n), [n]);
+  const locale = useLocale();
+  const levels = useMemo(() => reverseLevels(n), [n, locale]);
   const diffs = useMemo(() => (n === 16 ? printedDiffers() : []), [n]);
   const isDiff = (row: number, col: number) => diffs.some((d) => d.row === row && d.col === col);
   const cw = n > 8 ? 34 : 52;
@@ -203,7 +204,8 @@ function Stepper() {
   const ksV = useMemo(() => run(ks, values), [ks, values]);
   const bkR = useMemo(() => ranges(bk), [bk]);
   const ksR = useMemo(() => ranges(ks), [ks]);
-  const levels = useMemo(() => reverseLevels(n), [n]);
+  const locale = useLocale();
+  const levels = useMemo(() => reverseLevels(n), [n, locale]);
   const total = bk.steps.length;
   const k = Math.min(step, total);
   const up = upSteps(bk);

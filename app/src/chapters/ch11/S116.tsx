@@ -288,14 +288,14 @@ function LoadExplorer() {
           })}
         </svg>
         <div className="row" style={{ marginTop: '0.3rem', gap: '1rem' }} data-readout={mode} data-transactions={L.access.transactions} data-runs={L.runs}>
-          <Translated vi={<span><b>{L.access.transactions}</b> {m.unit} {seg} byte{m.segmentBytes == null ? ' (bạn tự chọn)' : ''}</span>}>
+          <Translated vi={<span><b>{L.access.transactions}</b> {({ sector: 'sector', line: 'dòng', segment: 'đoạn' } as Record<string, string>)[m.unit] ?? m.unit} {seg} byte{m.segmentBytes == null ? ' (bạn tự chọn)' : ''}</span>}>
             <span><b>{L.access.transactions}</b> {m.unit}{L.access.transactions === 1 ? '' : 's'} of {seg} bytes{m.segmentBytes == null ? ' (your choice)' : ''}</span>
           </Translated>
           <Translated vi={<span>{Math.round(L.access.efficiency * 100)}% số byte được nạp có dùng</span>}>
             <span>{Math.round(L.access.efficiency * 100)}% of fetched bytes used</span>
           </Translated>
           <span className="muted">{L.runs === 1 ? tr('one run of consecutive bytes', 'một dãy byte liên tiếp') : tr(`${L.runs} separate runs`, `${L.runs} dãy rời nhau`)}</span>
-          <Translated vi={<span className="muted">cả {F} lần nạp: {loadTransactions(mode, F, B, 32, seg)} {m.unit}</span>}>
+          <Translated vi={<span className="muted">cả {F} lần nạp: {loadTransactions(mode, F, B, 32, seg)} {({ sector: 'sector', line: 'dòng', segment: 'đoạn' } as Record<string, string>)[m.unit] ?? m.unit}</span>}>
             <span className="muted">all {F} load{F === 1 ? '' : 's'}: {loadTransactions(mode, F, B, 32, seg)} {m.unit}s</span>
           </Translated>
         </div>
@@ -318,8 +318,8 @@ function LoadExplorer() {
           vi={
             <>
               Một khối 32 luồng, một warp, đoạn gồm 32 × F số float được vẽ từng khúc: hàng <i>c</i> là khúc <i>c</i>, và các khe
-              nhỏ chia nó thành các {m.unit} {seg} byte. Ô tô đậm là các phần tử mà một lệnh nạp đọc; ô tô nhạt là phần còn lại
-              của các {m.unit} mà nó chạm tới. Mỗi lệnh được đếm riêng ({m.facts}).
+              nhỏ chia nó thành các {({ sector: 'sector', line: 'dòng', segment: 'đoạn' } as Record<string, string>)[m.unit] ?? m.unit} {seg} byte. Ô tô đậm là các phần tử mà một lệnh nạp đọc; ô tô nhạt là phần còn lại
+              của các {({ sector: 'sector', line: 'dòng', segment: 'đoạn' } as Record<string, string>)[m.unit] ?? m.unit} mà nó chạm tới. Mỗi lệnh được đếm riêng ({m.facts}).
             </>
           }
         >
@@ -343,7 +343,7 @@ function LoadExplorer() {
         <label className="field" style={{ maxWidth: '100%' }}>
           <Translated vi="Mô hình segment">Segment model</Translated>
           <select value={model} onChange={(e) => setModel(e.target.value as SegmentModelId)} style={{ maxWidth: '100%' }}>
-            {Object.values(SEGMENT_MODELS).map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
+            {Object.values(SEGMENT_MODELS).map((x) => <option key={x.id} value={x.id}>{tr(x.label, ({ nvidia: 'NVIDIA: sector 32 byte trong dòng cache 128 byte', amd64: 'AMD: dòng cache 64 byte', amd128: 'AMD: dòng cache 128 byte', metal: 'Apple: không có tài liệu' } as Record<string, string>)[x.id] ?? x.label)}</option>)}
           </select>
         </label>
         {m.segmentBytes == null ? (

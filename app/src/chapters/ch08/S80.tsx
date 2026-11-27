@@ -138,9 +138,9 @@ export const questionsS80: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Một khối chạy một vòng lặp. Ở mỗi lần lặp, mọi luồng ghi một phần tử của một bộ đệm chia sẻ, chờ ở một rào
+            Một khối chạy một vòng lặp. Ở mỗi lần lặp, mọi luồng ghi một phần tử của một buffer chia sẻ, chờ ở một rào
             chắn (barrier), tính toán từ những phần tử do các luồng khác ghi, rồi chờ ở rào chắn thứ hai. Lần lặp kế tiếp
-            ghi đè lên chính bộ đệm đó. Nếu mỗi lần lặp có một bộ đệm riêng, bạn có thể bỏ rào chắn nào?
+            ghi đè lên chính buffer đó. Nếu mỗi lần lặp có một buffer riêng, bạn có thể bỏ rào chắn nào?
           </>
         }
       >
@@ -159,7 +159,7 @@ export const questionsS80: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Các luồng vẫn đọc những gì luồng khác đã ghi. Chúng không được đọc trước khi dữ liệu có mặt, dù dữ liệu nằm trong bộ đệm nào.">
+          <Translated vi="Các luồng vẫn đọc những gì luồng khác đã ghi. Chúng không được đọc trước khi dữ liệu có mặt, dù dữ liệu nằm trong buffer nào.">
             Threads still read what other threads wrote. They must not read it before it is there, whatever buffer it is
             in.
           </Translated>
@@ -180,7 +180,7 @@ export const questionsS80: Record<string, Question> = {
       {
         label: <Translated vi="Không cái nào.">Neither.</Translated>,
         why: (
-          <Translated vi="Một trong hai tồn tại chỉ vì bộ đệm được dùng lại.">
+          <Translated vi="Một trong hai tồn tại chỉ vì buffer được dùng lại.">
             One of them exists only because the buffer is reused.
           </Translated>
         ),
@@ -193,7 +193,7 @@ export const questionsS80: Record<string, Question> = {
             Rào chắn thứ nhất canh giữ một phụ thuộc thật: luồng đọc cần thứ luồng ghi tạo ra (đọc sau ghi). Rào chắn thứ
             hai canh giữ một phụ thuộc giả: các luồng ghi của lần lặp kế tiếp không cần gì từ các luồng đọc của lần lặp
             này; chúng chỉ không được ghi đè lên thứ vẫn đang được đọc (ghi sau đọc). Trang 8.5 có một vòng lặp giống hệt,
-            với ba bộ đệm có nội dung dịch đi một mặt phẳng sau mỗi lần lặp (bằng cách sao chép), và hai rào chắn trong
+            với ba buffer có nội dung dịch đi một mặt phẳng sau mỗi lần lặp (bằng cách sao chép), và hai rào chắn trong
             mỗi lần lặp.
           </p>
         }

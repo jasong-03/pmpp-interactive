@@ -457,7 +457,7 @@ export const questionsS118: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Kernel top-p hợp nhất của lab 11.6 đọc một xác suất float mỗi phần tử và ghi một khối loại trừ float cùng một cờ giữ
+            Kernel top-p gộp của lab 11.6 đọc một xác suất float mỗi phần tử và ghi một khối loại trừ float cùng một cờ giữ
             một byte mỗi phần tử. Nó di chuyển bao nhiêu byte mỗi phần tử?
           </>
         }
@@ -477,7 +477,7 @@ export const questionsS118: Record<string, Question> = {
           <p>
             4 vào, 4 + 1 ra: 9 byte. Trần của nó là băng thông chia 9, thấp hơn một chút so với băng thông chia 8 của một scan đơn
             thuần. Phương án khác, các kernel riêng cho scan và cho ngưỡng, sẽ đọc các xác suất hai lần, ghi khối xác suất rồi đọc
-            lại: mỗi lượt đi qua hàng lại thêm những byte mà kernel hợp nhất không bao giờ di chuyển.
+            lại: mỗi lượt đi qua hàng lại thêm những byte mà kernel gộp không bao giờ di chuyển.
           </p>
         }
       >
@@ -763,7 +763,7 @@ export function S118() {
           <p>
             Tổng tích lũy trên một hàng xác suất, bước cốt lõi của lấy mẫu top-p, chính là phép tính này: một phép cộng mỗi phần tử,
             1/8 OP/B với float. Chạy nó bằng các kernel riêng cho chuẩn hóa softmax, tổng tích lũy và ngưỡng, thì mỗi kernel đọc
-            hàng và ghi một kết quả mà kernel sau đọc lại. Hợp nhất thành một lượt, hàng được đọc một lần và khối xác suất cùng các
+            hàng và ghi một kết quả mà kernel sau đọc lại. Gộp thành một lượt, hàng được đọc một lần và khối xác suất cùng các
             cờ giữ được ghi một lần: 9 byte mỗi phần tử trong lab 11.6. Đó là lập luận của mục 11.9, nạp một lần và ghi một lần, áp
             dụng cho mốc dự án M5.
           </p>

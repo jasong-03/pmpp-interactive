@@ -3,7 +3,7 @@ import { Ask, Predict, type Question } from '../../components/Ask';
 import { Aside, Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
 import { useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   ACCESS_LABEL,
   KIND_LABEL,
@@ -83,7 +83,8 @@ function SegmentExplorer() {
   const [stepIx, setStepIx] = useState(0);
   const [warp, setWarp] = useState(0);
   const width = (choices.find((c) => c.key === widthKey) ?? choices[0]).width;
-  const trace = useMemo(() => requests(kind, N, width), [kind, N, width]);
+  const locale = useLocale();
+  const trace = useMemo(() => requests(kind, N, width), [kind, N, width, locale]);
   const k = Math.min(stepIx, trace.steps.length - 1);
   const step = trace.steps[k];
   const warpCount = Math.ceil(N / 2 / width);

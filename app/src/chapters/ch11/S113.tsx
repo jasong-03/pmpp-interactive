@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Aside, Bench, Beyond, Simplification, Source } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { benchRows, fmt, num, realBackends, useReports, type BenchRow } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -31,21 +31,21 @@ const VARIANTS: { id: VariantId; readonly label: string; cfg: Omit<Config, 'thre
   {
     id: 'double',
     get label() {
-      return tr('two buffers, one barrier (Fig. 11.5)', 'hai bộ đệm, một rào chắn (Fig. 11.5)');
+      return tr('two buffers, one barrier (Fig. 11.5)', 'hai buffer, một rào chắn (Fig. 11.5)');
     },
     cfg: FIG_11_5,
   },
   {
     id: 'no-copy',
     get label() {
-      return tr('two buffers, copy branch left out', 'hai bộ đệm, bỏ nhánh sao chép');
+      return tr('two buffers, copy branch left out', 'hai buffer, bỏ nhánh sao chép');
     },
     cfg: { ...FIG_11_5, copy: false },
   },
   {
     id: 'single',
     get label() {
-      return tr('one buffer, barrier 1 only', 'một bộ đệm, chỉ có rào chắn 1');
+      return tr('one buffer, barrier 1 only', 'một buffer, chỉ có rào chắn 1');
     },
     cfg: { ...FIG_11_3, barrier2: false },
   },
@@ -55,10 +55,11 @@ function TwoBuffers() {
   const [variant, setVariant] = useState<VariantId>('double');
   const [schedule, setSchedule] = useState<Schedule>('in-order');
   const v = VARIANTS.find((x) => x.id === variant)!;
-  const trace = useMemo(() => run({ ...v.cfg, threads: 8 }, EXERCISE_1, schedule), [v, schedule]);
+  const locale = useLocale();
+  const trace = useMemo(() => run({ ...v.cfg, threads: 8 }, EXERCISE_1, schedule), [v, schedule, locale]);
   return (
     <Bench
-      title={tr('Two buffers, one barrier', 'Hai bộ đệm, một rào chắn')}
+      title={tr('Two buffers, one barrier', 'Hai buffer, một rào chắn')}
       task={
         <Translated vi="Chạy từng kernel đến cuối theo từng thứ tự. Kernel nào đúng ở mọi thứ tự, và kernel nào sai ở mọi thứ tự?">
           Run each kernel to the end in each order. Which one is right in every order, and which is wrong in every order?
@@ -68,8 +69,8 @@ function TwoBuffers() {
         <Translated
           vi={
             <>
-              Các hàng luân phiên giữa hai bộ đệm vật lý, như trong Fig. 11.4: buffer1_s chứa dữ liệu nạp vào, buffer2_s
-              chứa những gì lần lặp 0 đã ghi, và cứ thế. Mũi tên nét đứt là các lần sao chép. Với một bộ đệm, mỗi hàng là
+              Các hàng luân phiên giữa hai buffer vật lý, như trong Fig. 11.4: buffer1_s chứa dữ liệu nạp vào, buffer2_s
+              chứa những gì lần lặp 0 đã ghi, và cứ thế. Mũi tên nét đứt là các lần sao chép. Với một buffer, mỗi hàng là
               buffer_s sau bước nhảy (stride) đó.
             </>
           }
@@ -249,7 +250,7 @@ function MeasuredDouble({ predicted }: { predicted: number }) {
           key={f.be}
           vi={
             <p data-readout="measured" data-found="1">
-              Trên <b>{f.device}</b> ({f.be}), kernel bộ đệm kép chạy nhanh gấp <b>{fmt(f.s)}×</b> kernel hai rào chắn.{' '}
+              Trên <b>{f.device}</b> ({f.be}), kernel buffer kép chạy nhanh gấp <b>{fmt(f.s)}×</b> kernel hai rào chắn.{' '}
               {predicted > f.s * 1.5 ? 'Bạn đã kỳ vọng nhiều hơn.' : predicted < f.s / 1.5 ? 'Bạn đã kỳ vọng ít hơn.' : 'Kết quả này gần với dự đoán của bạn.'}
             </p>
           }
@@ -271,15 +272,15 @@ export const questionsS113: Record<string, Question> = {
   'ch11/11.3/q-which-barrier': {
     kind: 'choice',
     id: 'ch11/11.3/q-which-barrier',
-    prompt: <Translated vi={<>Bộ đệm kép loại bỏ rào chắn nào của Fig. 11.3?</>}><>Which barrier of Fig. 11.3 does double buffering remove?</></Translated>,
+    prompt: <Translated vi={<>Buffer kép loại bỏ rào chắn nào của Fig. 11.3?</>}><>Which barrier of Fig. 11.3 does double buffering remove?</></Translated>,
     options: [
       { label: <Translated vi="Dòng 14, vốn chỉ bảo vệ một quan hệ ghi-sau-đọc.">Line 14, which guards only a write-after-read.</Translated>, correct: true },
       {
         label: <Translated vi="Dòng 10, ở đầu vòng lặp: nó chỉ ngăn bên ghi đè lên những giá trị vẫn đang được đọc.">Line 10, at the top of the loop: it only keeps writers from overwriting values still being read.</Translated>,
-        why: <Translated vi="Đó là mô tả của dòng 14. Dòng 10 bắt bên đọc chờ kết quả của lần lặp trước, một phụ thuộc thật, và hai bộ đệm không thay đổi điều đó.">That describes line 14. Line 10 makes readers wait for the previous iteration's results, a true dependence, and two buffers do not change that.</Translated>,
+        why: <Translated vi="Đó là mô tả của dòng 14. Dòng 10 bắt bên đọc chờ kết quả của lần lặp trước, một phụ thuộc thật, và hai buffer không thay đổi điều đó.">That describes line 14. Line 10 makes readers wait for the previous iteration's results, a true dependence, and two buffers do not change that.</Translated>,
       },
       {
-        label: <Translated vi="Cả hai: với hai bộ đệm, không luồng nào đọc một ô mà luồng khác ghi.">Both: with two buffers no thread reads a slot that another thread writes.</Translated>,
+        label: <Translated vi="Cả hai: với hai buffer, không luồng nào đọc một ô mà luồng khác ghi.">Both: with two buffers no thread reads a slot that another thread writes.</Translated>,
         why: <Translated vi="Bên đọc vẫn cần những giá trị mà các luồng khác đã ghi ở lần lặp trước, và một trong hai rào chắn bảo vệ đúng điều đó.">Readers still need the values other threads wrote in the previous iteration, and one of the two barriers guards exactly that.</Translated>,
       },
       { label: <Translated vi="Không cái nào; nó chỉ tiết kiệm lưu lượng bộ nhớ chia sẻ, không bớt rào chắn.">Neither; it only saves shared-memory traffic, not barriers.</Translated>, why: <Translated vi="Nó bớt được một rào chắn mỗi lần lặp, và tốn thêm bộ nhớ chia sẻ.">It saves a barrier per iteration, and costs shared memory.</Translated> },
@@ -289,7 +290,7 @@ export const questionsS113: Record<string, Question> = {
         vi={
           <p>
             Dòng 14 áp đặt một phụ thuộc ghi-sau-đọc, hay phụ thuộc giả: lệnh ghi phải chờ những luồng đọc giá trị cũ chỉ
-            vì giá trị cũ và mới dùng chung một ô. Với bộ đệm đầu vào và đầu ra tách riêng thì không còn như vậy. Dòng 10
+            vì giá trị cũ và mới dùng chung một ô. Với buffer đầu vào và đầu ra tách riêng thì không còn như vậy. Dòng 10
             áp đặt một phụ thuộc thật (đọc-sau-ghi): bên đọc cần giá trị mà một luồng khác đã ghi ở lần lặp trước.
             Fig. 11.5 giữ rào chắn đó, ở dòng 09 của nó.
           </p>
@@ -312,8 +313,8 @@ export const questionsS113: Record<string, Question> = {
     options: [
       { label: <Translated vi="Các ô đầu ra của chúng giữ giá trị cũ, và các lần lặp sau đọc chúng như giá trị cuối cùng.">Their output slots keep stale values, which later iterations read as final.</Translated>, correct: true },
       {
-        label: <Translated vi="Không gì cả: các vị trí đó đã là giá trị cuối cùng trong bộ đệm đầu vào, nên kết quả không đổi.">Nothing: those positions are final in the input buffer, so the result is unchanged.</Translated>,
-        why: <Translated vi="Chúng là giá trị cuối cùng trong bộ đệm đầu vào. Lần lặp tiếp theo đọc bộ đệm kia.">They are final in the input buffer. The next iteration reads the other buffer.</Translated>,
+        label: <Translated vi="Không gì cả: các vị trí đó đã là giá trị cuối cùng trong buffer đầu vào, nên kết quả không đổi.">Nothing: those positions are final in the input buffer, so the result is unchanged.</Translated>,
+        why: <Translated vi="Chúng là giá trị cuối cùng trong buffer đầu vào. Lần lặp tiếp theo đọc buffer kia.">They are final in the input buffer. The next iteration reads the other buffer.</Translated>,
       },
       {
         label: <Translated vi="Một race condition: không có bước sao chép, bên đọc của lần lặp tiếp theo không được sắp sau bên ghi.">A race: without the copy, readers of the next iteration are not ordered after the writers.</Translated>,
@@ -325,8 +326,8 @@ export const questionsS113: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Với một bộ đệm, một giá trị đã xong cứ nằm yên tại chỗ. Với hai bộ đệm, mỗi lần lặp ghi vào một bộ đệm mới, và
-            chỗ nào không được ghi thì chứa thứ mà bộ đệm đó giữ từ hai lần lặp trước. Luồng 0 ở lần lặp 0 phải sao chép
+            Với một buffer, một giá trị đã xong cứ nằm yên tại chỗ. Với hai buffer, mỗi lần lặp ghi vào một buffer mới, và
+            chỗ nào không được ghi thì chứa thứ mà buffer đó giữ từ hai lần lặp trước. Luồng 0 ở lần lặp 0 phải sao chép
             x0 sang, nếu không ô 0 của buffer2_s sẽ không bao giờ được ghi (p. 260). Trình chạy từng bước cho thấy điều
             đó: kết quả sai ở mọi thứ tự luồng, và sai y hệt nhau.
           </p>
@@ -350,7 +351,7 @@ export const questionsS113: Record<string, Question> = {
       { label: 'buffer1_s', why: <Translated vi="Hãy đếm số lần hoán đổi: điều đó cần một số chẵn lần lặp.">Count the swaps: that would need an even number of iterations.</Translated> }, // i18n-ignore: array name
       { label: 'buffer2_s', correct: true }, // i18n-ignore: array name
       { label: <Translated vi="Phụ thuộc vào thứ tự luồng.">It depends on the thread order.</Translated>, why: <Translated vi="Mọi luồng hoán đổi con trỏ của mình y hệt nhau, mỗi lần lặp một lần.">Every thread swaps its pointers identically, once per iteration.</Translated> },
-      { label: <Translated vi="Cả hai đều chứa nó.">Both hold it.</Translated>, why: <Translated vi="Chỉ bộ đệm đầu ra cuối cùng có các giá trị cuối cùng.">Only the last output buffer has the final values.</Translated> },
+      { label: <Translated vi="Cả hai đều chứa nó.">Both hold it.</Translated>, why: <Translated vi="Chỉ buffer đầu ra cuối cùng có các giá trị cuối cùng.">Only the last output buffer has the final values.</Translated> },
     ],
     explain: (
       <Translated
@@ -388,7 +389,7 @@ export const questionsS113: Record<string, Question> = {
         vi={
           <>
             Fig. 11.9, ở phần tiếp theo, có hai rào chắn: một sau khi các warp ghi tổng của mình vào bộ nhớ chia sẻ, một sau
-            khi warp 0 đã scan các tổng đó. Bộ đệm kép có loại bỏ được rào chắn nào không?
+            khi warp 0 đã scan các tổng đó. Buffer kép có loại bỏ được rào chắn nào không?
           </>
         }
       >
@@ -408,7 +409,7 @@ export const questionsS113: Record<string, Question> = {
         label: <Translated vi="Có, rào chắn thứ hai: warp 0 ghi ngược vào chính các ô nó vừa đọc.">Yes, the second: warp 0 writes back into the slots it has just read.</Translated>,
         why: <Translated vi="Mỗi lane ghi lại ô mà chính nó đã đọc, việc này không cần rào chắn. Rào chắn bắt các warp khác chờ những lần ghi đó: lại là đọc sau ghi.">Each lane rewrites the slot it read itself, which needs no barrier. The barrier makes the other warps wait for those writes: a read after a write again.</Translated>,
       },
-      { label: <Translated vi="Có, cả hai: hai bộ đệm loại bỏ mọi rào chắn giữa các giai đoạn.">Yes, both: two buffers remove every barrier between the stages.</Translated>, why: <Translated vi="Bộ đệm kép chỉ loại bỏ xung đột ghi-sau-đọc.">Double buffering removes only write-after-read conflicts.</Translated> },
+      { label: <Translated vi="Có, cả hai: hai buffer loại bỏ mọi rào chắn giữa các giai đoạn.">Yes, both: two buffers remove every barrier between the stages.</Translated>, why: <Translated vi="Buffer kép chỉ loại bỏ xung đột ghi-sau-đọc.">Double buffering removes only write-after-read conflicts.</Translated> },
     ],
     explain: (
       <Translated
@@ -416,7 +417,7 @@ export const questionsS113: Record<string, Question> = {
           <p>
             Mỗi rào chắn ở đó tách một lần ghi khỏi những lần đọc cần nó: tổng của các warp được ghi trước khi warp 0 đọc
             chúng, các tổng đã scan được ghi trước khi các warp khác đọc chúng. Không rào chắn nào bảo vệ một giá trị cũ
-            khỏi bị ghi đè, nên bộ đệm thứ hai không có gì để sửa.
+            khỏi bị ghi đè, nên buffer thứ hai không có gì để sửa.
           </p>
         }
       >
@@ -515,13 +516,13 @@ export function S113() {
       <Source section="11.3" pages="258–259" />
       <Ask q={q['ch11/11.3/q-which-barrier']} />
 
-      <h2><Translated vi="Đọc từ một bộ đệm, ghi vào bộ đệm kia">Read from one buffer, write the other</Translated></h2>
+      <h2><Translated vi="Đọc từ một buffer, ghi vào buffer kia">Read from one buffer, write the other</Translated></h2>
       <Translated
         vi={
           <p>
-            <b>Bộ đệm kép</b> đặt đầu ra của mỗi lần lặp ở chỗ khác với đầu vào của nó. Một bộ đệm mới cho mỗi lần lặp
+            <b>Buffer kép</b> đặt đầu ra của mỗi lần lặp ở chỗ khác với đầu vào của nó. Một buffer mới cho mỗi lần lặp
             cũng làm được, nhưng phí bộ nhớ chia sẻ (shared memory). Một khi đầu ra của một lần lặp đã có, đầu vào của nó
-            không còn dùng nữa, nên hai bộ đệm là đủ: lần lặp 0 đọc buffer1 và ghi buffer2, lần lặp 1 đọc buffer2 và ghi
+            không còn dùng nữa, nên hai buffer là đủ: lần lặp 0 đọc buffer1 và ghi buffer2, lần lặp 1 đọc buffer2 và ghi
             buffer1, và cứ thế. Bên ghi không còn làm hỏng giá trị mà ai đó vẫn đang đọc, nên rào chắn chống lại điều đó
             được bỏ đi.
           </p>
@@ -538,8 +539,7 @@ export function S113() {
       <Translated
         vi={
           <p>
-            Lấy lần lặp 0. Luồng 2 đọc x1 từ ô 1 của buffer1 trong khi luồng 1 ghi Σx0..x1 vào ô 1 của buffer2. Với một bộ
-            đệm, luồng 1 sẽ phải chờ cho đến khi luồng 2 đọc xong; với hai bộ đệm, thứ tự giữa chúng không còn quan trọng.
+            Lấy lần lặp 0. Luồng 2 đọc x1 từ ô 1 của buffer1 trong khi luồng 1 ghi Σx0..x1 vào ô 1 của buffer2. Với một buffer, luồng 1 sẽ phải chờ cho đến khi luồng 2 đọc xong; với hai buffer, thứ tự giữa chúng không còn quan trọng.
           </p>
         }
       >
@@ -567,8 +567,8 @@ export function S113() {
       <Translated
         vi={
           <p>
-            Có một hệ quả dễ bị bỏ sót. Với một bộ đệm, một giá trị đã xong cứ nằm yên tại chỗ. Với hai bộ đệm, lần lặp
-            tiếp theo đọc bộ đệm kia, nên một luồng lẽ ra đã rảnh việc, chẳng hạn luồng 0 ở lần lặp 0, giờ phải sao chép
+            Có một hệ quả dễ bị bỏ sót. Với một buffer, một giá trị đã xong cứ nằm yên tại chỗ. Với hai buffer, lần lặp
+            tiếp theo đọc buffer kia, nên một luồng lẽ ra đã rảnh việc, chẳng hạn luồng 0 ở lần lặp 0, giờ phải sao chép
             giá trị của mình sang.
           </p>
         }
@@ -584,7 +584,7 @@ export function S113() {
         vi={
           <p>
             Trình chạy từng bước chạy Fig. 11.5 từng luồng một trên các giá trị của bài tập 1. Hãy tắt bước sao chép và xem
-            những gì còn lại trong các ô không ai ghi; sau đó thử một bộ đệm với chỉ rào chắn 1.
+            những gì còn lại trong các ô không ai ghi; sau đó thử một buffer với chỉ rào chắn 1.
           </p>
         }
       >
@@ -704,7 +704,7 @@ export function S113() {
       <Translated
         vi={
           <p>
-            Hai bộ đệm cần gấp đôi bộ nhớ chia sẻ: {sharedBytes(1024, 'double')} byte mỗi khối 1024 số float thay vì{' '}
+            Hai buffer cần gấp đôi bộ nhớ chia sẻ: {sharedBytes(1024, 'double')} byte mỗi khối 1024 số float thay vì{' '}
             {sharedBytes(1024, 'single')}. Bộ nhớ chia sẻ là một trong các ngân sách giới hạn số khối mà một SM giữ thường
             trú (<a href={href('ch05', '5.6')}>phần 5.6</a>), nên rào chắn tiết kiệm được có thể phải trả bằng occupancy
             (mức chiếm dụng). Nó có phải là lợi trên thiết bị của bạn hay không là chuyện đo đạc, không phải quy tắc: lab
@@ -721,7 +721,7 @@ export function S113() {
         </p>
       </Translated>
       <Beyond>
-        <Translated vi={<p>Cái giá về occupancy là nhận định của chúng tôi; sách chỉ nói bộ đệm thứ hai tốn bộ nhớ chia sẻ.</p>}>
+        <Translated vi={<p>Cái giá về occupancy là nhận định của chúng tôi; sách chỉ nói buffer thứ hai tốn bộ nhớ chia sẻ.</p>}>
           <p>The occupancy price is ours; the book only says the second buffer costs shared memory.</p>
         </Translated>
       </Beyond>
@@ -732,7 +732,7 @@ export function S113() {
           <Translated
             vi={
               <>
-                Ở 1024 luồng mỗi khối, kernel bộ đệm kép sẽ chạy nhanh gấp bao nhiêu lần kernel hai rào chắn trên thiết bị{' '}
+                Ở 1024 luồng mỗi khối, kernel buffer kép sẽ chạy nhanh gấp bao nhiêu lần kernel hai rào chắn trên thiết bị{' '}
                 <em>của bạn</em>? Hãy chốt một con số trước khi chạy lab 11.1.
               </>
             }
@@ -752,7 +752,7 @@ export function S113() {
       <Translated
         vi={
           <p>
-            Bộ đệm kép vẫn trả một rào chắn mỗi lần lặp, và ba lần truy cập bộ nhớ chia sẻ (hai lần đọc, một lần ghi) cho
+            Buffer kép vẫn trả một rào chắn mỗi lần lặp, và ba lần truy cập bộ nhớ chia sẻ (hai lần đọc, một lần ghi) cho
             mỗi phép cộng. Vòng lặp bị chi phối bởi đồng bộ hóa và bộ nhớ chia sẻ. Phần{' '}
             <a href={href('ch11', '11.4')}>11.4</a> chuyển phần lớn việc scan vào thanh ghi (register) và warp shuffle, và
             đưa cả phép scan khối xuống còn hai rào chắn.

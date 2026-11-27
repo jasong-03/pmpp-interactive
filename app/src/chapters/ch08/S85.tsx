@@ -5,7 +5,7 @@ import { solutionTabStatus } from '../../components/LabKit';
 import { Bench, Beyond, Simplification, Source, TierLegend, Today, type Tier } from '../../components/notes';
 import { benchRows, fmt, num, useReports, type Reports } from '../../lib/reports';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   BOOK_BLOCK_LIMIT,
   blocksSlab,
@@ -401,7 +401,8 @@ function Stepper() {
   const scroller = useRef<HTMLDivElement | null>(null);
 
   const prob = useMemo(() => makeProblem(cfg.N), [cfg.N]);
-  const trace = useMemo(() => runBlock(cfg, prob, bx, by, bz, schedule, 5), [cfg, prob, bx, by, bz, schedule]);
+  const locale = useLocale();
+  const trace = useMemo(() => runBlock(cfg, prob, bx, by, bz, schedule, 5), [cfg, prob, bx, by, bz, schedule, locale]);
   const total = trace.steps.length;
   const at = Math.min(n, total);
   const st = useMemo(() => stateAt(cfg, trace, at), [cfg, trace, at]);
@@ -1648,7 +1649,7 @@ export const questionsS85: Record<string, Question> = {
         vi={
           <p>
             Mọi phần tử vẫn được nạp một lần mỗi khối và mọi đầu ra được lưu một lần, nên FLOP/B giữ nguyên, 1.47 ở t = 32 như đã
-            viết mã. Điều thay đổi nằm trên chip: số lần đọc chia sẻ mỗi đầu ra giảm từ 7 xuống 4, các lần chép mặt phẳng biến mất, và
+            viết mã. Điều thay đổi nằm trên chip: số lần đọc chia sẻ mỗi đầu ra giảm từ 7 xuống 4, các lần sao chép mặt phẳng biến mất, và
             bộ nhớ chia sẻ mỗi khối còn một phần ba. Các bộ đếm của trình chạy từng bước cho thấy cả hai nửa.
           </p>
         }
@@ -1775,7 +1776,7 @@ export const questionsS85: Record<string, Question> = {
       </Translated>
     ),
     options: [
-      { label: <Translated vi="Ba biến vô hướng, vì mỗi lần chép giữa chúng tốn một lệnh và một thanh ghi mà trình biên dịch phải giữ.">{'The three scalars, because each copy between them costs an instruction and a register the compiler must keep.'}</Translated>, why: <Translated vi="Chép giữa các thanh ghi rẻ và để các giá trị nằm trong thanh ghi. Quy tắc là về cách đánh chỉ số.">{'Copies between registers are cheap and leave the values in registers. The rule is about indexing.'}</Translated> },
+      { label: <Translated vi="Ba biến vô hướng, vì mỗi lần sao chép giữa chúng tốn một lệnh và một thanh ghi mà trình biên dịch phải giữ.">{'The three scalars, because each copy between them costs an instruction and a register the compiler must keep.'}</Translated>, why: <Translated vi="Chép giữa các thanh ghi rẻ và để các giá trị nằm trong thanh ghi. Quy tắc là về cách đánh chỉ số.">{'Copies between registers are cheap and leave the values in registers. The rule is about indexing.'}</Translated> },
       {
         label: <Translated vi="Mảng được đánh chỉ số lúc chạy: bộ nhớ cục bộ nằm trong bộ nhớ thiết bị.">{'The array indexed at run time: local memory lives in device memory.'}</Translated>,
         correct: true,
@@ -2281,7 +2282,7 @@ export function S85() {
         vi={
           <p>
             Nó đem lại gì. Bộ nhớ chia sẻ mỗi khối giảm còn một phần ba, 4,096 byte ở t = 32. Số lần đọc chia sẻ mỗi đầu ra giảm từ 7
-            xuống 4, vì tâm và cả hai láng giềng z giờ đến từ thanh ghi, và các lần chép xoay vòng mặt phẳng biến mất: việc xoay vòng
+            xuống 4, vì tâm và cả hai láng giềng z giờ đến từ thanh ghi, và các lần sao chép xoay vòng mặt phẳng biến mất: việc xoay vòng
             là hai lần chuyển thanh ghi và một lần ghi giá trị hiện tại mới. Các bộ đếm của trình chạy từng bước cho thấy cả ba. Sách
             nói thanh ghi có độ trễ thấp hơn và băng thông cao hơn bộ nhớ chia sẻ, nên kernel sẽ chạy nhanh hơn.
           </p>
@@ -2435,7 +2436,7 @@ export function S85() {
         vi={
           <p>
             Sách xoay cửa sổ bằng cách chép ba biến vô hướng có tên, <code>inPrev = inCurr; inCurr = inNext;</code>, để mọi truy cập
-            dùng một tên cố định. Thật dễ bị cám dỗ tránh các lần chép bằng một mảng nhỏ và đánh chỉ số theo modulo, để mỗi mặt phẳng
+            dùng một tên cố định. Thật dễ bị cám dỗ tránh các lần sao chép bằng một mảng nhỏ và đánh chỉ số theo modulo, để mỗi mặt phẳng
             mới ghi đè ô cũ nhất. Kernel bên dưới làm đúng như vậy. Nó tính ra cùng kết quả như kernel của sách (một unit test chạy một
             mô hình vòng lặp của nó dưới ba thứ tự luồng; bản thân tệp chưa từng chạy), và theo quy tắc được ghi nhận của NVIDIA, cửa
             sổ của nó là ứng viên cho bộ nhớ cục bộ (local memory), vì trình biên dịch không thấy được chỉ số hằng trong{' '}

@@ -4,7 +4,7 @@ import { Code, useLabFile } from '../../components/Code';
 import { solutionTabStatus } from '../../components/LabKit';
 import { useReports } from '../../lib/reports';
 import { Aside, Bench, Beyond, Simplification, Source, Today, type Tier } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import { region } from '../../sim/histpriv';
 import {
@@ -68,7 +68,8 @@ function Stepper() {
   const [playing, setPlaying] = useState(false);
 
   const blockOrder = useMemo(() => blockOrderOf(order, seed), [order, seed]);
-  const trace = useMemo(() => simulate(shape, schedule, keep, blockOrder), [shape, schedule, keep, blockOrder]);
+  const locale = useLocale();
+  const trace = useMemo(() => simulate(shape, schedule, keep, blockOrder), [shape, schedule, keep, blockOrder, locale]);
   const total = trace.steps.length;
   const at = Math.min(n, total);
   const cur: Step | undefined = at > 0 ? trace.steps[at - 1] : undefined;
@@ -296,7 +297,8 @@ function Stepper() {
 }
 
 function Outcomes() {
-  const table = useMemo(() => outcomeTable(), []);
+  const locale = useLocale();
+  const table = useMemo(() => outcomeTable(), [locale]);
   return (
     <Bench
       title={tr('Every order at once', 'Mọi thứ tự cùng lúc')}
@@ -1243,8 +1245,7 @@ export function S124() {
         vi={
           <p>
             Danh sách riêng tốn <code>BLOCK_DIM</code> × 4 byte bộ nhớ chia sẻ mỗi khối: 1 KiB ở 256 luồng. Đọc giới hạn mỗi khối
-            của thiết bị bạn từ <code>python3 labs/pmpp.py doctor</code> và so sánh. Mục 12.6 đưa nhiều khóa mỗi luồng vào bộ nhớ
-            đệm tạm, và ở đó ngân sách bắt đầu quan trọng.
+            của thiết bị bạn từ <code>python3 labs/pmpp.py doctor</code> và so sánh. Mục 12.6 trung chuyển nhiều khóa mỗi luồng, và ở đó ngân sách bắt đầu quan trọng.
           </p>
         }
       >

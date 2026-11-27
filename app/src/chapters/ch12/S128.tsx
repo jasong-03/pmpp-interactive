@@ -56,7 +56,7 @@ export const questionsS128: Record<string, Question> = {
     ),
     options: [
       {
-        label: <Translated vi="Vì các cột của ma trận nằm liền nhau trong bộ nhớ, nên một khối có thể chuyển mỗi cột bằng một phép chép thường.">Because the columns of a matrix are contiguous in memory, so a block can move each one with a plain copy.</Translated>,
+        label: <Translated vi="Vì các cột của ma trận nằm liền nhau trong bộ nhớ, nên một khối có thể chuyển mỗi cột bằng một phép sao chép thường.">Because the columns of a matrix are contiguous in memory, so a block can move each one with a plain copy.</Translated>,
         why: <Translated vi="Trong ma trận thứ tự hàng (row-major), một cột có bước nhảy (stride): các phần tử của nó cách nhau trọn một hàng.">In a row-major matrix a column is strided: its elements are a whole row apart.</Translated>,
       },
       {

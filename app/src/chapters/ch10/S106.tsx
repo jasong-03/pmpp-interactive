@@ -3,7 +3,7 @@ import { Ask, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Aside, Bench, Beyond, Simplification, Source, Today, type Tier } from '../../components/notes';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   FIG_VALUES,
   HUNT_FILE,
@@ -123,9 +123,10 @@ function BarrierHunt() {
   const [schedule, setSchedule] = useState<Schedule>('in-order');
   const [n, setN] = useState(0);
 
+  const locale = useLocale();
   const table = useMemo(
     () => Object.fromEntries(VARIANTS.map((v) => [v, SCHEDULES.map((s) => runShared(v, values, s))])) as Record<Variant, ThreadRun[]>,
-    [data], // eslint-disable-line react-hooks/exhaustive-deps
+    [data, locale], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const run = table[variant][SCHEDULES.indexOf(schedule)];
   const total = run.steps.length;
@@ -356,7 +357,7 @@ function BarrierHunt() {
                 {Array.from({ length: B }, (_, t) => (
                   <tr key={t} className={cur?.thread === t ? 'cur' : ''}>
                     <td>{t}</td>
-                    <td>{st.status[t] === 'waiting' ? tr(`waiting on line ${run.steps[st.last[t]].op!.lines[0]}`, `đang chờ ở dòng ${run.steps[st.last[t]].op!.lines[0]}`) : st.status[t]}</td>
+                    <td>{st.status[t] === 'waiting' ? tr(`waiting on line ${run.steps[st.last[t]].op!.lines[0]}`, `đang chờ ở dòng ${run.steps[st.last[t]].op!.lines[0]}`) : tr(st.status[t], ({ 'not started': 'chưa bắt đầu', running: 'đang chạy', finished: 'đã xong' } as Record<string, string>)[st.status[t]] ?? st.status[t])}</td>
                     {VARIANT[variant].two ? <td className="t-reg">{regs(t) == null ? '·' : fmtValue(regs(t)!)}</td> : null}
                   </tr>
                 ))}

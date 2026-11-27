@@ -1044,7 +1044,7 @@ export function Wrap() {
             Phần nén gọn ứng viên của lab 12.4 là một phần của mốc dự án M5 trong dự án xuyên suốt, lấy mẫu trên GPU: các cặp
             (column, logit) ổn định và một số đếm cho mỗi hàng của logits <code>[batch × vocab]</code>, bước nằm giữa một ngưỡng và
             một lần rút. Lab 9.3 cho M5 số đếm token, lab 10.3 cho giá trị lớn nhất của hàng và softmax, và lab 11.6 cho mặt nạ
-            giữ lại top-p; lab 14.3 sắp xếp các ứng viên; module X1 thêm top-k radix (lab X1.1), min-p và các bộ lọc hợp nhất
+            giữ lại top-p; lab 14.3 sắp xếp các ứng viên; module X1 thêm top-k radix (lab X1.1), min-p và các bộ lọc gộp
             (lab X1.2), và lần rút, trong bộ lấy mẫu theo batch của lab X1.3.{' '}
             <span data-m5={m5.join(',') || 'none'}>
               {backends.length === 0

@@ -300,7 +300,7 @@ function BytesTable() {
             <>
               Mô hình: traffic() trong src/sim/stablescan.ts, khóa 4 byte, khối 256 khóa; cách tính của khóa học này, không
               phải của sách. Một cột đo được xuất hiện cho mỗi thiết bị đã chạy benchmark của lab 12.3: thời gian đo được,
-              quy ra số byte mỗi khóa mà một phép chép thường sẽ di chuyển trong cùng thời gian đó trên cùng thiết bị, để nó
+              quy ra số byte mỗi khóa mà một phép sao chép thường sẽ di chuyển trong cùng thời gian đó trên cùng thiết bị, để nó
               đọc theo đơn vị của mô hình.
             </>
           }

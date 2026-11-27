@@ -598,7 +598,7 @@ export function S122() {
         <Translated
           vi={
             <p>
-              Số đếm, không phải thời gian: không có bộ đệm (cache), hàng đợi hay độ trễ. Một trình biên dịch có thể đã gộp các
+              Số đếm, không phải thời gian: không có bộ nhớ đệm (cache), hàng đợi hay độ trễ. Một trình biên dịch có thể đã gộp các
               atomic của một warp thành một (xem bên dưới), và khi đó phần cứng không bao giờ thấy số đếm của Fig. 12.2.
             </p>
           }

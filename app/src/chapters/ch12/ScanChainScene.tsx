@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { Scene, type Beat } from '../../components/Scene';
 import { SCENE, sceneRuns, type ChainFrame, type ChainPhase, type ChainRun } from '../../sim/inplace';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 
 // "The scan chain orders the blocks" (section 12.7). Twelve keys of Fig. 12.10's pattern,
 // three blocks of four, two resident slots, the hardware starting blockIdx 2, 1, 0. Six
@@ -210,9 +210,13 @@ const readBy = (f: ChainFrame) => {
   return out;
 };
 
+// RUNS is built once at import, so its event text is in the language of that moment; Running rebuilds
+// the runs (cheap: twelve keys) when the language changes and reads the events from those.
 function Running({ run, a, b, p, headline }: { run: ChainRun; a: number; b: number; p: number; headline: (f: ChainFrame, k: number) => ReactNode }) {
   const k = frameAt(run, a, b, p);
   const f = run.frames[k];
+  const locale = useLocale();
+  const live = useMemo(() => sceneRuns(), [locale]);
   return (
     <Stage headline={headline(f, k)}>
       <ArrayRow y={ROW_BEFORE} values={f.array} label={tr('the array, as it is now (a dot: its key has been read)', 'mảng, như hiện tại (dấu chấm: khóa của ô đó đã được đọc)')} keepMarks brackets numbered read={readBy(f)}
@@ -223,7 +227,7 @@ function Running({ run, a, b, p, headline }: { run: ChainRun; a: number; b: numb
       <Gantt run={run} upto={k} title={run === RUNS.dynamic ? tr('numbers from a counter', 'số lấy từ một bộ đếm') : tr('numbers from blockIdx', 'số lấy từ blockIdx')} />
       <Slots frame={f} />
       <text x={AX} y={118} fontSize="11" data-events="" style={{ fill: 'var(--ink-2)' }}>
-        {f.events.join('; ')}
+        {(run === RUNS.dynamic ? live.dynamic : live.blockIdx).frames[k].events.join('; ')}
       </text>
     </Stage>
   );
