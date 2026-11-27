@@ -35,7 +35,7 @@ rồi scan.
 ## Hợp đồng
 
 - `rows >= 1`, `cols >= 1`, giá trị bất kỳ: không chỉ bội số của 256 hay của ô (tile) của bạn.
-- Float bất kỳ: số âm, `-0.0` và `+0.0`, vô cực, `FLT_MAX`, số dưới chuẩn (subnormal), NaN.
+- Float bất kỳ: số âm, `-0.0` và `+0.0`, vô cực, `FLT_MAX`, số subnormal, NaN.
 - Thứ tự là thứ tự của khóa sau, sắp xếp tăng dần: lấy 32 bit `u` của float; nếu
   `u` là `-0.0` (`0x80000000`) thì biến nó thành `+0.0`; rồi đặt bit dấu của một giá trị không âm
   và đảo mọi bit của một giá trị âm; rồi đảo toàn bộ khóa. Trên các số, đó là
@@ -46,15 +46,15 @@ rồi scan.
 - Ổn định: các khóa bằng nhau giữ thứ tự cột tăng dần. Thứ tự giảm dần đến từ việc đảo khóa,
   chứ không phải từ việc đảo ngược một kết quả tăng dần, vốn sẽ liệt kê các phần tử bằng nhau theo cột giảm dần (A3).
 - `sortedProbs[r][p]` đúng bằng 32 bit của `probs[r][sortedIdx[r][p]]`. `probs` không bị
-  sửa đổi. Không có gì được ghi ra ngoài ba bộ đệm đầu ra.
+  sửa đổi. Không có gì được ghi ra ngoài ba buffer đầu ra.
 
 ### Vì sao dùng bit, không dùng float
 
 Các kernel không bao giờ thực hiện một phép toán dấu phẩy động. Hàm khởi chạy đưa cho chúng `probs` và
-`sortedProbs` dưới dạng `unsigned int*` (trong CUDA là một phép ép kiểu; trong Metal các bộ đệm được gắn dưới dạng
+`sortedProbs` dưới dạng `unsigned int*` (trong CUDA là một phép ép kiểu; trong Metal các buffer được gắn dưới dạng
 `device const uint*` và `device uint*`), nên phép kiểm tra `-0.0`, phép kiểm tra dấu và phép sao chép
 đều là việc trên số nguyên. Điều đó quan trọng trên Metal: cả hai chế độ toán học mặc định có thể có của nó đều cho phép "no
-signed zeros", fast math để NaN và INF không xác định, và số dưới chuẩn có thể bị ép về không (flush to zero) trong
+signed zeros", fast math để NaN và INF không xác định, và số subnormal có thể bị ép về không (flush to zero) trong
 phép tính (C3). Một biểu thức phía float `x == 0.0f ? 0.0f : x` có thể bị viết lại; một phép kiểm tra số nguyên thì không.
 Trên HIP, `__float_as_uint` có trong header nhưng không có trong tài liệu tham chiếu toán học mà AMD công bố
 (B6). Cách nhìn không dấu không cần intrinsic ép kiểu bit nào cả, nên đó là dạng chạy được
@@ -70,8 +70,8 @@ Một khối 256 luồng mỗi hàng, hình dạng của lab 10.3. Ba kernel:
 
 1. `descKeys`: khóa của mỗi giá trị (ở trên), và cột của nó làm chỉ số.
 2. `sortRowsPass`, khởi chạy một lần cho mỗi chữ số r bit (bạn chọn; gợi ý là 8, tức bốn
-   lượt qua 32 bit, chữ số ít quan trọng nhất trước), đọc một bộ đệm khóa và chỉ số
-   của `scratch` và ghi vào bộ đệm kia. Mỗi khối:
+   lượt qua 32 bit, chữ số ít quan trọng nhất trước), đọc một buffer khóa và chỉ số
+   của `scratch` và ghi vào buffer kia. Mỗi khối:
    - đếm các chữ số của hàng mình trong một histogram bộ nhớ chia sẻ gồm 2^r ngăn, bằng phép toán nguyên tử
      (chương 9);
    - scan 2^r số đếm (loại trừ): chỗ mỗi bucket bắt đầu trong hàng đầu ra;
@@ -79,7 +79,7 @@ Một khối 256 luồng mỗi hàng, hình dạng của lab 10.3. Ba kernel:
      chia sẻ theo chữ số bằng r phép tách một bit ổn định, dùng các công thức của Fig. 14.6 và
      phép scan cấp khối được cung cấp; rồi mỗi khóa được ghi vào offset chạy của bucket của nó, và các
      offset tiến lên theo kích thước bucket của ô.
-3. `gatherRows`: `sortedIdx` từ bộ đệm chỉ số cuối cùng, `sortedProbs` bằng cách sao chép các bit của
+3. `gatherRows`: `sortedIdx` từ buffer chỉ số cuối cùng, `sortedProbs` bằng cách sao chép các bit của
    `probs` tại các chỉ số đó.
 
 Vì sao lượt này ổn định qua các ô: các ô được một khối duy nhất duyệt theo thứ tự, và offset của
@@ -114,7 +114,7 @@ cơ số lớn mà mục 14.7 mô tả (và A10 đếm theo sector).
   - one-hot (các số không phải giữ thứ tự cột phía sau số một);
   - logits có `-0.0` và `+0.0` xen kẽ mỗi 11 cột, và (trong chừng mực hàng còn
     chỗ) mỗi loại hai giá trị `-inf`, `+inf`, `-FLT_MAX`, `FLT_MAX`, `FLT_MIN`, `-FLT_MIN` và bốn
-    số dưới chuẩn ở cả hai dấu;
+    số subnormal ở cả hai dấu;
   - như trên với tối đa bốn NaN, mỗi dấu hai cái, hai trong số đó có payload.
 - `sortedIdx` bằng đúng tham chiếu (đó là phép kiểm tra tính ổn định); `sortedProbs` bằng đúng
   các bit được gom; mỗi hàng đầu ra là một hoán vị; 64 phần tử canh gác sau cuối
@@ -132,7 +132,7 @@ cơ số lớn mà mục 14.7 mô tả (và A10 đếm theo sector).
 không có gì sắp thứ tự chúng nếu kết quả tình cờ ra đúng. `race` chạy các luồng của một khối
 cùng lúc dưới ThreadSanitizer và báo những cặp như vậy kèm cả hai dòng mã nguồn. Trong lab này, những
 chỗ cần làm đúng là histogram (phép toán nguyên tử, và một rào chắn giữa bước xóa về không, đếm và
-đọc), bộ đệm ô (mỗi phép tách đọc nó rồi ghi lại), các vị trí bắt đầu bucket của một
+đọc), buffer ô (mỗi phép tách đọc nó rồi ghi lại), các vị trí bắt đầu bucket của một
 ô, và các offset chạy (được phép phân tán đọc, rồi tiến lên, rồi được ô kế tiếp đọc).
 
 ## Con đường thư viện, theo từng backend
@@ -197,7 +197,7 @@ bỏ qua. Các con số là phép đo trên máy của bạn, không phải mụ
   mảng threadgroup của kernel có vừa không. Histogram threadgroup là `atomic_uint` (ch09-facts C1).
   Kernel xếp hạng các luồng của nó theo SIMD group và lane, vì việc chia một threadgroup thành
   các SIMD group là do bản cài đặt quyết định (ch04-facts C2) và phép scan chạy theo thứ tự đó. Mọi
-  dispatch đi vào một compute encoder duy nhất: một encoder thông thường là tuần tự, và các bộ đệm device được
+  dispatch đi vào một compute encoder duy nhất: một encoder thông thường là tuần tự, và các buffer device được
   theo dõi xung đột (hazard-tracked), nên mỗi lượt thấy được lượt trước (ch02-facts C9).
 - Bước kiểm tra front-end CUDA cần thư mục include shim mà `labs/pmpp.py` truyền vào
   (`-I labs/common/include/pmpp/emu/shim`) cho `<cuda/atomic>`.

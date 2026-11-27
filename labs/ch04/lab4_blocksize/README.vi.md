@@ -39,7 +39,7 @@ dựng từ độ rộng mà thiết bị của bạn báo cáo: một lần đ�
 thiết bị nhận, và 7 luồng. Phần lớn để lại một khối cuối không đầy. `out` được điền sẵn, nên một
 đầu ra bạn không bao giờ ghi sẽ bị báo. Trên thiết bị thật, một giá trị được ghi quá cuối `out`
 sẽ bị báo; trên trình giả lập (emulator), AddressSanitizer dừng ở lần truy cập đầu tiên ra ngoài
-một bộ đệm và nêu tên dòng đó.
+một buffer và nêu tên dòng đó.
 
 Mô hình chạy trên những giới hạn mà không ai cần sở hữu (CUDA, HIP và trình giả lập):
 

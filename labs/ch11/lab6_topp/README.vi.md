@@ -70,7 +70,7 @@ không giả định điều đó.
 ## Thiết kế gợi ý
 
 Scan theo hàng đã sửa của lab 11.3 (mỗi hàng một khối 256 luồng, mỗi đoạn 4 phần tử cho mỗi luồng,
-một tiền tố được mang sang), với phép so ngưỡng và phép đếm được hợp nhất vào, để các xác suất
+một tiền tố được mang sang), với phép so ngưỡng và phép đếm được gộp vào, để các xác suất
 chỉ được đọc một lần:
 
 - Khi khối lượng của mỗi token còn trong thanh ghi, quyết định giữ, ghi nó, và đếm nó.
@@ -107,7 +107,7 @@ chỉ được đọc một lần:
   tắc áp dụng cho `massBefore[i]` mà bạn đã ghi; `kept` bằng số lượng số một của hàng. Các đầu ra
   khởi đầu là NaN, 0xAB và -1, nên bất cứ thứ gì không bao giờ được ghi sẽ lộ ra, và các phần
   tử canh gác sau cuối mỗi đầu ra phải còn nguyên.
-- Mốc so sánh và phép chép được cung cấp cũng được kiểm thử, để một tệp cung cấp bị hỏng sẽ lộ
+- Mốc so sánh và phép sao chép được cung cấp cũng được kiểm thử, để một tệp cung cấp bị hỏng sẽ lộ
   ra ở đây.
 
 ## Dải dung sai, và vì sao
@@ -147,12 +147,12 @@ Mốc so sánh được cung cấp cộng cả một hàng trong một luồng, 
 
 Hãy ghi ra dự đoán của bạn (trang labs hỏi nó dưới id `ch11/labs/p-lab6-copy`): **với 64 hàng
 128,256 token, kernel của bạn sẽ đạt bao nhiêu phần băng thông chép của bạn?** Hai điều cần cân
-nhắc: phép chép chạy một luồng mỗi token, ở đây là 32,064 khối 256; thiết kế gợi ý chạy một khối
+nhắc: phép sao chép chạy một luồng mỗi token, ở đây là 32,064 khối 256; thiết kế gợi ý chạy một khối
 mỗi hàng, 64 khối, mỗi khối đi qua 126 đoạn lần lượt với các rào chắn (barrier) khối trong mỗi
 đoạn. Mục 11.8 gọi một kernel bị giới hạn bởi bộ nhớ đạt hơn 80% băng thông, không có truy cập
 thừa, là được tối ưu tốt (p. 273).
 
-Benchmark đo phép chép, mốc so sánh một luồng mỗi hàng và kernel của bạn ở rows x cols =
+Benchmark đo phép sao chép, mốc so sánh một luồng mỗi hàng và kernel của bạn ở rows x cols =
 1 x 128,256, 8 x 128,256, 64 x 128,256 và 256 x 32,000, trên các hàng softmax đã sắp xếp với
 p = 0.9. Thời gian mỗi lần gọi là lần tốt nhất trong 5 lần chạy có đo, mỗi lần lặp lại lời gọi
 cho đến khi kéo dài ít nhất 2 ms. Nó in ra số mili giây mỗi lần gọi, GB/s với 9 byte mỗi token
@@ -161,7 +161,7 @@ kết quả được đo đều được kiểm tra trước khi báo. Các con 
 phải mục tiêu.
 
 Một hình dạng 1 hoặc 8 hàng chỉ vài megabyte, và một lần chạy có đo lặp lại lời gọi trên cùng
-các bộ đệm nhiều lần. Nếu GB/s của phép chép ở đó cao hơn ở 64 hàng, các lần lặp đó đang được
+các buffer nhiều lần. Nếu GB/s của phép sao chép ở đó cao hơn ở 64 hàng, các lần lặp đó đang được
 phục vụ từ thứ gì đó nhanh hơn bộ nhớ chính, và "of copy" đang so với thứ đó. Hãy đọc tỉ lệ ở
 64 x 128,256 và 256 x 32,000 cho câu hỏi về băng thông; đọc các hình dạng nhỏ để biết một khối
 mỗi hàng làm được gì ở batch 1.

@@ -72,7 +72,7 @@ thứ tự hàng (row-major), chiều batch đứng trước.
 - `main.cpp`: chương trình điều khiển (driver), bộ lượng tử hóa CPU và bản tham chiếu có giải lượng tử hóa. Bạn không cần
   sửa nó.
 - `CMakeLists.txt` liên kết lời giải của lab 22.1 (gather FP32), lời giải của lab X2.1 (Q8_0, nếu
-  có) và đường không hợp nhất được cung cấp.
+  có) và đường không gộp được cung cấp.
 
 Các chữ ký hàm là cố định. Lab X2.4 liên kết chúng:
 
@@ -123,7 +123,7 @@ void encodeGemvQ4_0Unfused(id<MTLComputeCommandEncoder>, id<MTLComputePipelineSt
   (18 cho mỗi khối). Y bắt đầu là NaN, theo sau là các giá trị canh gác (sentinel), và mỗi trường hợp khởi chạy hai lần.
 - **Phép so sánh.** Kết quả được so với `dequantize_row_q4_0` theo sau là một tích vô hướng bằng
   double, trong phạm vi 1e-4 x (1 + sum of |x w|), không bao giờ so từng bit.
-- **Mốc cơ sở cũng được kiểm tra.** Đường không hợp nhất được cung cấp được kiểm tra trên ba kích thước, nên
+- **Mốc cơ sở cũng được kiểm tra.** Đường không gộp được cung cấp được kiểm tra trên ba kích thước, nên
   benchmark chỉ so sánh các kernel đúng.
 
 ## Mỗi backend bắt được gì
@@ -165,14 +165,14 @@ void encodeGemvQ4_0Unfused(id<MTLComputeCommandEncoder>, id<MTLComputePipelineSt
 
 Hãy ghi lại những điều này trước:
 
-1. Mức tăng tốc của kernel Q4_0 hợp nhất của bạn ở batch 1 trên 4096 -> 4096:
+1. Mức tăng tốc của kernel Q4_0 gộp của bạn ở batch 1 trên 4096 -> 4096:
    - so với F32: trần theo byte là 4 / 0.5625 = 7.11;
    - so với Q8_0: 1.0625 / 0.5625 = 1.89.
 
    Đó là các tỉ lệ byte. Chúng không phải lời hứa.
-2. Mức tăng tốc của đường không hợp nhất so với F32. Nó đọc 0.5625 byte mỗi trọng số, ghi 4
+2. Mức tăng tốc của đường không gộp so với F32. Nó đọc 0.5625 byte mỗi trọng số, ghi 4
    và đọc lại 4, so với 4 của F32. Mô hình byte cho khoảng 0.47, tức là chậm hơn cả
-   việc không lượng tử hóa (A1 trích PyTorch nói đúng điều này về int8 không hợp nhất). Thiết bị của bạn
+   việc không lượng tử hóa (A1 trích PyTorch nói đúng điều này về int8 không gộp). Thiết bị của bạn
    có đồng ý không?
 
 Rồi hãy nghĩ về batch 8: số byte activation như nhau cho mọi định dạng, và công việc giải nén
@@ -191,17 +191,17 @@ cho mỗi trọng số được chia sẻ cho nhiều hàng hơn.
   Chúng chạy luân phiên: một vòng không tính giờ, rồi năm vòng, và mỗi kernel giữ vòng tốt nhất của nó.
 - **Các bản sao của W.** Một lần submit có tính giờ đi qua các bản sao trọng số của mỗi định dạng mà
   tổng cộng chứa ít nhất 256 MB, nên không lần khởi chạy nào tìm thấy trọng số của nó trong bộ nhớ đệm (cache) (như lab 22.1).
-  Đường không hợp nhất ghi và đọc một ma trận nháp duy nhất. Ma trận đó không được sao chép, nên
+  Đường không gộp ghi và đọc một ma trận nháp duy nhất. Ma trận đó không được sao chép, nên
   bộ nhớ đệm có thể giúp nó. Thời gian của nó vẫn tính cho mỗi lần khởi chạy, gồm cả giải lượng tử hóa và gather.
 - **`W GB/s`** là số byte mà mỗi định dạng lưu (Q4_0: các khối 18 byte) chia cho thời gian.
-  Với đường không hợp nhất, điều đó bỏ qua lưu lượng ma trận nháp mà nó cũng di chuyển. Trang labs
+  Với đường không gộp, điều đó bỏ qua lưu lượng ma trận nháp mà nó cũng di chuyển. Trang labs
   so sánh `W GB/s` với băng thông đo được của lab 5.1.
 - **`vs F32` và `vs Q8_0`** là các tỉ lệ thời gian.
 - **Các hàng báo cáo:** `qgemv`: `{kernel, format, batch, in, out, seconds, weight_bytes,
   weight_gb_per_s, speedup_vs_f32}`.
 
 Đây là các phép đo trên thiết bị của bạn ở những kích thước này, không phải thuộc tính của các kernel.
-Ở chỗ mức tăng tốc hợp nhất thấp hơn 7.11, hãy hỏi kernel còn trả thêm gì cho mỗi trọng số
+Ở chỗ mức tăng tốc gộp thấp hơn 7.11, hãy hỏi kernel còn trả thêm gì cho mỗi trọng số
 mà F32 không phải trả: giải nén, hệ số tỉ lệ, số -8. Hãy hỏi cả nó trả gì cho mỗi hàng của X.
 
 ## Đi xa hơn
@@ -209,7 +209,7 @@ mà F32 không phải trả: giải nén, hệ số tỉ lệ, số -8. Hãy h�
 - **Prefill** (của khóa học này, theo `mul_mm` của llama.cpp, x2-facts D4). Với nhiều token, GEMV là
   kernel sai. Giải lượng tử hóa một ô (tile) của W vào bộ nhớ chia sẻ (shared memory), rồi chạy GEMM phân ô
   của lab 15.6 trên đó. Đó là "giải lượng tử hóa, rồi nhân", làm ở mức từng ô thay vì cho
-  cả ma trận. So sánh nó với đường không hợp nhất ở batch 64.
+  cả ma trận. So sánh nó với đường không gộp ở batch 64.
 - **Activation đã nhân tỉ lệ trước, cách làm quen thuộc trên Metal** (D4, D5, D6). llama.cpp, MLX và PyTorch MPS
   không bao giờ dịch các nibble. Chúng áp mặt nạ tại chỗ, để mỗi nibble bị nhân với 1, 16, 256 hoặc
   4096, và chia các activation tương ứng cho cùng lũy thừa của hai đó, một phép chia chính xác. Hãy thử

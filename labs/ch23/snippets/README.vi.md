@@ -9,13 +9,13 @@ lab không biên dịch chúng; `check.py` chạy chúng.
 
 | Tệp | Hiển thị ở | Cách dùng | Test trong `app/src/chapters/ch23/` |
 |---|---|---|---|
-| `staged_loop.cu` | mục 23.3, trình chạy từng bước "Copy, compute, copy back", tab CUDA: vòng lặp theo giai đoạn, phát lệnh theo chiều sâu trước và theo chiều rộng trước | nạp bằng `useLabFile`; trình chạy từng bước tô sáng các dòng mà `app/src/sim/chunkpipe.ts` (`LINES`) nói đã phát từng thao tác | `S233.snippets.test.ts` kiểm tra các dòng đó đúng là những lời gọi mà mô hình nói |
-| `staged_loop_metal.mm`, `staged_loop.metal` | cùng trình chạy từng bước, khung nhìn Metal: K vùng đệm dùng chung đang hoạt động cùng lúc trên Apple silicon | như trên | như trên |
+| `staged_loop.cu` | mục 23.3, trình chạy từng bước "Copy, compute, copy back", tab CUDA: vòng lặp chia giai đoạn (staged), phát lệnh theo chiều sâu trước và theo chiều rộng trước | nạp bằng `useLabFile`; trình chạy từng bước tô sáng các dòng mà `app/src/sim/chunkpipe.ts` (`LINES`) nói đã phát từng thao tác | `S233.snippets.test.ts` kiểm tra các dòng đó đúng là những lời gọi mà mô hình nói |
+| `staged_loop_metal.mm`, `staged_loop.metal` | cùng trình chạy từng bước, khung nhìn Metal: K buffer dùng chung đang hoạt động cùng lúc trên Apple silicon | như trên | như trên |
 
-Cả hai là của chúng tôi, dựa theo vòng lặp sao chép và thực thi theo giai đoạn của NVIDIA (CUDA C++
+Cả hai là của chúng tôi, dựa theo vòng lặp sao chép và thực thi chia giai đoạn của NVIDIA (CUDA C++
 Best Practices Guide, mục 10.1.2; `notes/today/ch23-facts.md` A7) và mẫu "Synchronizing CPU and GPU
-work" của Apple (C5). Chúng chia công việc theo cách lab 23.1 làm: phần `c` là `[c*n/chunks,
-(c+1)*n/chunks)`, các phần rỗng bị bỏ qua, và phần không rỗng thứ j đi vào stream (hoặc ô) `j % S`.
+work" của Apple (C5). Chúng chia công việc theo cách lab 23.1 làm: chunk `c` là `[c*n/chunks,
+(c+1)*n/chunks)`, các chunk rỗng bị bỏ qua, và chunk không rỗng thứ j đi vào stream (hoặc ô) `j % S`.
 Chúng cố ý nhỏ hơn lab: không kiểm tra lỗi, và bên gọi tạo và đồng bộ hóa các stream.
 
 ## Chạy chúng: `check.py`
@@ -28,10 +28,10 @@ python3 labs/ch23/snippets/check.py --build DIR # or $PMPP_BUILD_DIR/ch23-snippe
 | Snippet | Điều được kiểm tra | Trạng thái nó hỗ trợ |
 |---|---|---|
 | `staged_loop.cu` | front end CUDA (clang, các header stub của khóa học) chấp nhận nó và chương trình điều khiển (driver) `check/staged_loop_test.cu` của nó | front-end-checked |
-| `staged_loop.cu` | trên trình giả lập (emulator) CPU (dịch bằng `labs/tools/cu2emu.py`, bật AddressSanitizer), cả hai thứ tự phát lệnh đều cho `2x + 1` ở mọi phần tử, với vùng đệm host được ghim, cho các phần bằng nhau, các phần không đều (độ dài 2, 3, 2, 3), nhiều phần hơn số phần tử (phần rỗng), 1 phần tử trong 64 phần, nhiều stream hơn số phần, một stream, và n = 0; không có gì được ghi ra ngoài đầu ra | emulator-checked |
-| `staged_loop_metal.mm` với `staged_loop.metal` | biên dịch bằng clang++ và chạy trên GPU của máy Mac này (kernel được biên dịch lúc chạy) với K = 1, 2, 3 và nhiều vùng đệm hơn số phần, với các phần bằng nhau, không đều và rỗng và n = 0, so với một bản tham chiếu CPU theo một dung sai; không có gì được ghi ra ngoài đầu ra | verified on Metal |
+| `staged_loop.cu` | trên trình giả lập (emulator) CPU (dịch bằng `labs/tools/cu2emu.py`, bật AddressSanitizer), cả hai thứ tự phát lệnh đều cho `2x + 1` ở mọi phần tử, với buffer host được ghim, cho các chunk bằng nhau, các chunk không đều (độ dài 2, 3, 2, 3), nhiều chunk hơn số phần tử (chunk rỗng), 1 phần tử trong 64 chunk, nhiều stream hơn số chunk, một stream, và n = 0; không có gì được ghi ra ngoài đầu ra | emulator-checked |
+| `staged_loop_metal.mm` với `staged_loop.metal` | biên dịch bằng clang++ và chạy trên GPU của máy Mac này (kernel được biên dịch lúc chạy) với K = 1, 2, 3 và nhiều buffer hơn số chunk, với các chunk bằng nhau, không đều và rỗng và n = 0, so với một bản tham chiếu CPU theo một dung sai; không có gì được ghi ra ngoài đầu ra | verified on Metal |
 
-Trình giả lập chạy các stream một cách đồng bộ, nên nó kiểm tra mỗi phần tính ra gì và kết quả nằm
+Trình giả lập chạy các stream một cách đồng bộ, nên nó kiểm tra mỗi chunk tính ra gì và kết quả nằm
 ở đâu, chứ không bao giờ kiểm tra có gì chồng lấp hay không; độ chồng lấp là phép đo của lab 23.1.
 Chưa có gì ở đây từng chạy trên phần cứng CUDA hoặc HIP.
 

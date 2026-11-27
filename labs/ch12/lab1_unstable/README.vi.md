@@ -117,12 +117,12 @@ Mỗi backend có thể cho bạn thấy gì:
 
 ## Trước khi bạn đo hiệu năng
 
-`--bench` tăng n từ 2^22 cho đến khi bản sao được cung cấp mất ít nhất 3 ms (tối đa 2^26 khóa,
+`--bench` tăng n từ 2^22 cho đến khi kernel sao chép được cung cấp mất ít nhất 3 ms (tối đa 2^26 khóa,
 và đầu vào cộng đầu ra tối đa một phần tư bộ nhớ mà thiết bị báo cáo). Rồi nó đo thời gian ba bộ
 lọc trên các khóa phân bố đều với tỉ lệ được giữ 0, 0.001, 0.01, 0.03, 0.1, 0.25, 0.5, 0.75 và
 1, lấy kết quả tốt nhất trong 5 lần chạy mỗi cấu hình, và kiểm tra chính xác mọi kết quả trước
 khi báo cáo. Nó in ra mili giây và GB/s của lưu lượng tối thiểu mà một bộ lọc cần (đọc 4n byte,
-ghi 4 byte cho mỗi khóa được giữ, 4 byte cho bộ đếm); 8n byte mỗi lượt của bản sao là cùng con
+ghi 4 byte cho mỗi khóa được giữ, 4 byte cho bộ đếm); 8n byte mỗi lượt của kernel sao chép là cùng con
 số đó cho một bộ lọc giữ mọi thứ. Việc đặt `*outputSize` về 0 không được tính giờ.
 
 Hãy ghi ra trước:

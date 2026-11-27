@@ -67,7 +67,7 @@ starter đã được sửa kể từ lúc bản sao của bạn được tạo,
   `PMPP_DISABLE_HIP`, `PMPP_EMU_SANITIZE=OFF`, và các tùy chọn riêng của từng lab mà README của
   chúng nêu.
 - `doctor` in ra thuộc tính thiết bị của mỗi backend. Trên CUDA và HIP, chúng gồm
-  `asyncEngineCount` và `concurrentKernels` (liệu các lần chép và các kernel có thể chồng lên nhau
+  `asyncEngineCount` và `concurrentKernels` (liệu các lần sao chép và các kernel có thể chồng lên nhau
   hay không, chương 22 và 23); trên ROCm, `asyncEngineCount` là một hằng số của runtime, không
   phải số lượng copy engine (`notes/today/ch23-facts.md`, B3).
 

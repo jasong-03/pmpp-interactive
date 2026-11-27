@@ -93,10 +93,10 @@ luồng (`../shared/fpprobe.*`). Đầu vào đến từ một buffer, nên trì
 
 - `1 + 0.75 ULP`: số float liền trên 1 khi device làm tròn đến gần nhất, 1 khi nó làm tròn về phía
   không. Metal cho phép cả hai (C2); mặc định của CUDA là làm tròn đến gần nhất (A9).
-- `2^-126 * 0.5`: số dưới chuẩn (subnormal) 2^-127 nếu các số denormal FP32 được giữ, 0 nếu bị xả về
+- `2^-126 * 0.5`: số subnormal 2^-127 nếu các số denormal FP32 được giữ, 0 nếu bị xả về
   không. nvcc mặc định giữ chúng (A6); Metal có thể xả (C2); mặc định của HIP không được ghi trong
   tài liệu (B3).
-- `(1 + 2^-12)^2 - (1 + 2^-11)`: đúng bằng 2^-24 với một lần làm tròn (một phép nhân-cộng hợp nhất),
+- `(1 + 2^-12)^2 - (1 + 2^-11)`: đúng bằng 2^-24 với một lần làm tròn (một phép nhân-cộng gộp),
   0 khi tích được làm tròn trước (A9).
 
 Công cụ thăm dò được biên dịch với thiết lập mặc định của từng backend. Trên các trình giả lập, nó
@@ -109,7 +109,7 @@ nhiều so với bất kỳ tổng nào ở đây (appA-facts E1). Sai số đư
 `S = sum of |x|`.
 
 **Dữ liệu**, sinh từ các seed cố định và làm tròn về định dạng của biến tích lũy, với mọi giá trị
-nhỏ hơn số chuẩn nhỏ nhất của định dạng được đặt về 0 (không có đầu vào dưới chuẩn; Metal có thể xả
+nhỏ hơn số chuẩn nhỏ nhất của định dạng được đặt về 0 (không có đầu vào subnormal; Metal có thể xả
 chúng, C2):
 
 - `ones`; `ints`, các số nguyên từ -3 đến 3;
@@ -151,7 +151,7 @@ thực hiện:
   đoạn: `(1 + K(coarse)) * (1 + g(L)) * (1 + K(c2)) * (1 + g(L)) - 1`. Đây là một ước lượng bậc nhất
   với biên độ rộng rãi, không phải một chứng minh.
 
-`a` cho phép trường hợp một tổng riêng phần dưới chuẩn bị xả về không: 2n (serial, tree) hoặc 4n
+`a` cho phép trường hợp một tổng riêng phần subnormal bị xả về không: 2n (serial, tree) hoặc 4n
 (Kahan) nhân với số chuẩn nhỏ nhất của định dạng. Ở đây chỉ dữ liệu FP16 mới có thể tạo ra trường
 hợp đó.
 
@@ -244,7 +244,7 @@ nơi các mục A.4 và A.6 và trang labs đọc chúng.
   `result`, `reference`, `abs_err`, `rel_err` (tương đối so với S), `ulps` (theo định dạng của biến
   tích lũy, tại bản tham chiếu) và `model`: `same` nếu kết quả của bạn có cùng các bit như mô hình
   CPU của thứ tự đó dưới chế độ làm tròn đã thăm dò. `differs` có thể đến từ một thứ tự khác, từ một
-  device đã xả một tổng riêng phần dưới chuẩn (mô hình giữ chúng), hoặc từ một trình biên dịch đã
+  device đã xả một tổng riêng phần subnormal (mô hình giữ chúng), hoặc từ một trình biên dịch đã
   sắp xếp lại các phép cộng của bạn. Một kết quả bị tràn được in thành `inf` và lưu thành `null`:
   tổng thật của 65,536 số một lớn hơn giá trị half lớn nhất, 65,504.
 - **coarse**: tree và Kahan ở float trên 2^22 số float uniform ở coarse 1, 4, 16, 64, 256, 1024 và
@@ -267,7 +267,7 @@ thước này, không phải tính chất của các kernel. Không có giá tr�
 ## Các backend khác nhau ở đâu (không có trong sách)
 
 - **CUDA**: `__fadd_rn` và `__fsub_rn` là các phép cộng mà NVIDIA ghi trong tài liệu là không bao giờ
-  được hợp nhất vào một phép nhân-cộng (appA-facts A9); việc chúng có ngăn cả việc sắp xếp lại hay
+  được gộp vào một phép nhân-cộng (appA-facts A9); việc chúng có ngăn cả việc sắp xếp lại hay
   không thì không được nêu (A13). `__half` và `__nv_bfloat16` dùng các toán tử thông thường, mỗi `+`
   là một phép cộng làm tròn đến số chẵn gần nhất (A16). BF16 cần compute capability 8.0 trở lên (A2).
 - **HIP**: cùng mã nguồn thông qua `pmpp/vendors/hip.h`. HIP-Clang mặc định dùng

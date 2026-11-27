@@ -24,7 +24,7 @@ lỗi độc lập**. Hãy tìm và sửa cả bốn.
   `python3 labs/pmpp.py run 10.2` cho GPU của bạn.
 
 Chương trình điều khiển (driver) kiểm thử các độ dài là bội của 256 và các độ dài không phải bội
-(trên các trình giả lập tối đa 4097). Mỗi trường hợp được khởi chạy hai lần trên cùng bộ đệm đầu ra
+(trên các trình giả lập tối đa 4097). Mỗi trường hợp được khởi chạy hai lần trên cùng buffer đầu ra
 với dữ liệu khác nhau. Dữ liệu là các số nguyên từ 1 đến 8 và mọi tổng riêng phần đều nhỏ hơn 2^24,
 nên mọi thứ tự cộng đều cho ra đúng cùng một số float: một tổng sai là một lỗi, không bao giờ do
 làm tròn.
@@ -55,7 +55,7 @@ Rồi chạy `emu`, `race` và GPU của bạn, và so sánh. Điền bảng nà
    - **Một lần shuffle đọc một lane không tham gia vào nó.** Trình giả lập trả về các byte `0xCD`,
      mà khi đọc như số float là một số âm lớn, và in một ghi chú nêu tên dòng của lần shuffle và
      lane mà nó đã đọc.
-   - **Một lần đọc ra ngoài một mảng.** Mỗi bộ đệm device, và bộ nhớ `__shared__` của mỗi khối, là
+   - **Một lần đọc ra ngoài một mảng.** Mỗi buffer device, và bộ nhớ `__shared__` của mỗi khối, là
      đúng một khối heap ở đó, nên AddressSanitizer dừng lần chạy ở lần đọc đầu tiên như vậy.
      Hãy đọc `READ`, khung đầu tiên (`kernel.cu:` và một số dòng), và địa chỉ nằm sau vùng nhớ bao
      nhiêu byte. Các bài kiểm thử sau điểm dừng không được chạy.

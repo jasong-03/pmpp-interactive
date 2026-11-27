@@ -69,15 +69,15 @@ Cùng ba kernel đó nằm trong `work/kernel.metal` (`dcs_scatter`, `dcs_gather
 
 ## Trên Metal
 
-- Không có symbol nào để chép vào. Tất cả nguyên tử nằm trong một bộ đệm gồm các `float4`, 16 byte
-  mỗi nguyên tử, và một phần là chính bộ đệm đó được bind lại ở nguyên tử đầu tiên của phần:
+- Không có symbol nào để chép vào. Tất cả nguyên tử nằm trong một buffer gồm các `float4`, 16 byte
+  mỗi nguyên tử, và một phần là chính buffer đó được bind lại ở nguyên tử đầu tiên của phần:
   `setBuffer:atoms offset:16 * start atIndex:1`. Kernel nhận nó dưới dạng
   `constant float4* atoms`. Apple không ghi trong tài liệu bộ nhớ đệm hằng nào phía sau không gian
   địa chỉ đó, cũng không ghi giới hạn kích thước nào cho nó (`notes/today/ch21-facts.md` C1).
 - Các hàm atomic của Metal chỉ nhận kiểu atomic. Kernel scatter khai báo lưới là
   `device atomic_float*` và cộng bằng
   `atomic_fetch_add_explicit(&grid[p], v, memory_order_relaxed)`; các kernel gather và gộp việc khai
-  báo cùng bộ đệm đó là `device float*`. Atomic float cần GPU Apple7 (M1) trở lên (C2).
+  báo cùng buffer đó là `device float*`. Atomic float cần GPU Apple7 (M1) trở lên (C2).
 - Các dispatch của một compute encoder thông thường chạy theo thứ tự chúng được encode và thấy các
   lần ghi của nhau (`notes/today/ch02-facts.md` C9), nên vòng lặp theo phần không cần rào chắn
   (barrier).
@@ -162,8 +162,8 @@ Hãy viết những điều sau ra trước; trang labs ghi lại chúng.
 ## Benchmark
 
 Chỉ thiết bị thật. Mỗi thời gian là cả một lát, tính mọi phần, lần tốt nhất trong `--reps` lần
-chạy (mặc định 5), với các kernel lần lượt thay phiên. Trên CUDA và HIP, nó gồm cả các lần chép
-`cudaMemcpyToSymbol`; trên Metal, các nguyên tử đã nằm sẵn trong một bộ đệm và một phần chỉ là một
+chạy (mặc định 5), với các kernel lần lượt thay phiên. Trên CUDA và HIP, nó gồm cả các lần sao chép
+`cudaMemcpyToSymbol`; trên Metal, các nguyên tử đã nằm sẵn trong một buffer và một phần chỉ là một
 lần bind lại.
 
 - **A**, scatter so với gather: một lát 256 x 256, 1,024 nguyên tử, phần 256. Giữ nhỏ vì scatter chỉ

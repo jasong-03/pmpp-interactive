@@ -18,7 +18,7 @@ khối lớn nhất.
 **Phần việc của bạn:**
 
 - **(a) `KoggeStoneDoubleBufferKernel`** (Fig. 11.5). Bắt đầu từ Fig. 11.3 được cung cấp và bỏ
-  rào chắn thứ hai của nó bằng hai bộ đệm chia sẻ đổi vai cho nhau ở mỗi vòng lặp. Như vậy còn
+  rào chắn thứ hai của nó bằng hai buffer chia sẻ đổi vai cho nhau ở mỗi vòng lặp. Như vậy còn
   lại một rào chắn mỗi vòng lặp. Các luồng không cộng vẫn phải chép giá trị của mình sang, và
   kết quả được đọc từ `inBuffer_s` sau lần đổi cuối cùng.
 - **(b) `warpScan`, `blockScan` và `WarpScanKernel`** (Figs. 11.8 đến 11.10), viết cho khả
@@ -49,7 +49,7 @@ khối lớn nhất.
   không phải là một số nguyên SIMD group gồm `threadExecutionWidth` lane, hoặc có nhiều SIMD
   group hơn số lane của một SIMD group.
 - Được cung cấp, không sửa, trong `../shared-g11/`: `bs_two_barrier.cu` và `.metal` (Fig. 11.3,
-  mốc so sánh), `bs_copy.cu` và `.metal` (một phép chép đơn giản, làm mốc băng thông), và
+  mốc so sánh), `bs_copy.cu` và `.metal` (một phép sao chép đơn giản, làm mốc băng thông), và
   `bs_launch.mm`.
 
 ## Lệnh
@@ -121,14 +121,14 @@ Hãy ghi những điều này ra trước. Bài học hỏi chúng dưới các 
 
 1. Với khối 1024, scan warp-shuffle của bạn sẽ chạy nhanh hơn kernel hai rào chắn bao nhiêu
    lần (`ch11/labs/p-lab1-warp`).
-2. Riêng việc dùng bộ đệm kép sẽ nhanh hơn kernel hai rào chắn bao nhiêu lần
+2. Riêng việc dùng buffer kép sẽ nhanh hơn kernel hai rào chắn bao nhiêu lần
    (`ch11/11.3/p-double`, được hỏi ở mục 11.3).
 3. Trên Metal: vòng lặp shuffle của bạn sẽ nhanh hơn, chậm hơn hay bằng phiên bản một lần gọi
    `simd_prefix_inclusive_sum`? Chênh bao nhiêu?
 
 Sách đếm rào chắn: hai mỗi vòng lặp ở Fig. 11.3, một mỗi vòng lặp ở Fig. 11.5, tổng cộng hai
 cho Fig. 11.9 (pp. 258-265). Sách cũng nói một scan di chuyển ít nhất 8 byte mỗi phần tử, và
-ngay cả một phép chép cũng không đạt băng thông công bố (pp. 272-273). Bao nhiêu phần của số rào
+ngay cả một phép sao chép cũng không đạt băng thông công bố (pp. 272-273). Bao nhiêu phần của số rào
 chắn trở thành thời gian thì tùy thiết bị của bạn.
 
 ## Đọc kết quả
@@ -138,12 +138,12 @@ vào và đầu ra cần thiết), mỗi khối một đoạn, với khối 256,
 nó đo kernel chép trước, rồi kernel hai rào chắn, (a) của bạn, (b) của bạn và, trên Metal, (b2).
 
 - `time ms` là lần tốt nhất trong năm lần chạy sau một lần khởi động không đo. Một phần tư
-  giây các phép chép không đo chạy trước, để kernel được đo đầu tiên không phải trả thêm chi
+  giây các phép sao chép không đo chạy trước, để kernel được đo đầu tiên không phải trả thêm chi
   phí đánh thức thiết bị.
 - `GB/s` tính 8 byte mỗi phần tử (một lần đọc 4 byte, một lần ghi 4 byte) chia cho thời gian
   đó: số byte một scan phải di chuyển, không phải số byte hệ thống bộ nhớ đã di chuyển.
 - `of copy` là tốc độ của kernel tính theo tỉ lệ so với kernel chép ở cùng kích thước khối.
-  Phép chép là mức cao nhất máy này đã cho một kernel di chuyển cùng số byte, nên nó là thước
+  Phép sao chép là mức cao nhất máy này đã cho một kernel di chuyển cùng số byte, nên nó là thước
   đo ở đây, không phải đỉnh công bố.
 
 Cùng các hàng đó được đưa vào các trang bài học (mục 11.3 và 11.4 và trang labs). Các con số là

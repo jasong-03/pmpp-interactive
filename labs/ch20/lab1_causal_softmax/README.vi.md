@@ -146,7 +146,7 @@ trong phạm vi `5e-5`. Sai số tương đối của một P nhiều nhất b�
 Tổng cộng nhiều nhất khoảng 1.8e-5; `5e-5` lớn hơn gấp đôi con số đó. Thiếu phép trừ giá trị lớn
 nhất, sai hệ số co giãn, sai cận hay một điểm số bị che lọt vào tổng đều lệch hàng bậc độ lớn.
 HIP công bố các sai khác đo được, không phải cận (ch10-facts B4); ngoài điều đó, unverified. Số
-hạng tuyệt đối chỉ để một xác suất dưới chuẩn (subnormal), thứ mà GPU có thể xả về 0 (flush to zero), không
+hạng tuyệt đối chỉ để một xác suất subnormal, thứ mà GPU có thể xả về 0 (flush to zero), không
 tự mình làm hỏng một hàng.
 
 **L:** `|got - ref| <= 5e-5 + 2^-21 * |ref|`. `log(s)` biến sai số tương đối của `s` (nhiều nhất

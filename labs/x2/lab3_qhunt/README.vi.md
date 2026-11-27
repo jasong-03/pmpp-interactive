@@ -102,7 +102,7 @@ Qua được trên GPU không chứng tỏ rằng một rào chắn là không c
 ## Trước khi benchmark, hãy dự đoán
 
 Đường nào nhanh hơn trên thiết bị của bạn cho một token decode, **tính cả lượt lượng tử hóa**:
-(a) lượng tử hóa activation sang Q8_1, rồi GEMV số nguyên; hay (b) GEMV float hợp nhất của lab X2.2,
+(a) lượng tử hóa activation sang Q8_1, rồi GEMV số nguyên; hay (b) GEMV float gộp của lab X2.2,
 vốn giải lượng tử hóa bên trong tích vô hướng và đọc activation float? Còn
 ở batch 8 thì sao?
 

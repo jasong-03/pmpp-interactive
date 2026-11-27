@@ -34,11 +34,11 @@ nên các lần nạp của mỗi vòng đều được hợp nhất (coalescing
   ghi `blockCounts[b]`.
 - Phép scan được cung cấp biến `blockCounts` thành `blockOffsets`.
 - `stagedScatterKernel`: khối đọc lại ô của nó, từng vòng một. Vị trí của mỗi khóa được giữ
-  trong một bộ đệm trung gian ở bộ nhớ chia sẻ là (số khóa được giữ của các vòng trước) + (số
+  trong một buffer trung gian ở bộ nhớ chia sẻ là (số khóa được giữ của các vòng trước) + (số
   khóa được giữ của các warp trước trong vòng này) + (số lane được giữ nằm dưới nó trong warp
   của nó). Số hạng cuối là tổng tiền tố nhị phân của p. 293: phiếu bầu, AND với mặt nạ các lane
   phía dưới, rồi popcount. Sau các vòng, các luồng liên tiếp sao chép đoạn đã đệm ra
-  `output[blockOffsets[b] + j]`. Khối cuối cùng ghi `*outputSize`. Bộ đệm trung gian là
+  `output[blockOffsets[b] + j]`. Khối cuối cùng ghi `*outputSize`. Buffer trung gian là
   `extern __shared__`, `256 * coarse * 4` byte, 16 KiB ở coarse 16.
 - `launchStableFilterStaged(input, output, n, threshold, outputSize, blockCounts,
   blockOffsets, scanScratch, coarse)`.
@@ -83,7 +83,7 @@ Trên Metal, bỏ phiếu và popcount trở thành `simd_sum(keep ? 1u : 0u)` v
 
 - Kiểm thử: `python3 labs/pmpp.py run 12.3 --backend emu` trước (vài phút: mỗi luồng GPU chạy
   trên CPU), rồi `python3 labs/pmpp.py run 12.3`.
-- Race condition trên bộ nhớ chia sẻ: `python3 labs/pmpp.py run 12.3 --backend race`. Bộ đệm
+- Race condition trên bộ nhớ chia sẻ: `python3 labs/pmpp.py run 12.3 --backend race`. Buffer
   trung gian và tổng của mỗi warp được ghi lại ở mỗi vòng; một rào chắn (barrier) bị thiếu hiện
   ra ở đây kèm cả hai dòng mã nguồn, ngay cả khi đáp án tình cờ ra đúng.
 - Đo: `python3 labs/pmpp.py run 12.3 --bench` (chỉ trên thiết bị thật).
@@ -96,7 +96,7 @@ Trên Metal, bỏ phiếu và popcount trở thành `simd_sum(keep ? 1u : 0u)` v
 - n = 1, 31, 32, 33, 255, 256, 257, 1000, 4099, 65537, 2^20 và 3 x 2^20 + 17 trên GPU. Trình
   giả lập chạy phần A tới 4099 cộng 65537 (chỉ ở mức giữ một nửa) và phần B tới 4099; backend
   race chạy n tới 2048.
-- Phần A, và phần B ở coarse 1, 2, 4, 8 và 16. Coarse 16 chỉ chạy ở nơi bộ đệm trung gian của
+- Phần A, và phần B ở coarse 1, 2, 4, 8 và 16. Coarse 16 chỉ chạy ở nơi buffer trung gian của
   nó vừa bộ nhớ chia sẻ của thiết bị; nếu không, chương trình điều khiển in ra rằng nó đã bỏ qua.
 - Tỉ lệ được giữ 0, 0.001, 0.5, 0.97 và 1, cùng năm mẫu: chỉ khóa đầu tiên, chỉ khóa cuối
   cùng, cứ một khóa giữ một khóa bỏ, các đoạn 12 khóa vắt qua mọi ranh giới ô, và một đoạn lấp
@@ -129,7 +129,7 @@ của phần A cao hơn mô hình của nó khoảng 8 byte mỗi khóa. Bộ nh
 lại: lần đọc thứ hai một ô của phần B có thể đến từ bộ nhớ đệm, còn các mảng của phần A thì có
 thể không. Thiết bị của bạn quyết định.
 
-Benchmark bắt đầu ở n = 2^24 và nhân đôi n cho đến khi một bản sao thường của đầu vào mất 3 ms
+Benchmark bắt đầu ở n = 2^24 và nhân đôi n cho đến khi một lần sao chép thường của đầu vào mất 3 ms
 (trong giới hạn một phần tám bộ nhớ của thiết bị). Với các tỉ lệ được giữ 0.001, 0.01, 0.1,
 0.5, 0.9 và 1, nó đo thời gian phần A ("flags") và phần B ("staged") ở mọi hệ số gộp việc vừa
 bộ nhớ. Mỗi hàng cho thời gian (tốt nhất trong 5 lần chạy), GB/s trên lưu lượng tối thiểu

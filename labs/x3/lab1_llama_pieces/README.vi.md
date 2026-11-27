@@ -170,7 +170,7 @@ bằng 0. Các cận sai số bên dưới tính theo đơn vị `FLT_EPSILON`, 
   `simd_sum` cộng không được ghi trong tài liệu (ch10-facts A4, C1): ngay cả khi nó cộng 32 lane của mình lần lượt
   từng cái một thì cận sẽ vào khoảng 25.
 - RoPE, `k = 8`. Mỗi đầu ra là hai phép nhân và một phép cộng các giá trị có độ lớn tối đa 1: dưới 3,
-  dù có hay không có phép nhân cộng hợp nhất (fused multiply-add). Bản tham chiếu đọc cùng các bảng float, nên
+  dù có hay không có phép nhân cộng gộp (fused multiply-add). Bản tham chiếu đọc cùng các bảng float, nên
   sai số làm tròn của chúng không được tính; test vị trí 0 là chính xác.
 - SwiGLU, `k = 16`. CUDA: `expf` trong 2 ulp (ch10-facts A11), rồi một phép cộng, một phép chia
   làm tròn đúng và phép nhân: dưới 4. Dạng Metal với `e = exp(-|g|)`: `exp` nhanh

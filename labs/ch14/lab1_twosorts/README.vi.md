@@ -34,7 +34,7 @@ Metal (C4). Nên ở đây một lượt là ba lần khởi chạy:
 - `radixScatter(keysIn, valsIn, keysOut, valsOut, onesBefore, n, bit)`: hai công thức đích
   của Fig. 14.6; giá trị di chuyển cùng khóa của nó.
 - `launchRadixSortOneBit(keys, vals, tmpKeys, tmpVals, bits, scanScratch, n)`: 32 lượt,
-  bit ít quan trọng nhất trước, đọc một cặp bộ đệm và ghi vào cặp kia. Các cặp đã sắp xếp
+  bit ít quan trọng nhất trước, đọc một cặp buffer và ghi vào cặp kia. Các cặp đã sắp xếp
   phải kết thúc trong `keys`/`vals`.
 
 Các giá trị là vị trí đầu vào của các khóa. Trong lab 14.3 chúng là id token. Với vị trí làm
@@ -81,7 +81,7 @@ trang sách.
   con trỏ kiểu atomic (`notes/today/infra-facts.md` C1).
 - Sửa `work/launch.mm`:
   - `runOddEvenSort(queue, step, data, flag, n)` commit một command buffer cho mỗi cặp bước
-    chẵn-lẻ, chờ nó, và đọc cờ qua `flag.contents`. Một bộ đệm shared-storage
+    chẵn-lẻ, chờ nó, và đọc cờ qua `flag.contents`. Một buffer shared-storage
     không cần sao chép, nhưng CPU chỉ được đọc nó sau khi công việc GPU ghi vào nó đã
     hoàn tất (`notes/today/ch05-facts.md` C6; `waitUntilCompleted`, infra-facts C12).
     Trả về số bước, hoặc -1 nếu một command buffer thất bại.
@@ -124,7 +124,7 @@ trang sách.
   n = 1000 và hai mẫu ở mỗi kích thước khác; nó trả giá cho mọi luồng của mọi khối trong
   96 lần khởi chạy trở lên mà một phép sắp xếp thực hiện.
 - Trước mỗi lần chạy, driver ghi 0xCDCDCDCD vào mọi ô của `bits`, vùng nháp của phép scan,
-  các bộ đệm tạm và 64 ô canh gác sau cuối mỗi mảng. Một lượt ghi quá n sẽ bị bắt;
+  các buffer tạm và 64 ô canh gác sau cuối mỗi mảng. Một lượt ghi quá n sẽ bị bắt;
   trên trình giả lập, AddressSanitizer dừng một lượt ghi quá vùng cấp phát và chỉ ra dòng mã.
 
 ## Trước khi bạn benchmark

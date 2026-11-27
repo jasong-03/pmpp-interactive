@@ -34,9 +34,9 @@ Sách không in kernel GQA nào. Cách nhóm lại thiết kế của lab 20.4 n
   nhau chiều head** (4 giá trị mỗi lane). Với mỗi key, một warp nạp hàng K và hàng V của nó vào
   thanh ghi (register) một lần, rồi tính g_q điểm số (g_q cây bướm) và g_q lần cập nhật online.
 - **Mỗi warp giữ g_q trạng thái đang chạy** (m, D, O~), một cho mỗi query head.
-- **Phép trộn chạy một lần cho mỗi query head**, qua cùng một vùng đệm chia sẻ: công bố O~ của
+- **Phép trộn chạy một lần cho mỗi query head**, qua cùng một buffer chia sẻ: công bố O~ của
   các warp cho head g, rào chắn (barrier), kết hợp bằng Eqs. 20.4 và 20.6, ghi đầu ra của head g,
-  rào chắn lần nữa trước khi head g + 1 ghi đè vùng đệm. Giữ O~ của cả tám head cùng lúc sẽ cần 32
+  rào chắn lần nữa trước khi head g + 1 ghi đè buffer. Giữ O~ của cả tám head cùng lúc sẽ cần 32
   KiB, đó là toàn bộ giới hạn của một threadgroup Metal trên các họ GPU mà bảng của Apple liệt kê
   (C1).
 - **Kích thước nhóm là một hằng số lúc biên dịch, `GQ`.** Trong `kernel.cu` kernel là một

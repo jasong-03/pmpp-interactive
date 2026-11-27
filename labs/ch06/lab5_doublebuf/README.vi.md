@@ -1,6 +1,6 @@
 > Bản tiếng Việt của [README.md](README.md). Bản tiếng Anh là bản gốc; nếu hai bản khác nhau, hãy theo bản tiếng Anh.
 
-# Lab 6.5: bộ đệm kép, với một trình phát hiện race condition theo dõi
+# Lab 6.5: buffer kép, với một trình phát hiện race condition theo dõi
 
 Sách: mục 6.7 (pp. 146-147), áp dụng cho kernel phân ô của mục 5.4 (Fig. 5.9, p. 108) mà bạn đã
 viết ở lab 5.2.
@@ -13,7 +13,7 @@ vuông có độ rộng là bội của `TILE_WIDTH`, như ở lab 5.2.
 
 - Sửa `work/kernel.cu` (`doubleBufferedMatmulKernel`) và `work/kernel.metal`
   (`double_buffered_matmul`). Các lần khởi chạy, `launchDoubleBufferedMatmul` trong `kernel.cu` và
-  `encodeDoubleBufferedMatmul` trong `work/launch.mm`, là của lab 5.2 và đều đúng: bộ đệm kép thay
+  `encodeDoubleBufferedMatmul` trong `work/launch.mm`, là của lab 5.2 và đều đúng: buffer kép thay
   đổi kernel, không thay đổi lần khởi chạy.
 - `provided/` chứa kernel hai rào chắn của lab 5.2 cho CUDA và Metal, đã đổi tên. Benchmark đo thời
   gian kernel của bạn so với nó. Bạn không sửa nó.
@@ -43,7 +43,7 @@ vuông có độ rộng là bội của `TILE_WIDTH`, như ở lab 5.2.
 
 Vòng lặp của lab 5.2 ghi trước và đọc sau, nên rào chắn bảo vệ sự phụ thuộc giả (ghi sau đọc) là rào
 chắn thứ hai của nó. Trong vòng lặp minh họa của sách ở p. 146, lần đọc đến trước, và ở đó nó là rào
-chắn thứ nhất. Sách hoán đổi hai con trỏ bộ đệm ở cuối mỗi vòng lặp (p. 147); chọn cặp ô theo số
+chắn thứ nhất. Sách hoán đổi hai con trỏ buffer ở cuối mỗi vòng lặp (p. 147); chọn cặp ô theo số
 giai đoạn cũng làm được cùng việc đó.
 
 ## Các bài kiểm thử bắt được gì
@@ -93,15 +93,15 @@ vòng lặp "trước" của sách (`notes/today/ch06-facts.md`, D3). Dù phép 
 
 Không có trong sách; từ `notes/today/ch06-facts.md`.
 
-- Vòng lặp hai bộ đệm, một rào chắn chỉ cần rào chắn khối, nên cùng tệp `.cu` biên dịch được cho HIP
+- Vòng lặp hai buffer, một rào chắn chỉ cần rào chắn khối, nên cùng tệp `.cu` biên dịch được cho HIP
   (B8). Trên Metal, đó là `threadgroup_barrier(mem_flags::mem_threadgroup)` một lần mỗi giai đoạn
   (C7).
 - Hai cặp ô `float` 32 x 32 là 16 KB, gấp đôi của lab 5.2. Chương trình điều khiển (driver) so sánh
   những gì kernel cần với những gì thiết bị báo cáo (`sharedMemPerBlock` trên CUDA và HIP, bộ nhớ
   threadgroup của pipeline so với `maxThreadgroupMemoryLength` trên Metal) thay vì giả định một
   giới hạn.
-- Ngày nay NVIDIA công bố bộ đệm kép chủ yếu cùng với các phép sao chép bất đồng bộ: ô tiếp theo
-  được nạp vào một bộ đệm trong khi các luồng tính trên bộ đệm kia (A16). Đó là hướng chương 15 đưa
+- Ngày nay NVIDIA công bố buffer kép chủ yếu cùng với các phép sao chép bất đồng bộ: ô tiếp theo
+  được nạp vào một buffer trong khi các luồng tính trên buffer kia (A16). Đó là hướng chương 15 đưa
   ý tưởng này đi tiếp. AMD chỉ công bố phép sao chép bất đồng bộ vào LDS cho CDNA 3 và 4, qua một
   intrinsic của trình biên dịch (B8). Metal hoàn toàn không công bố phép sao chép bất đồng bộ nào
   vào bộ nhớ threadgroup (C7), nên trên Metal, dạng đồng bộ trong lab này là dạng bạn có.

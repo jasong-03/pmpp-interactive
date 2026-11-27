@@ -1,6 +1,6 @@
 > Bản tiếng Việt của [README.md](README.md). Bản tiếng Anh là bản gốc; nếu hai bản khác nhau, hãy theo bản tiếng Anh.
 
-# Lab 15.5: bộ đệm kép và đường ống phần mềm
+# Lab 15.5: buffer kép và đường ống phần mềm
 
 Sách: mục 15.8 (pp. 364-368), Figs. 15.12 đến 15.14. Mốc dự án M3, giai đoạn 5 trên 5: giai
 đoạn cuối cùng trong cách bố trí của sách, nên hàng `stage` của lab này là bậc trên cùng của
@@ -9,23 +9,23 @@ chiếc thang bắt đầu từ lab 5.3. Lab 15.6 mới chính là mốc dự á
 `work/` chứa lời giải của lab 15.4, đã đổi tên (`gemmPipelinedKernel`, `launchGemmPipelined`,
 `launchGemmPipelinedWidth`, `gemm_pipelined`, `encodeGemmPipelined`), với vòng lặp ô bị lấy
 ra. Hãy đặt nó trở lại sao cho vòng lặp `tile` tính với cặp `tile` trong khi nạp cặp
-`tile + 1` vào một bộ đệm thứ hai, với một rào chắn (barrier) mỗi vòng lặp thay vì hai:
+`tile + 1` vào một buffer thứ hai, với một rào chắn (barrier) mỗi vòng lặp thay vì hai:
 
 - hai cặp ô chia sẻ, `A_s[2][...]` và `B_s[2][...]` (TODO 1);
 - một phần mở đầu nạp cặp 0 và chờ; một vòng lặp trên `tile < numTiles - 1` chạy `mm` trên
-  cặp `tile`, rồi nạp cặp `tile + 1` vào bộ đệm còn lại, rồi chờ; một phần kết chạy `mm` trên
+  cặp `tile`, rồi nạp cặp `tile + 1` vào buffer còn lại, rồi chờ; một phần kết chạy `mm` trên
   cặp cuối cùng (TODO 2).
 
-Fig. 15.14 là một khung sườn: các đối số của nó bị lược bỏ, các bộ đệm không được khai báo, và
+Fig. 15.14 là một khung sườn: các đối số của nó bị lược bỏ, các buffer không được khai báo, và
 các kiểu con trỏ của nó không khớp với các ô một chiều của Fig. 15.3 (`notes/ch15.md`,
 "Unclear" 8). Sách hoán đổi một con trỏ hiện tại và một con trỏ kế tiếp ở cuối mỗi vòng lặp;
-chọn bộ đệm của một cặp theo tính chẵn lẻ của nó, `tile & 1`, như lab 6.5 làm, là cùng một
+chọn buffer của một cặp theo tính chẵn lẻ của nó, `tile & 1`, như lab 6.5 làm, là cùng một
 sự luân phiên. Hai trường hợp hình vẽ để lại cho bạn: `numTiles - 1` làm gì khi K bằng 0 (một
-số đếm không dấu sẽ tràn vòng), và phần kết đọc bộ đệm nào.
+số đếm không dấu sẽ tràn vòng), và phần kết đọc buffer nào.
 
 ## Tệp
 
-- `work/kernel.cu` và `work/kernel.metal`: các bộ đệm kép và vòng lặp ô.
+- `work/kernel.cu` và `work/kernel.metal`: các buffer kép và vòng lặp ô.
   `work/launch.mm` đã hoàn chỉnh: đường ống thay đổi kernel, không thay đổi phần khởi chạy.
 
 ## Phương pháp
@@ -45,8 +45,8 @@ là ba cặp. `(5, 0, 9)` không có cặp ô nào: C phải ra toàn số 0. N�
 30 giây, nên lỗi tràn vòng không dấu thất bại ở đó với lý do đó thay vì chạy hàng giờ. Cả hai
 dạng của lỗi này đã được kiểm tra là tự thất bại: một `numTiles` không dấu không có điều kiện
 chặn thất bại trên `emu` và Metal qua bộ canh giờ; một `numTiles` có dấu không có điều kiện
-chặn, mà phần kết khi đó đọc các bộ đệm không ai nạp, thất bại trên `emu` (rác trong C) và đã
-qua trên Metal, nơi các bộ đệm đó tình cờ chứa số 0. Backend race chạy từng khối 256 luồng một
+chặn, mà phần kết khi đó đọc các buffer không ai nạp, thất bại trên `emu` (rác trong C) và đã
+qua trên Metal, nơi các buffer đó tình cờ chứa số 0. Backend race chạy từng khối 256 luồng một
 dưới ThreadSanitizer trên `(128, 24, 128)` và `(130, 9, 131)`.
 
 Rào chắn bên trong vòng lặp đã được kiểm tra là tự thất bại khi bị bỏ đi:
@@ -91,7 +91,7 @@ Không có trong sách; từ `notes/today/ch15-facts.md`.
 - HIP không ghi nhận cách sao chép bất đồng bộ dùng được nào vào LDS cho việc này; dạng phần
   mềm của lab này là dạng nên dùng ở đó (B5). Metal hoàn toàn không ghi nhận cách nào
   (`ch06-facts.md` C7).
-- CUTLASS dùng bộ đệm kép ở hai cấp: các ô chia sẻ, như ở đây, và các dải thanh ghi bên trong
+- CUTLASS dùng buffer kép ở hai cấp: các ô chia sẻ, như ở đây, và các dải thanh ghi bên trong
   mỗi luồng (A12).
 - Metal: thống kê pipeline của Xcode báo các luồng chờ ở rào chắn bao lâu
   ("Synchronization (barrier)", C3), nơi để xem bớt một rào chắn mang lại được gì.

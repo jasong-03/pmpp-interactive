@@ -58,7 +58,7 @@ Chỗ khác với trang sách:
 
 - Sửa `work/kernel.cu` (CUDA, HIP và cả hai trình giả lập): `SinglePassScanKernel`,
   `interBlockScan` và `launchSinglePassScan`. Không có `kernel.metal` hay `launch.mm`.
-- Được cung cấp, không sửa: `../shared-g13/global_copy.cu` (một phép chép đơn giản, mốc băng
+- Được cung cấp, không sửa: `../shared-g13/global_copy.cu` (một phép sao chép đơn giản, mốc băng
   thông).
 
 ## Lệnh
@@ -82,7 +82,7 @@ hoặc khối 0 cũng chờ.
 - Dữ liệu và dung sai như trong lab 11.4: toàn số một và các số nguyên từ -3 đến 3 phải khớp
   chính xác; các giá trị phân bố đều trong [-1, 1] phải nằm trong phạm vi 1e-5 nhân tổng |x|
   tính đến phần tử đó, cộng 1e-6, so với vòng lặp của Fig. 11.1 chạy bằng double.
-- Mỗi trường hợp chạy hai lần trên cùng các bộ đệm. Trước lần khởi chạy đầu tiên, mọi cờ đều
+- Mỗi trường hợp chạy hai lần trên cùng các buffer. Trước lần khởi chạy đầu tiên, mọi cờ đều
   được đặt, `partialSums` và đầu ra là NaN, và bộ đếm giữ giá trị lớn hơn số khối một đơn vị,
   như thể còn sót lại từ việc khác. Lần khởi chạy thứ hai nhận dữ liệu mới và bất cứ thứ gì
   lần đầu để lại.
@@ -148,14 +148,14 @@ Hãy ghi điều này ra trước. Trang labs hỏi nó dưới id trong ngoặc
 ## Đọc kết quả
 
 Benchmark scan n = 2^26 số float. Nó dùng ít hơn nếu thiết bị của bạn báo ít hơn bốn lần 512 MB
-đầu vào và đầu ra. Nó chạy với khối 256 và 1024 (S = 1024 và 4096), đo phép chép rồi kernel một
+đầu vào và đầu ra. Nó chạy với khối 256 và 1024 (S = 1024 và 4096), đo phép sao chép rồi kernel một
 lượt, và kiểm tra phép scan trước khi báo.
 
 - `time ms` là lần tốt nhất trong năm lần chạy sau một lần khởi động không đo. Trên CUDA và HIP,
   nó là thời gian phía host bao quanh hàm khởi chạy và một lần đồng bộ hóa, nên nó bao gồm hai
   lần gọi `cudaMemset` của hàm khởi chạy.
 - `GB/s` tính 8 byte mỗi phần tử, phép đếm của sách cho một lượt, chia cho thời gian đó.
-- `of copy` là thời gian của phép chép tính theo tỉ lệ so với thời gian của kernel.
+- `of copy` là thời gian của phép sao chép tính theo tỉ lệ so với thời gian của kernel.
 
 Hãy chạy benchmark của lab 11.4 trên cùng thiết bị để so sánh. Trang labs đặt các hàng của cả
 hai lab cạnh nhau. Các con số là phép đo của máy đó ở kích thước đó. Hãy chạy mỗi benchmark

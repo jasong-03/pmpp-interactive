@@ -41,7 +41,7 @@ lớp tuyến tính của nó. Một lần khởi chạy cho mỗi phép toán c
 
 Các trọng số vẫn ở dạng lượng tử hóa trong bộ nhớ thiết bị. Không có gì trong bước ghi ra một bản sao đã giải lượng tử hóa của một
 ma trận trọng số: việc đó sẽ di chuyển nhiều byte hơn cả bước float32 (A1, nơi phép đo của chính PyTorch
-với một đường int8 không hợp nhất cho kết quả chậm hơn FP16). Các GEMV giải lượng tử hóa bên trong
+với một đường int8 không gộp cho kết quả chậm hơn FP16). Các GEMV giải lượng tử hóa bên trong
 tích vô hướng của chúng.
 
 Trên Metal, cùng bước đó là `embed_rows_q8_0` và `embed_rows_q4_0` trong `kernel.metal`

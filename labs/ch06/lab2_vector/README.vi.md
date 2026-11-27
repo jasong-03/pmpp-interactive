@@ -26,9 +26,9 @@ gian chúng so với mỗi luồng một số float.
 
 - Sửa `work/kernel.cu` (CUDA, HIP, trình giả lập): hai kernel và các lần khởi chạy của chúng.
 - Sửa `work/kernel.metal` (`vec_add4`, `vec_add_coarse`) và `work/launch.mm` (`encodeVecAdd4`,
-  `encodeVecAddCoarse`). `vec_add4` khai báo ba bộ đệm của nó là `float4` cho các cụm đầy đủ và
-  nhận lại chính ba bộ đệm đó dưới dạng `float` thường cho phần đuôi, nên `encodeVecAdd4` gắn mỗi
-  bộ đệm hai lần, ở hai chỉ số.
+  `encodeVecAddCoarse`). `vec_add4` khai báo ba buffer của nó là `float4` cho các cụm đầy đủ và
+  nhận lại chính ba buffer đó dưới dạng `float` thường cho phần đuôi, nên `encodeVecAdd4` gắn mỗi
+  buffer hai lần, ở hai chỉ số.
 - Được cung cấp, không sửa: bản cơ sở mỗi luồng một số float trong `provided/vecadd.cu`,
   `provided/vecadd.metal` và `provided/vecadd_launch.mm`.
 
@@ -64,7 +64,7 @@ Phép ép kiểu cần một con trỏ căn chỉnh 16 byte. Những gì mỗi n
   (A11). `cudaMalloc` trả về vùng nhớ căn chỉnh ít nhất 256 byte (A3).
 - HIP: `float4` tồn tại với tên của CUDA và có căn chỉnh 16 byte trong header; cũng không trang
   nào của AMD mô tả phép ép kiểu này (B5, infra B6).
-- Metal: cách được công bố là khai báo bộ đệm `device const float4*` (C3, infra C7), và đó là điều
+- Metal: cách được công bố là khai báo buffer `device const float4*` (C3, infra C7), và đó là điều
   `vec_add4` làm. Một phép ép con trỏ vẫn biên dịch được, và MLX cùng llama.cpp dùng nó, nhưng đặc
   tả không mô tả nó. Apple cũng nói chỉ số `uint` có thể ngăn các lần nạp được vector hóa, nên các
   kernel Metal đánh chỉ số bằng `int` (C3). GPU thực sự thực hiện bao nhiêu lần truy cập cho một

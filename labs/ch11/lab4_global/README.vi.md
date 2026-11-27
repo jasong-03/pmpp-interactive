@@ -41,7 +41,7 @@ số float, và không có giả định nào về nội dung của nó lúc b�
   `encodeScanScanAdd` và `encodeReduceScanScan`. Chúng ghi nhiều lần dispatch vào một compute
   encoder duy nhất mà chương trình điều khiển đã mở. Mỗi lần dispatch thấy những gì lần trước
   nó đã ghi. Apple ghi trong tài liệu hai lý do: `computeCommandEncoder` thông thường
-  "dispatches its compute commands serially", và các bộ đệm do device tạo ra được theo dõi
+  "dispatches its compute commands serially", và các buffer do device tạo ra được theo dõi
   xung đột (hazard-tracked) theo mặc định (ch02 facts C9). Các threadgroup không bao giờ trao
   đổi với nhau bên trong một lần dispatch.
 
@@ -56,7 +56,7 @@ số float, và không có giả định nào về nội dung của nó lúc b�
 - Được cung cấp trong mã khởi đầu (starter), không thuộc bài tập: `warpScan` và `blockScan` từ
   lab 11.1, `warpReduce` từ lab 10.1, và trên Metal là phép kiểm tra `fits`. Bạn có thể thay
   bằng bản của mình nếu muốn.
-- Được cung cấp, không sửa, trong `../shared-g13/`: `global_copy.cu` và `.metal` (một phép chép
+- Được cung cấp, không sửa, trong `../shared-g13/`: `global_copy.cu` và `.metal` (một phép sao chép
   đơn giản, mốc băng thông) và `global_launch.mm`.
 
 ## Lệnh
@@ -84,7 +84,7 @@ Lần chạy trên trình giả lập chậm, phần lớn thời gian nằm ở
   tính đến phần tử đó, cộng 1e-6. Vì sao nhiều như vậy: mỗi đầu ra đi qua tối đa khoảng 16 phép
   cộng có làm tròn ở mỗi mức của phân cấp. Với 4 mức, trường hợp xấu nhất là
   64 × 2^-24 ≈ 3.8e-6 nhân tổng đó.
-- Mỗi thiết kế chạy hai lần trên cùng các bộ đệm. Lần khởi chạy đầu tiên bắt đầu với đầu ra và
+- Mỗi thiết kế chạy hai lần trên cùng các buffer. Lần khởi chạy đầu tiên bắt đầu với đầu ra và
   scratch đầy NaN, nên một tổng được đọc trước khi được ghi sẽ lộ ra. Lần khởi chạy thứ hai nhận
   dữ liệu mới và bất cứ thứ gì lần đầu để lại trong scratch, nên một kernel cộng dồn vào
   scratch thay vì ghi đè cũng sẽ lộ ra.
@@ -115,9 +115,9 @@ Mỗi backend có thể bắt được gì:
   định (ch11 facts C5). Vì vậy kernel đơn của lab 11.5 không có phiên bản Metal. llama.cpp phát
   hành cùng scan-scan-add ba lần dispatch trên Metal, và backend MPS của PyTorch dùng ba lượt
   rút gọn, scan và mang sang (ch11 facts D1, D4).
-- **Metal**: một bộ đệm có thể được gắn tại một độ lệch byte (`setBuffer:offset:atIndex:`), và
-  đó là cách một bộ đệm scratch chứa mọi mức. Với một mảng `float`, độ lệch phải là bội số của
-  4 (ch06 facts C3). Không có bộ đệm null để nói "không có tổng". Vì vậy ở chỗ CUDA có thể
+- **Metal**: một buffer có thể được gắn tại một độ lệch byte (`setBuffer:offset:atIndex:`), và
+  đó là cách một buffer scratch chứa mọi mức. Với một mảng `float`, độ lệch phải là bội số của
+  4 (ch06 facts C3). Không có buffer null để nói "không có tổng". Vì vậy ở chỗ CUDA có thể
   truyền `nullptr`, Metal dùng một kernel riêng.
 - **Thư viện**: `DeviceScan` của CUB làm một lượt với decoupled look-back, và scan của rocPRIM
   cũng vậy; MPSGraph có `cumulativeSum` (ch11 facts A8, B2, C6).
@@ -129,24 +129,24 @@ Hãy ghi những điều này ra trước. Bài học hỏi điều đầu tiên
 1. reduce-scan-scan sẽ chạy nhanh hơn scan-scan-add bao nhiêu lần ở n = 2^26 trên thiết bị của
    bạn? Phép đếm byte cho 16/12, khoảng 1.33 (`ch11/11.9/p-rss`, được hỏi ở mục 11.9).
 2. Mỗi thiết kế sẽ đạt bao nhiêu phần tốc độ của kernel chép? Nếu cả hai di chuyển số byte của
-   mình nhanh như phép chép di chuyển 8 byte của nó, scan-scan-add sẽ mất gấp đôi thời gian của
-   phép chép và reduce-scan-scan gấp rưỡi.
+   mình nhanh như phép sao chép di chuyển 8 byte của nó, scan-scan-add sẽ mất gấp đôi thời gian của
+   phép sao chép và reduce-scan-scan gấp rưỡi.
 
 ## Đọc kết quả
 
 Benchmark scan n = 2^26 số float. Nó dùng ít hơn nếu thiết bị của bạn báo ít hơn bốn lần 512 MB
 đầu vào và đầu ra. Nó chạy với khối 256 và 1024 (S = 1024 và 4096). Với mỗi kích thước khối, nó
-đo phép chép, rồi scan-scan-add, rồi reduce-scan-scan, và kiểm tra từng kết quả trước khi báo.
+đo phép sao chép, rồi scan-scan-add, rồi reduce-scan-scan, và kiểm tra từng kết quả trước khi báo.
 
 - `time ms` là lần tốt nhất trong năm lần chạy sau một lần khởi động không đo. Nó bao gồm mọi
-  kernel của mọi mức. Một phần tư giây các phép chép không đo chạy trước, để kernel được đo đầu
+  kernel của mọi mức. Một phần tư giây các phép sao chép không đo chạy trước, để kernel được đo đầu
   tiên không phải trả thêm chi phí đánh thức thiết bị.
 - `Gelem/s` là n chia cho thời gian.
 - `book B/elem` là phép đếm byte bộ nhớ toàn cục mỗi phần tử của sách (pp. 272-275): 8 cho phép
   chép, 16 + 8/S và 12 + 12/S cho các thiết kế. `GB/s book` là con số đó nhân n, chia cho thời
   gian. Đó là một mô hình lưu lượng, không phải phép đo lưu lượng, nên theo cách đếm này một
-  thiết kế có thể cho thấy nhiều GB/s hơn phép chép.
-- `of copy` là thời gian của phép chép tính theo tỉ lệ so với thời gian của thiết kế.
+  thiết kế có thể cho thấy nhiều GB/s hơn phép sao chép.
+- `of copy` là thời gian của phép sao chép tính theo tỉ lệ so với thời gian của thiết kế.
 - Dòng cuối cho mỗi kích thước khối cho tỉ lệ đo được của hai thiết kế bên cạnh tỉ lệ phép đếm
   byte của sách.
 

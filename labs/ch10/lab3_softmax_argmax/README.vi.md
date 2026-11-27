@@ -90,7 +90,7 @@ Tổng cộng khoảng 4e-5 với `exp` nhanh của Metal (6.1e-6 + 1.4e-6 + 3.2
 `expf` của CUDA; `1e-4` vẫn lớn hơn gấp đôi con số lớn hơn. Một bước trừ max bị thiếu, một scale
 sai hay một mẫu số sai sẽ lệch đến nhiều bậc độ lớn. Số hạng tuyệt đối thấp hơn rất nhiều so với xác
 suất nhỏ nhất mà các hàng kiểm thử tạo ra (khoảng 1e-14), nên trên thực tế phép kiểm tra là tương
-đối; nó có mặt để một kết quả dưới chuẩn (subnormal), mà GPU có thể đưa về 0, không tự làm một hàng
+đối; nó có mặt để một kết quả subnormal, mà GPU có thể đưa về 0, không tự làm một hàng
 thất bại.
 
 Hãy viết `expf`, không phải `__expf`: cận ở trên dùng con số của `expf`, và sai số của `__expf` tăng
@@ -114,7 +114,7 @@ lịch.
 Chương trình điều khiển cũng chạy một bộ giải mã greedy đơn giản trên argmax của bạn. "Mô hình" là
 một bảng tra logits tất định, `V x V`: sau token t, logits là hàng t, và mọi hàng có giá trị lớn nhất
 ở hai cột, một thế hòa chính xác. Với một batch gồm 4 chuỗi, mỗi bước chép các hàng của các token
-hiện tại vào một bộ đệm logits `[4 x V]`, gọi `launchArgmaxRows`, và đưa các chỉ số trở lại làm các
+hiện tại vào một buffer logits `[4 x V]`, gọi `launchArgmaxRows`, và đưa các chỉ số trở lại làm các
 token tiếp theo. Sau 16 bước, các chuỗi phải khớp với của CPU.
 
 Đó là greedy decoding từ đầu đến cuối cho một bảng, không phải cho một mô hình ngôn ngữ. Mốc M10

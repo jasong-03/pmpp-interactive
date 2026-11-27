@@ -46,9 +46,9 @@ như `fread` làm trong Fig. C.1; `consume` đọc kết quả, như `use_data` 
 
 **Metal**, trong `work/launch.mm`:
 
-- `feedPrivateCopy`: mô hình tường minh. `produce` ghi vào một bộ đệm trung chuyển dùng chung;
-  một blit, trong một command buffer riêng, chép nó vào một bộ đệm private; các lượt chạy trên
-  bộ đệm private; một blit thứ hai chép kết quả vào một bộ đệm dùng chung; `consume`.
+- `feedPrivateCopy`: mô hình tường minh. `produce` ghi vào một buffer trung chuyển dùng chung;
+  một blit, trong một command buffer riêng, chép nó vào một buffer private; các lượt chạy trên
+  buffer private; một blit thứ hai chép kết quả vào một buffer dùng chung; `consume`.
 - `feedNoCopy`: bộ nhớ host căn theo trang, độ dài làm tròn lên thành số trang nguyên, được bọc
   bằng `newBufferWithBytesNoCopy` (ch02-facts C2). llama.cpp đưa trọng số mô hình được ánh xạ bộ
   nhớ của nó cho Metal theo cách này (appC-facts D4).
@@ -95,7 +95,7 @@ như `fread` làm trong Fig. C.1; `consume` đọc kết quả, như `use_data` 
 - **Hai nghĩa của "unified memory".** Nghĩa của sách (CUDA 6) là một vùng các trang mà runtime
   di chuyển giữa hai bộ nhớ vật lý. Nghĩa của Apple là một bộ nhớ vật lý duy nhất mà không gì phải
   di chuyển (appC-facts, ghi chú thuật ngữ). Metal không có chế độ managed trên Apple silicon
-  (ch05-facts C6), nên đường đi thứ ba của nó là một bộ đệm dùng chung.
+  (ch05-facts C6), nên đường đi thứ ba của nó là một buffer dùng chung.
 
 ## Kiểm thử làm gì
 
@@ -110,7 +110,7 @@ Một lượt và ba lượt. Với mỗi đường đi và mỗi trường hợ
 2. `produce` và `consume` mỗi hàm được gọi đúng một lần, với con trỏ khác null.
 3. Cấu trúc. Với `feedMapped`, `feedManaged`, `feedNoCopy` và `feedShared`, bảng mà hàm khởi chạy
    được cung cấp ghi lại chính là vùng nhớ mà `produce` đã ghi: một con trỏ phục vụ cả hai phía.
-   Với `feedExplicit` và `feedPrivateCopy` thì không, nên đã có một lần chép, và trên Metal bộ đệm
+   Với `feedExplicit` và `feedPrivateCopy` thì không, nên đã có một lần sao chép, và trên Metal buffer
    mà kernel đọc có private storage.
 4. `feedNoCopy`: con trỏ mà `produce` ghi qua là bội của kích thước trang (`getpagesize()`).
 
@@ -181,19 +181,19 @@ chọn và lý do.
   `cudaMemcpy` từ device sang device với kích thước bằng bảng, đo bằng event, lấy lần tốt nhất trong
   vài lần. Băng thông device tính số byte đọc cộng số byte ghi. Tỉ lệ giữa chúng là câu trả lời của
   máy bạn cho câu "less than 10%" của sách. `feedExplicit` chép từ bộ nhớ `malloc`, không phải bộ
-  nhớ ghim, nên lần chép của nó có thể chạy dưới con số của phép thăm dò (ch02-facts A16).
-- Metal in ra liệu địa chỉ CPU của một bộ đệm (`contents`) có bằng địa chỉ GPU của nó
-  (`gpuAddress`, macOS 13 trở lên) không, cho một bộ đệm shared và một bộ đệm no-copy. Apple không
+  nhớ ghim, nên lần sao chép của nó có thể chạy dưới con số của phép thăm dò (ch02-facts A16).
+- Metal in ra liệu địa chỉ CPU của một buffer (`contents`) có bằng địa chỉ GPU của nó
+  (`gpuAddress`, macOS 13 trở lên) không, cho một buffer shared và một buffer no-copy. Apple không
   ghi câu trả lời nào: đây là một quan sát trên máy của bạn (appC-facts C3).
 - Rồi mỗi workload và đường đi một hàng. `seconds` là toàn bộ lời gọi feed, lần tốt nhất trong vài
-  lần gọi sau một lần khởi động không đo: cấp phát, `produce`, các lần chép, các lượt chạy, đồng bộ
+  lần gọi sau một lần khởi động không đo: cấp phát, `produce`, các lần sao chép, các lượt chạy, đồng bộ
   hóa, `consume` và giải phóng. Trên Metal, `GPU copy` và `GPU kernels` cộng dồn
   `GPUEndTime - GPUStartTime` của các command buffer mà lời gọi đó đã truyền cho `waitFor` dưới dạng
   công việc chép và kernel (ch05-facts C9).
 - Việc cấp phát cố ý nằm trong thời gian đo: hàm của Fig. C.1 cũng cấp phát. Một bộ cấp phát host
   có thể trả lại bộ nhớ nó đang giữ từ lần gọi trước, trong khi `newBufferWithLength` xóa sạch những
   gì nó trao ra (ch02-facts C2), nên một phần chênh lệch giữa hai đường đi có thể đến từ cấp phát
-  chứ không phải từ các lần chép. Hãy nhìn các cột GPU trước khi kết luận.
+  chứ không phải từ các lần sao chép. Hãy nhìn các cột GPU trước khi kết luận.
 - Các dòng cuối chia các thời gian mà dự đoán của bạn đã hỏi.
 
 Kết quả của lần gọi khởi động và của lần gọi cuối được kiểm tra; một kết quả sai được báo mà không
@@ -211,16 +211,16 @@ của các đường đi.
   driver hỗ trợ HMM; nếu không, nó hoạt động như bộ nhớ host ghim (B5). `cudaMallocManaged` và
   `cudaMemAttachGlobal` đến được HIP qua hai define tạm trong `feeding.h` cho đến khi header dùng
   chung ánh xạ chúng. Chưa chạy trên phần cứng AMD ở đây.
-- **Metal**: một bộ nhớ. Một bộ đệm shared không cần chép (ch05-facts C6); một bộ đệm private không
-  có địa chỉ CPU (ch02-facts C2); một bộ đệm no-copy bọc bộ nhớ căn theo trang của chính bạn (C2).
+- **Metal**: một bộ nhớ. Một buffer shared không cần chép (ch05-facts C6); một buffer private không
+  có địa chỉ CPU (ch02-facts C2); một buffer no-copy bọc bộ nhớ căn theo trang của chính bạn (C2).
   Không có chế độ managed nào và không có việc di chuyển trang khi GPU gặp lỗi trang được ghi trong
   tài liệu cho Apple silicon (appC-facts C5).
 
 ## Đi xa hơn
 
 - `feedExplicit` trung chuyển qua bộ nhớ `malloc`. Hãy trung chuyển qua `cudaMallocHost` thay vào
-  đó và so sánh lần chép của nó với con số của phép thăm dò. Một bộ đệm trung chuyển có còn đáng
-  giữ khi nó đã được ghim, hay `produce` nên ghi thẳng vào bộ đệm ghim và lần chép đi thẳng từ đó?
+  đó và so sánh lần sao chép của nó với con số của phép thăm dò. Một buffer trung chuyển có còn đáng
+  giữ khi nó đã được ghim, hay `produce` nên ghi thẳng vào buffer ghim và lần sao chép đi thẳng từ đó?
 - Prefetch bảng sang device trong `feedManaged` trước lượt đầu tiên. Lời gọi này đã thay đổi trong
   CUDA 13 để nhận một `cudaMemLocation` (appC-facts A14), còn header mặc định của HIP vẫn nhận một
   device kiểu `int` (B6), nên dòng đó cần một `#if`. Không trình giả lập nào có lời gọi này: phần

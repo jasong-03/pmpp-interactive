@@ -60,7 +60,7 @@ làm; MLX thì viết hai overload (ch13-facts C3). Đặc tả MSL cũng không
 trong `if`.
 
 `encodeMergeTiled` đặt hai dispatch trong một encoder. Runtime mở loại encoder tuần tự mặc định, và
-các bộ đệm do device tạo được theo dõi hazard, nên phép trộn bắt đầu sau khi phân hoạch đã ghi
+các buffer do device tạo được theo dõi hazard, nên phép trộn bắt đầu sau khi phân hoạch đã ghi
 `bounds` (`notes/today/ch02-facts.md` C9). `setThreadgroupMemoryLength` cần một bội của 16 byte
 (ch05-facts C8): `tile * 8` luôn là bội đó.
 
@@ -140,7 +140,7 @@ Mỗi backend bắt được gì:
   chắn làm việc này), nên mỗi khối nạp đúng những phần tử nó sẽ dùng: phương án thay thế ở p. 316 và
   ý tưởng của Exercise 3. Mỗi khối một ô, nên không có vòng while và không có việc ghi chép
   `A_consumed`.
-- **Không có bộ đệm vòng** (mục 13.7). Nạp chính xác không để lại gì thừa để giữ.
+- **Không có buffer vòng** (mục 13.7). Nạp chính xác không để lại gì thừa để giữ.
 - Trong Metal: template theo kiểu con trỏ và các điều kiện bảo vệ biên tường minh (ở trên).
 
 ## Vượt ra ngoài sách

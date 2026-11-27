@@ -106,7 +106,7 @@ Mỗi backend bắt được gì:
   `[[simdgroup_index_in_threadgroup]]` và `[[thread_index_in_simdgroup]]`, không từ `t / width`
   (ch04 facts C2). Độ rộng cũng không được công bố: hãy đọc `[[threads_per_simdgroup]]`. Atomic
   float cần `device atomic_float*` và `atomic_fetch_add_explicit` với `memory_order_relaxed`: Metal
-  3, Apple7 trở lên (infra facts C1). Metal không có `cudaMemset` bên trong một compute pass. Bộ đệm
+  3, Apple7 trở lên (infra facts C1). Metal không có `cudaMemset` bên trong một compute pass. Buffer
   nằm trong shared storage và command buffer của nó chưa được commit, nên `launch.mm` ghi số 0 qua
   `out.contents` (ch05 facts C6).
 - Các kernel Metal được cung cấp truyền các tổng riêng phần qua bộ nhớ device, nên rào chắn của

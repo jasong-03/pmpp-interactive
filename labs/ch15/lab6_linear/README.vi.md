@@ -55,13 +55,13 @@ này:
   phải chính là các vùng cấp phát: căn chỉnh 16 byte trên CUDA, nơi `cudaMalloc` căn chỉnh ít
   nhất 256 byte (ch06-facts A3); trên HIP, tài liệu tham khảo bộ nhớ của AMD không nêu căn
   chỉnh nào cho `hipMalloc` (ch15-facts B8), nên các đường float4 ở đó là unverified. Trên
-  Metal, chúng đi qua các bộ đệm được khai báo `device float4*`, cách được Metal ghi nhận,
+  Metal, chúng đi qua các buffer được khai báo `device float4*`, cách được Metal ghi nhận,
   không phải một phép ép kiểu con trỏ (ch06-facts C3).
 - **Lớp 4096 -> 4096** trong benchmark là lựa chọn của khóa học này, một kích thước ẩn cỡ 7B.
 
 Những chỗ mã khác trang sách, như trong lab 15.5: một khối một chiều 256 luồng (notes,
 "Unclear" 7); mọi chỉ số vào ô A có đệm dùng `bK + 1`, kể cả độ lệch hàng (notes, "Unclear"
-4); Fig. 15.14 được cụ thể hóa, với bộ đệm được chọn theo tính chẵn lẻ (notes, "Unclear" 8).
+4); Fig. 15.14 được cụ thể hóa, với buffer được chọn theo tính chẵn lẻ (notes, "Unclear" 8).
 
 ## Tệp
 

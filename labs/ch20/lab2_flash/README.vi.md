@@ -31,7 +31,7 @@ launchFlashAttention(Q, K, V, O, L, batch, heads, n, scale)
 - Với `s = scale * Q K^T`, `m` là `s` nhìn thấy được lớn nhất của hàng và `D` là tổng của
   `exp(s - m)` trên các cột nhìn thấy được: `O = (sum of exp(s - m) V) / D` và
   `L = m + log(D)`, cùng `L` mà lab 20.1 ghi cho cùng các điểm số.
-- Không có vùng đệm `n x n` nào cả. Chương trình điều khiển (driver) chỉ cấp phát Q, K, V, O và
+- Không có buffer `n x n` nào cả. Chương trình điều khiển (driver) chỉ cấp phát Q, K, V, O và
   L, và kiểm tra điều đó.
 
 ## Thiết kế (của sách)
@@ -155,7 +155,7 @@ gọn (kết quả có ở mọi lane), `simdgroup_barrier(mem_flags::mem_thread
   - V có mức khác nhau ở mọi cột, để một sự nhầm lẫn cột trong O lộ ra.
 - **Kiểm tra**: mọi hàng của O và L của mọi head so với một tham chiếu double trên CPU, với các
   dung sai dưới đây; O và L khởi đầu là NaN, nên một phần tử không ai ghi sẽ bị bắt; 64 giá trị
-  canh sau O và sau L phải không bị chạm tới; và không có vùng đệm thiết bị nào gồm `n x n` số
+  canh sau O và sau L phải không bị chạm tới; và không có buffer thiết bị nào gồm `n x n` số
   float.
 
 ## Dung sai, và lý do

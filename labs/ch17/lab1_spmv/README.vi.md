@@ -105,7 +105,7 @@ bộ nhớ toàn cục đẩy (flush) các số subnormal về không (ch10-fact
   (không có gì đã chạy).
 - `y` có 128 phần tử sau hàng cuối của nó, được đặt một giá trị canh phải còn nguyên. Mọi mảng mà
   kernel của bạn đọc cũng có vài phần tử sau phần cuối, nên một luồng vượt quá hàng cuối vẫn nằm
-  trong các bộ đệm, và những gì các phần tử đó chứa khiến nó làm thay đổi vùng bảo vệ của `y`.
+  trong các buffer, và những gì các phần tử đó chứa khiến nó làm thay đổi vùng bảo vệ của `y`.
 - Trên CUDA, HIP, `emu` và `race`, `x` được đưa cho kernel của bạn dưới dạng buffer + 1, và phần
   tử trước `x[0]` là NaN: đọc `x` ở cột -1 của một ô đệm biến hàng thành NaN, và thông báo nói điều
   đó.
@@ -122,8 +122,8 @@ Mỗi backend bắt được gì:
   bạn không cần atomic (mỗi hàng do một luồng sở hữu); kernel COO của bản lai thì cần, và một `+=`
   thường ở đó sẽ bị báo kèm dòng mã nguồn của nó.
 - **Metal** không có vùng canh NaN trước `x`: fast math mặc định của nó làm việc lan truyền NaN
-  không đáng tin cậy, và các hàm encode nhận nguyên bộ đệm, nên không có cách nào có kiểm tra để
-  đưa cho kernel `x + 1`. Một kernel đọc `x[-1]` sẽ đọc bất cứ thứ gì nằm trước bộ đệm, điều có thể
+  không đáng tin cậy, và các hàm encode nhận nguyên buffer, nên không có cách nào có kiểm tra để
+  đưa cho kernel `x + 1`. Một kernel đọc `x[-1]` sẽ đọc bất cứ thứ gì nằm trước buffer, điều có thể
   hoặc không lộ ra thành lỗi: đừng trông cậy vào nó, hãy chạy `emu`. Với `dispatchThreads`, không
   có luồng nào vượt quá hàng cuối, nên kiểm tra hàng chỉ được thử đến nếu bạn dispatch nguyên các
   threadgroup. Trong các kiểm thử `numRows = 0`, chương trình điều khiển đặt một bộ đếm vào chỗ
@@ -143,7 +143,7 @@ Mỗi backend bắt được gì:
 - **Metal**: `[[thread_position_in_grid]]` là hàng, và `dispatchThreads` tạo đúng `numRows` luồng
   (ch05-facts C4, C5). Kernel COO khai báo `y` là `device atomic_float*` và cộng bằng
   `atomic_fetch_add_explicit(..., memory_order_relaxed)`: Metal 3 và Apple7, bộ nhớ device
-  (ch17-facts C1). Kernel ELL của bạn bind cùng bộ đệm đó dưới dạng `device float*`. Các dispatch
+  (ch17-facts C1). Kernel ELL của bạn bind cùng buffer đó dưới dạng `device float*`. Các dispatch
   COO và ELL dùng chung một compute pass, chạy chúng theo thứ tự (ch02-facts C9). Apple không ghi
   trong tài liệu đơn vị coalescing, quy tắc căn lề hay mô hình phân kỳ nào (ch17-facts C3): trên
   Metal, benchmark là một phép đo không có gì để đối chiếu.
@@ -205,6 +205,6 @@ dạng.
 - Exercise 5 (p. 422): viết kernel JDS. Ma trận `spread_sorted` đã ở sẵn thứ tự hàng JDS; phần còn
   lại là bố cục theo thứ tự cột không đệm và mảng `iterPtr`.
 - Exercise 4 (p. 422) yêu cầu phần COO của bản lai chạy trên host. Hãy đo nó so với kernel được
-  cung cấp ở K = 16 trên `skewed`, tính cả các lần chép.
+  cung cấp ở K = 16 trên `skewed`, tính cả các lần sao chép.
 - Thay vòng lặp ELL của bạn bằng vòng lặp đúng còn lại (toàn độ rộng có kiểm tra cột, hoặc
   `nnzPerRow`) và đo cả hai trên `spread` và `skewed`. Vòng lặp nào đọc các ô đệm?

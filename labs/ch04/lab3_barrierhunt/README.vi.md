@@ -31,7 +31,7 @@ mảng là bội của nó và với độ dài không phải bội.
    trường hợp đạt và không đạt: những kích thước khối nào, và độ dài có phải là bội hay không.
 3. Biết mỗi loại thất bại trông thế nào trên trình giả lập:
    - **Giá trị sai.** Thông báo nêu phần tử sai đầu tiên, khối của nó và luồng của nó.
-   - **Một lần ghi ra ngoài mảng.** Bộ đệm của trình giả lập đúng bằng mảng, nên
+   - **Một lần ghi ra ngoài mảng.** Buffer của trình giả lập đúng bằng mảng, nên
      AddressSanitizer dừng lần chạy ở lần ghi đầu tiên như vậy. Hãy đọc ba thứ gần đầu báo cáo
      của nó: `WRITE`, khung đầu tiên (`kernel.cu:` và một số dòng), và câu cho biết địa chỉ nằm
      trước hoặc sau vùng nhớ bao nhiêu byte. Các bài kiểm thử sau điểm dừng không được chạy.

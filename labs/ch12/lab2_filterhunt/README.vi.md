@@ -69,7 +69,7 @@ bảng này khi làm:
    - **Một lỗ hổng hoặc tràn**: `slot 0 of [0, 1) was never written (it still holds the
      sentinel)`, hoặc `slot 19, at or past the count 19, was written`. Số đếm đã đúng, nên các
      khóa đã đi vào sai chỗ.
-   - **Một lần ghi ra ngoài mảng đầu ra.** Trên trình giả lập, mỗi bộ đệm device là đúng một
+   - **Một lần ghi ra ngoài mảng đầu ra.** Trên trình giả lập, mỗi buffer device là đúng một
      khối heap, nên AddressSanitizer dừng lượt chạy ở lần ghi đầu tiên như vậy. Hãy đọc
      `WRITE`, khung đầu tiên (`kernel.cu:` và một số dòng), và địa chỉ nằm sau vùng nhớ bao
      nhiêu byte. Các bài kiểm thử sau điểm dừng không được chạy: sửa lỗi đó, rồi chạy lại.

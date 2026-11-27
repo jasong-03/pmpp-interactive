@@ -25,8 +25,8 @@ không được biên dịch hay chạy.
   `app/src/sim/unroll.test.ts` kiểm tra từng bản có trong tệp này đúng từng chữ. Việc `x` cuối cùng
   nằm ở đâu là quy tắc của sách và danh sách của NVIDIA (ch06-facts A13); không gì ở đây được biên
   dịch bằng nvcc để kiểm chứng.
-- `s67_exchange.cu`: vòng lặp trao đổi của sách (pp. 146 to 147), một bộ đệm chia sẻ với hai rào
-  chắn và hai bộ đệm với một rào chắn, được làm cho biên dịch được (phép tính, các khai báo và
+- `s67_exchange.cu`: vòng lặp trao đổi của sách (pp. 146 to 147), một buffer chia sẻ với hai rào
+  chắn và hai buffer với một rào chắn, được làm cho biên dịch được (phép tính, các khai báo và
   `swapPointers` là của chúng tôi). Mục 6.7 hiển thị nó; `snippets-s67.test.ts` gắn bản sao trong
   `S67.tsx` với nó và kiểm tra rằng các vòng lặp của trình chạy từng bước
   (`app/src/sim/doublebuf.ts`, `loopSource`) là các vòng lặp của tệp này, đúng từng dòng.

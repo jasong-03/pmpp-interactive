@@ -23,7 +23,7 @@ tính hóa `X[n, c, h + p, w + q]` của trang sách.
 **(2) Trải + GEMM.** `unrollKernel` và `launchUnroll(X, n, Bt, C, H, W, K)` ghi đầu vào đã trải của
 mẫu n ở dạng chuyển vị, thành Bt = B^T: P hàng, mỗi hàng ứng với một điểm ảnh đầu ra, mỗi hàng chứa
 C*K*K giá trị của mảng vùng của điểm ảnh đó theo thứ tự (c, p, q) của sách. Rồi
-`launchConvGemm(X, F, Y, Bt, N, C, H, W, M, K)`: với mỗi mẫu, trải vào bộ đệm tạm `Bt` và gọi một
+`launchConvGemm(X, F, Y, Bt, N, C, H, W, M, K)`: với mỗi mẫu, trải vào buffer tạm `Bt` và gọi một
 lần GEMM M2 của dự án, của lab 6.4
 
 ```
@@ -36,8 +36,8 @@ lời gọi đó là điểm chính của lab: chữ ký GEMM của dự án có
 **Metal.** `conv_direct` và `unroll_input` nằm trong `kernel.metal`; `encodeConvDirect`,
 `encodeUnroll` và `encodeConvGemm` trong `launch.mm`. `encodeConvGemm` lặp qua các mẫu trong một
 compute encoder và gọi `encodeLinearAt` được cung cấp, hàm này bind kernel `linear` của lab 6.4 với
-một độ lệch byte vào mỗi bộ đệm. Một compute encoder thông thường chạy các dispatch của nó theo thứ
-tự và các bộ đệm được theo dõi hazard, nên một bộ đệm tạm phục vụ được mọi mẫu
+một độ lệch byte vào mỗi buffer. Một compute encoder thông thường chạy các dispatch của nó theo thứ
+tự và các buffer được theo dõi hazard, nên một buffer tạm phục vụ được mọi mẫu
 (`notes/today/ch02-facts.md` C9).
 
 Fig. 19.11 đã sửa được cung cấp và đo bên cạnh hai đường đi của bạn; bạn không viết nó.
@@ -63,8 +63,7 @@ Fig. 19.11 đã sửa được cung cấp và đo bên cạnh hai đường đi 
   `unrollKernel`, `launchUnroll`, `launchConvGemm`.
 - `work/kernel.metal`: `conv_direct`, `unroll_input`.
 - `work/launch.mm`: `encodeConvDirect`, `encodeUnroll`, `encodeConvGemm`. Hàm cuối cùng của nó,
-  `convGemmScratchProblem`, được cung cấp: trước khi chương trình điều khiển (driver) cấp phát bộ
-  đệm tạm, nó kiểm tra B^T của một mẫu với `maxBufferLength` của thiết bị (Metal giới hạn một bộ đệm
+  `convGemmScratchProblem`, được cung cấp: trước khi chương trình điều khiển (driver) cấp phát buffer tạm, nó kiểm tra B^T của một mẫu với `maxBufferLength` của thiết bị (Metal giới hạn một buffer
   ở đó, ít nhất 256 MB theo tài liệu của Apple, `notes/today/ch19-facts.md` C2) và thất bại kèm một
   thông báo thay vì cấp phát.
 - Được cung cấp, không sửa, trong `provided/`:
@@ -137,7 +136,7 @@ Benchmark chỉ chạy trên thiết bị thật (`emu` nói nó bị bỏ qua).
 Các tỉ lệ phình được tính từ Eq. 19.4, K^2 H_out W_out / (H W), không phải đo. Với mỗi lớp, ba
 đường đi lần lượt chạy và lần tốt nhất trong vài vòng được tính: kernel trực tiếp của bạn; trải +
 GEMM của bạn, được đo như cả lớp, rồi riêng N lần trải của nó, rồi riêng N lần GEMM của nó trên một
-bộ đệm tạm đã điền sẵn; và implicit GEMM được cung cấp.
+buffer tạm đã điền sẵn; và implicit GEMM được cung cấp.
 
 Hãy viết ra ba con số trước:
 
@@ -174,7 +173,7 @@ Những điều cần cân nhắc:
 
 Benchmark in ra, cho mỗi lớp, ba đường đi theo ms và GFLOP/s (2 N M C K^2 P / time), riêng các lần
 trải và các lần GEMM kèm phần của phép trải trong lớp, và tỉ lệ của trải + GEMM so với trực tiếp.
-Nó cũng in ra GEMM nào đã chạy và, trên Metal, kích thước bộ đệm tạm bên cạnh `maxBufferLength`. Các
+Nó cũng in ra GEMM nào đã chạy và, trên Metal, kích thước buffer tạm bên cạnh `maxBufferLength`. Các
 con số của nó là phép đo trên máy của bạn, không phải giá trị kỳ vọng. Trang của lab so sánh ba dự
 đoán của bạn với chúng.
 

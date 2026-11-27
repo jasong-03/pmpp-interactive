@@ -47,7 +47,7 @@ lập (emulator), và thất bại nếu bất cứ điều gì bài học khẳ
 
 | Snippet | Điều được kiểm tra | Được khẳng định ở |
 |---|---|---|
-| `launch_checked.cu` | `(32, 32, 2)` bị từ chối, vùng đệm không bị động đến, trạng thái lỗi được đặt lại; `(1, 1, 128)`, một lưới 65,536 khối theo trục y và một chiều bằng không bị từ chối; trình giả lập từ chối 1 MiB bộ nhớ chia sẻ động | mục 3.1 |
+| `launch_checked.cu` | `(32, 32, 2)` bị từ chối, buffer không bị động đến, trạng thái lỗi được đặt lại; `(1, 1, 128)`, một lưới 65,536 khối theo trục y và một chiều bằng không bị từ chối; trình giả lập từ chối 1 MiB bộ nhớ chia sẻ động | mục 3.1 |
 | `scale_rows_defect.cu` | cột 0 kết thúc ở 1.0; 4, 64 và 37 trên 200 phần tử bằng 1.0 khi chạy theo thứ tự, đảo ngược, xáo trộn | trang tổng kết |
 | `blur_kernel.cu` | khớp với một bản tham chiếu CPU trên sáu kích thước ảnh | mục 3.3 |
 | `blur_unsigned.cu` | cùng đầu ra với `blur_kernel.cu`; `-Wall -Wextra` cảnh báo về phép so sánh có dấu/không dấu (và không cảnh báo với `blur_kernel.cu`) | mục 3.3 |

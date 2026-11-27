@@ -1,6 +1,6 @@
 > Bản tiếng Việt của [README.md](README.md). Bản tiếng Anh là bản gốc; nếu hai bản khác nhau, hãy theo bản tiếng Anh.
 
-# Lab X1.4: săn lỗi bộ lọc, ba lỗi trong một kernel top-p và min-p hợp nhất
+# Lab X1.4: săn lỗi bộ lọc, ba lỗi trong một kernel top-p và min-p gộp
 
 Không có trong sách: module X1 là của khóa học này, các lỗi cũng vậy. Kernel là phần B của lab X1.2,
 nên các thành phần của nó là phép rút gọn (reduction) hai giai đoạn của sách (Figs. 10.13 và 10.16,

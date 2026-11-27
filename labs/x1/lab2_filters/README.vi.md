@@ -1,12 +1,12 @@
 > Bản tiếng Việt của [README.md](README.md). Bản tiếng Anh là bản gốc; nếu hai bản khác nhau, hãy theo bản tiếng Anh.
 
-# Lab X1.2: top-p và min-p, ghép từ các lab trước, rồi hợp nhất (mốc dự án M5)
+# Lab X1.2: top-p và min-p, ghép từ các lab trước, rồi gộp (mốc dự án M5)
 
 Không có trong sách: module X1 là của khóa học này (sách hoàn toàn không có lấy mẫu, PLAN.md). Các
 thành phần là của sách: phép rút gọn (reduction) hai giai đoạn của chương 10 (Figs. 10.13 và 10.16,
 pp. 240 và 243) và warp scan cùng block scan của chương 11 (Figs. 11.8 và 11.9, p. 264), mà các lab
 10.3, 11.6 và 14.3 đã dựng thành một softmax, một mặt nạ top-p và một phép sắp xếp hàng. Thứ tự của hai
-bộ lọc, quy tắc top-p và phép kiểm tra min-p là của llama.cpp; việc hợp nhất, lập luận tiền tố và cận
+bộ lọc, quy tắc top-p và phép kiểm tra min-p là của llama.cpp; việc gộp, lập luận tiền tố và cận
 sai số là của chúng tôi. Một mục đứng riêng như (D1) dưới đây nằm trong `notes/today/x1-facts.md`; các mục
 khác ghi rõ tệp của chúng. Những gì mã nguồn của llama.cpp làm đã được kiểm tra trong lượt rà soát dữ
 kiện ngày 2026-11-20.
@@ -37,7 +37,7 @@ void launchMinPCount(const float* sortedLogits, const int* keptTopP, int* n,
 hàm này đếm số token qua min-p của mỗi hàng đã sắp xếp và ghi `n` từ số đếm đó và `keptTopP` của lab
 11.6. Benchmark cũng gọi nó riêng, để đo thời gian chuỗi sau phép sắp xếp.
 
-**Phần B, hợp nhất.** Viết
+**Phần B, gộp.** Viết
 
 ```cpp
 void launchFilterSortedFused(const float* sortedLogits, float* sortedProbs, int* n,
@@ -225,10 +225,10 @@ thậm chí không hứa làm tròn về gần nhất (C5). Bên trong dải, đ
 
 Hai dự đoán (trang labs hỏi chúng dưới tên `x1/labs/p-lab2-fused` và `x1/labs/p-lab2-sort`):
 
-1. **Ở 64 hàng gồm 151,936, kernel hợp nhất sẽ nhanh hơn chuỗi ghép không tính phép sắp xếp bao nhiêu
+1. **Ở 64 hàng gồm 151,936, kernel gộp sẽ nhanh hơn chuỗi ghép không tính phép sắp xếp bao nhiêu
    lần?** Trước hết hãy đếm số byte mỗi thiết kế phải di chuyển cho mỗi token: softmax của chuỗi ghép
    đọc logits ba lần và ghi xác suất, lab 11.6 đọc chúng và ghi khối xác suất cùng byte giữ lại, min-p
-   đọc logits thêm lần nữa; kernel hợp nhất đọc logits hai lần và ghi xác suất một lần. Rồi hãy quyết
+   đọc logits thêm lần nữa; kernel gộp đọc logits hai lần và ghi xác suất một lần. Rồi hãy quyết
    định xem cả hai có chạy ở cùng băng thông không.
 2. **Phép sắp xếp sẽ chiếm bao nhiêu phần thời gian của chuỗi ghép, kể cả phép sắp xếp, ở K =
    151,936, và ở K = 40?** Trình khám phá của mục X1.5 là nơi để lập luận về điều này: lab 14.3 làm
@@ -237,11 +237,11 @@ Hai dự đoán (trang labs hỏi chúng dưới tên `x1/labs/p-lab2-fused` và
 Benchmark chạy rows 1 và 64 nhân K = 40, 1,024, 32,000 và 151,936 trên các hàng dạng softmax ở top-p
 mặc định 0.95 và min-p 0.05 của llama.cpp (D1). Nó đo riêng phép sắp xếp của lab 14.3, toàn bộ
 `launchFilterRows` của bạn (kể cả phép sắp xếp), chuỗi ghép sau phép sắp xếp (softmax, mặt nạ top-p,
-phép đếm min-p của bạn, trên cùng logits đã sắp xếp), và kernel hợp nhất của bạn trên các logits đã sắp
+phép đếm min-p của bạn, trên cùng logits đã sắp xếp), và kernel gộp của bạn trên các logits đã sắp
 xếp đó, không tính thời gian phép sắp xếp. Thời gian mỗi lần gọi là tốt nhất của 5 lần chạy đo, mỗi lần
 lặp lại lời gọi cho đến khi kéo dài ít nhất 2 ms. Nó in ra số mili giây mỗi lần gọi, GB/s theo số byte
-tối thiểu mỗi thiết kế bộ lọc phải di chuyển (29 byte mỗi token cho bản ghép, 12 cho bản hợp nhất), phần
-của phép sắp xếp trong chuỗi ghép, và mức tăng tốc của kernel hợp nhất so với chuỗi ghép sau phép sắp
+tối thiểu mỗi thiết kế bộ lọc phải di chuyển (29 byte mỗi token cho bản ghép, 12 cho bản gộp), phần
+của phép sắp xếp trong chuỗi ghép, và mức tăng tốc của kernel gộp so với chuỗi ghép sau phép sắp
 xếp. Mọi kết quả đo được đều được kiểm tra trước khi báo cáo. Các con số là phép đo trên máy của bạn,
 không phải mục tiêu.
 
@@ -266,6 +266,6 @@ buffer; hãy đọc các kích thước 64 hàng để biết băng thông.
 ## Tiếp theo là gì
 
 Đây là giai đoạn top-p và min-p của mốc M5. Lab X1.3 ghép cùng giai đoạn này từ các bản sao riêng của
-nó bên trong toàn bộ bộ lấy mẫu; muốn đi xa hơn, hãy thay kernel hợp nhất của lab này vào chỗ giai đoạn
-ghép ở đó và đo sự khác biệt trên cả một bước lấy mẫu. Lab X1.4 săn ba lỗi trong kernel hợp nhất mà bạn
+nó bên trong toàn bộ bộ lấy mẫu; muốn đi xa hơn, hãy thay kernel gộp của lab này vào chỗ giai đoạn
+ghép ở đó và đo sự khác biệt trên cả một bước lấy mẫu. Lab X1.4 săn ba lỗi trong kernel gộp mà bạn
 vừa viết.

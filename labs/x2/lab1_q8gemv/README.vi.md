@@ -89,7 +89,7 @@ void encodeGemvQ8_0(id<MTLComputeCommandEncoder> enc, id<MTLComputePipelineState
 
 - **Các phần của chính chương trình điều khiển được kiểm tra trước.**
   - `floatToHalfBits` được kiểm tra trên các giá trị suy ra bằng tay: hòa thì về chẵn, giá trị FP16 hữu hạn
-    lớn nhất, tràn thành vô cực, số dưới chuẩn (subnormal), và 1/127. Sau đó mọi mẫu trong 65536
+    lớn nhất, tràn thành vô cực, số subnormal, và 1/127. Sau đó mọi mẫu trong 65536
     mẫu FP16 đi qua `halfBitsToFloat` và quay lại.
   - `quantizeRowQ8_0Ref` được kiểm tra trên một khối suy ra bằng tay (`qfixture.h`). Độ lớn lớn nhất
     của nó là 127/32, nên d = 1/32 chính xác (FP16 `0x2800`), và các mã của nó bao gồm các trường hợp
@@ -106,7 +106,7 @@ void encodeGemvQ8_0(id<MTLComputeCommandEncoder> enc, id<MTLComputePipelineState
     mod quay vòng), nên một hệ số tỉ lệ lấy từ sai khối sẽ cho kết quả sai.
   - Mọi khối đều chứa cả +peak và -peak, nên các mã 127 và -127 xuất hiện trong mọi khối.
   - Với out >= 3, một hàng toàn số không (d = 0).
-  - Các hệ số tỉ lệ nhỏ nhất là số FP16 dưới chuẩn, mà `halfBitsToFloat` phải giải mã được.
+  - Các hệ số tỉ lệ nhỏ nhất là số subnormal FP16, mà `halfBitsToFloat` phải giải mã được.
 - **Kích thước chính xác.** X, Wq và Wd chứa đúng số byte của chúng, nên trên `emu`, một lần đọc vượt quá bất kỳ
   mảng nào sẽ là một báo cáo AddressSanitizer chỉ đúng dòng.
 - **Y được kiểm tra hai lần.** Y bắt đầu là NaN, nên một phần tử không ai ghi sẽ thất bại. Theo sau nó

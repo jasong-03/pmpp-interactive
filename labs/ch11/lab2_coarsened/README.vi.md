@@ -33,7 +33,7 @@ vị trí n hoặc sau đó nạp 0 và không được ghi. Kích thước kh�
   lần build kiểm thử và đo cả năm hệ số. Các hàm khởi chạy nhận hệ số làm đối số cuối cùng và
   chọn bản khởi tạo bằng một `switch`. Trên Metal, nó là một macro tiền xử lý, được đặt khi
   chương trình điều khiển (driver) build pipeline: mỗi hệ số một pipeline.
-- Bộ đệm đoạn là bộ nhớ chia sẻ động, `extern __shared__ float buffer_s[];`, có kích thước theo
+- Buffer đoạn là bộ nhớ chia sẻ động, `extern __shared__ float buffer_s[];`, có kích thước theo
   đối số thứ ba của `<<< >>>`. Trên trang sách, nó là một mảng tĩnh `COARSE_FACTOR*BLOCK_DIM`
   với `BLOCK_DIM` cố định lúc biên dịch. Nếu đặt kích thước theo khối lớn nhất, một mảng tĩnh
   sẽ giữ chỗ gấp bốn lần lượng mà một khối 256 luồng dùng, và benchmark sẽ đo cả điều đó. Với
@@ -140,7 +140,7 @@ thiết bị của bạn báo), với khối 256 và 1024. Với mỗi kích th�
 thread-major. Một cấu hình không vừa được in ra là bị bỏ qua, kèm lý do.
 
 - `time ms` là lần tốt nhất trong năm lần chạy sau một lần khởi động không đo. Một phần tư
-  giây các phép chép không đo chạy trước, để kernel được đo đầu tiên không phải trả thêm chi
+  giây các phép sao chép không đo chạy trước, để kernel được đo đầu tiên không phải trả thêm chi
   phí đánh thức thiết bị.
 - `GB/s` tính 8 byte mỗi phần tử (một lần đọc 4 byte, một lần ghi 4 byte) chia cho thời gian
   đó: số byte một scan phải di chuyển, không phải số byte hệ thống bộ nhớ đã di chuyển.
@@ -155,7 +155,7 @@ Bài tập 4 (p. 286), bắt đầu từ kernel phân ô thanh ghi của bạn:
 
 - **Nạp vector** cho các lượt từ toàn cục sang chia sẻ và từ chia sẻ sang toàn cục. Kỹ thuật
   của sách trên CUDA ép `float*` thành `float4*`. Không nhà cung cấp nào ghi phép ép đó trong
-  tài liệu (infra facts A6, B6). Trên Metal, thay vào đó hãy khai báo bộ đệm là
+  tài liệu (infra facts A6, B6). Trên Metal, thay vào đó hãy khai báo buffer là
   `device const float4*`, cách được ghi trong tài liệu để đọc bốn số float một lúc (infra facts
   C7). Khi đó mỗi luồng di chuyển bốn phần tử liền kề mỗi lượt, nên các lượt và chỉ số của
   chúng thay đổi. n không nhất thiết là bội số của 4: hãy xử lý phần đuôi.

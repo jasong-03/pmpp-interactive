@@ -87,7 +87,7 @@ phụ thuộc vào nó).
     chưa tới một phút): r = 1 qua; r = 2, c = 1 và c = 2 thất bại. Giờ mỗi lần chạy đều chỉ ra cặp
     của rào chắn bị thiếu: một lệnh ghi ô ở một phép tách (`vals_s[dst] = ...`, hoặc
     `keys_s[dst]`) đối đầu với một lệnh đọc nó ở đầu phép tách kế tiếp (`myVals[k] = vals_s[p]`);
-    một số lần chạy còn báo bộ đệm `scan_s` của phép scan được dùng lại qua các phép tách và một race
+    một số lần chạy còn báo buffer `scan_s` của phép scan được dùng lại qua các phép tách và một race
     ghi-ghi trên `start_s` ở bước 3. Lần chạy sau đó dừng với một SEGV của ThreadSanitizer tại
     `keys_s[dst] = ...` (một chỉ số bị hỏng; backend race không có kiểm tra biên). Khi lỗi này
     được cài lần đầu, biến thể race dùng chung một token ThreadSanitizer giữa mọi
@@ -114,7 +114,7 @@ phụ thuộc vào nó).
 - Các khóa phải bằng kết quả của `std::stable_sort` và các giá trị, vốn là vị trí đầu vào,
   phải bằng đúng hoán vị của nó: giữa các khóa bằng nhau, vị trí phải tăng dần.
 - Trước mỗi lần chạy, chương trình điều khiển (driver) ghi 0xCDCDCDCD vào toàn bộ bảng, `localStarts`, vùng nháp
-  của phép scan, các bộ đệm tạm và 64 ô canh gác sau cuối mỗi mảng cặp.
+  của phép scan, các buffer tạm và 64 ô canh gác sau cuối mỗi mảng cặp.
   Một số đếm bucket không được ghi cho lượt này, hoặc một lệnh ghi vào phần đệm, sẽ thất bại.
 - Một cấu hình mà thiết bị không chạy được (threadgroup hoặc bộ nhớ chia sẻ vượt giới hạn) được
   in ra là bị bỏ qua kèm lý do; nó không được tính là qua.

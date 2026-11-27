@@ -102,7 +102,7 @@ ghi hay số luồng thường trú cùng lúc (facts C1, C5).
   1 x 1000, 3 x 40, 37 x 53 và 64 x 257, và cấu hình nó đã dùng so với các quy tắc cho thiết bị
   thật. Y được điền sẵn, nên một đầu ra bạn không bao giờ ghi sẽ bị báo. Trên thiết bị thật, một
   giá trị được ghi quá cuối Y cũng bị báo; trên trình giả lập, AddressSanitizer dừng ở lần truy
-  cập đầu tiên ra ngoài một bộ đệm và nêu tên dòng đó.
+  cập đầu tiên ra ngoài một buffer và nêu tên dòng đó.
 - Metal: `MetalInfo` so với giá trị chính chương trình điều khiển đọc được, cho ba pipeline: hai
   kernel của `kernel.metal`, và `linear_layer` được biên dịch lại với giới hạn luồng đặt thấp hơn
   giới hạn của thiết bị (qua `MTLComputePipelineDescriptor.maxTotalThreadsPerThreadgroup`, facts C5).
