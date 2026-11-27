@@ -654,7 +654,7 @@ function AccessExplorer() {
         <span style={FIELD}>
           <Translated vi="Segment">Segment</Translated>
           <span className="seg" role="group" aria-label={tr('Segment model', 'Mô hình segment')} style={{ flexWrap: 'wrap' }}>
-            {MODELS.map((m) => <button key={m} aria-pressed={model === m} onClick={() => setModel(m)}>{SEGMENT_MODELS[m].label}</button>)}
+            {MODELS.map((m) => <button key={m} aria-pressed={model === m} onClick={() => setModel(m)}>{tr(SEGMENT_MODELS[m].label, ({ nvidia: 'NVIDIA: sector 32 byte trong dòng 128 byte', amd64: 'AMD: dòng cache 64 byte', amd128: 'AMD: dòng cache 128 byte', metal: 'Apple: không có tài liệu' } as Record<string, string>)[m] ?? SEGMENT_MODELS[m].label)}</button>)}
           </span>
         </span>
         {model === 'metal' ? (
@@ -699,7 +699,7 @@ function AccessExplorer() {
           <Translated
             vi={
               <>
-                {segs.length} {unit} {seg} byte
+                {segs.length} {({ sector: 'sector', line: 'dòng cache', segment: 'đoạn' } as Record<string, string>)[unit] ?? unit} {seg} byte
                 {segs.length > 1 && mapping === 'row' ? `, cách nhau ${fmtInt(QWEN3_VOCAB * 4)} byte (mỗi hàng một)` : segs.length > 1 ? ', nằm cạnh nhau' : ''}
               </>
             }
@@ -718,7 +718,7 @@ function AccessExplorer() {
           </tr>
           <tr><th><Translated vi="số byte được yêu cầu">bytes asked for</Translated></th><td className="num">{acc.bytesNeeded}</td></tr>
           <tr>
-            <th><Translated vi={<>số {unit} bị chạm tới</>}>{unit}s touched</Translated></th>
+            <th><Translated vi={<>số {({ sector: 'sector', line: 'dòng cache', segment: 'đoạn' } as Record<string, string>)[unit] ?? unit} bị chạm tới</>}>{unit}s touched</Translated></th>
             <td className="num">{acc.transactions} × {seg} B = {acc.bytesFetched} B</td>
           </tr>
           <tr><th><Translated vi="phần hữu ích trong số byte được nạp">useful share of the bytes fetched</Translated></th><td className="num">{Math.round(acc.efficiency * 100)}%</td></tr>

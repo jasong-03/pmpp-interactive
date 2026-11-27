@@ -157,7 +157,7 @@ export const questionsSX31: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="Phép hợp nhất (fusion) đã gửi RMS_NORM và MUL của nó tới ggml_cuda_op_rms_norm_fused; chạy lại với GGML_CUDA_DISABLE_FUSION được đặt.">
+          <Translated vi="Phép gộp (fusion) đã gửi RMS_NORM và MUL của nó tới ggml_cuda_op_rms_norm_fused; chạy lại với GGML_CUDA_DISABLE_FUSION được đặt.">
             Fusion sent RMS_NORM and its MUL to ggml_cuda_op_rms_norm_fused; rerun with GGML_CUDA_DISABLE_FUSION set.
           </Translated>
         ),
@@ -173,14 +173,14 @@ export const questionsSX31: Record<string, Question> = {
       },
       {
         label: <Translated vi="Bản build HIP đã được nạp thay cho bản CUDA. Kiểm tra thư viện dùng chung nào tiến trình thực sự đã mở.">The HIP build was loaded instead of the CUDA one. Check which shared library the process actually opened.</Translated>,
-        why: <Translated vi="Bản build HIP biên dịch cùng norm.cu và chạy cùng lượt hợp nhất, nên điều này cũng không giải thích được.">The HIP build compiles the same norm.cu and runs the same fusion pass, so this would not explain it either.</Translated>,
+        why: <Translated vi="Bản build HIP biên dịch cùng norm.cu và chạy cùng lượt gộp, nên điều này cũng không giải thích được.">The HIP build compiles the same norm.cu and runs the same fusion pass, so this would not explain it either.</Translated>,
       },
     ],
     explain: (
       <Translated
         vi={
           <p>
-            Trước switch trong <code>ggml_cuda_compute_forward</code>, một lượt hợp nhất (fusion) xem xét các chuỗi node.
+            Trước switch trong <code>ggml_cuda_compute_forward</code>, một lượt gộp (fusion) xem xét các chuỗi node.
             RMS_NORM theo sau bởi MUL trở thành một lời gọi tới <code>ggml_cuda_op_rms_norm_fused</code>, và RMS_NORM, MUL,
             ADD, được thử sớm hơn một bước, thành một lời gọi tới <code>ggml_cuda_op_rms_norm_fused_add</code>. Biến môi
             trường <code>GGML_CUDA_DISABLE_FUSION</code> tắt lượt này, và khi đó case thường sẽ chạy.
@@ -204,7 +204,7 @@ export const questionsSX31: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Host Metal của llama.cpp cần kernel RMSNorm được hợp nhất với phép nhân trọng số, cho các hàng float. Để tìm mã
+            Host Metal của llama.cpp cần kernel RMSNorm được gộp với phép nhân trọng số, cho các hàng float. Để tìm mã
             nguồn của nó, bạn tìm gì trong các file <code>.metal</code>?
           </>
         }
@@ -222,7 +222,7 @@ export const questionsSX31: Record<string, Question> = {
       },
       {
         label: <Translated vi="Tên C++ của template, kernel_rms_norm_fuse_impl, vì mọi bản khởi tạo mà pipeline có thể chạy đều mang tên đó.">The template’s C++ name, kernel_rms_norm_fuse_impl, since every instantiation the pipeline can run carries that name.</Translated>,
-        why: <Translated vi="Template đó phục vụ mọi mức hợp nhất và mọi kiểu. Tên của nó không cho bạn biết bản khởi tạo nào chạy.">That template serves every fusion level and type. Its name does not tell you which instantiation runs.</Translated>,
+        why: <Translated vi="Template đó phục vụ mọi mức gộp và mọi kiểu. Tên của nó không cho bạn biết bản khởi tạo nào chạy.">That template serves every fusion level and type. Its name does not tell you which instantiation runs.</Translated>,
       },
       {
         label: <Translated vi="Tên hàm host, ggml_metal_op_norm, được định nghĩa trong file .metal.">The host function’s name, ggml_metal_op_norm, which the .metal file defines.</Translated>,
@@ -239,7 +239,7 @@ export const questionsSX31: Record<string, Question> = {
           <p>
             Metal tìm kernel bằng một chuỗi tên. Trong <code>norm.metal</code> dòng 179,{' '}
             <code>template [[host_name("kernel_rms_norm_mul_f32")]] … kernel_rms_norm_fuse_impl&lt;float, 2&gt;;</code> gán
-            cho bản khởi tạo có mức hợp nhất 2 cái tên mà host dựng ra. Template cần điều này: mỗi bản chuyên biệt hóa có tên
+            cho bản khởi tạo có mức gộp 2 cái tên mà host dựng ra. Template cần điều này: mỗi bản chuyên biệt hóa có tên
             riêng.
           </p>
         }
@@ -421,7 +421,7 @@ function FollowTheCall() {
         {c.variants ? (
           <label className="check">
             <input type="checkbox" checked={fusion} onChange={(e) => reset(choice, e.target.checked)} />{' '}
-            <Translated vi="bật hợp nhất (mặc định)">fusion on (the default)</Translated>
+            <Translated vi="bật gộp (mặc định)">fusion on (the default)</Translated>
           </label>
         ) : null}
       </div>
@@ -460,7 +460,7 @@ function FollowTheCall() {
                     color: 'var(--ink)',
                   }}>
                   {o.label}
-                  {o.kind ? <span className="muted"> ({o.kind})</span> : null}
+                  {o.kind ? <span className="muted"> ({tr(o.kind, ({ 'function name': 'tên hàm', 'yaml key': 'khóa yaml', 'switch case': 'case của switch', 'formatted string': 'chuỗi được định dạng', 'file name': 'tên tệp', 'environment variable': 'biến môi trường' } as Record<string, string>)[o.kind] ?? o.kind)})</span> : null}
                 </button>
               );
             })}
@@ -510,7 +510,7 @@ export function SX31() {
           <p>
             Mọi framework bạn dùng đều có một chỗ mà op bạn gọi trở thành một lời gọi vào một backend: một kernel CUDA, một
             kernel HIP, một pipeline Metal. Tìm ra chỗ đó, và mỗi op chỉ còn cách một lần tìm kiếm ngắn. Mục này chỉ ra chỗ đó
-            nằm ở đâu trong llama.cpp, MLX và PyTorch, cùng hai thứ làm hỏng cách tìm đơn giản: hợp nhất (fusion) và mã được
+            nằm ở đâu trong llama.cpp, MLX và PyTorch, cùng hai thứ làm hỏng cách tìm đơn giản: gộp (fusion) và mã được
             sinh tự động.
           </p>
         }
@@ -588,10 +588,10 @@ export function SX31() {
       <Translated
         vi={
           <p>
-            Có một điểm cần lưu ý. Trước khi switch đó thấy một node, một lượt hợp nhất xem xét các chuỗi node. Nếu một
-            RMS_NORM được theo sau bởi một MUL (trọng số của phép chuẩn hóa), cặp đó đi tới một lời gọi hợp nhất, và case
+            Có một điểm cần lưu ý. Trước khi switch đó thấy một node, một lượt gộp xem xét các chuỗi node. Nếu một
+            RMS_NORM được theo sau bởi một MUL (trọng số của phép chuẩn hóa), cặp đó đi tới một lời gọi gộp, và case
             riêng của switch cho RMS_NORM không bao giờ chạy. Trong một đồ thị Llama, kernel chạy cho RMS_NORM thường là kernel
-            hợp nhất, nên hàm host bạn tìm thấy đầu tiên không phải là hàm thực sự chạy.
+            gộp, nên hàm host bạn tìm thấy đầu tiên không phải là hàm thực sự chạy.
           </p>
         }
       >
@@ -620,7 +620,7 @@ export function SX31() {
       <Excerpt
         x={x.fusion}
         caption={
-          <Translated vi="Lượt hợp nhất, trước switch. RMS_NORM, MUL, ADD được thử sớm hơn một bước.">
+          <Translated vi="Lượt gộp, trước switch. RMS_NORM, MUL, ADD được thử sớm hơn một bước.">
             The fusion pass, before the switch. RMS_NORM, MUL, ADD is tried one step earlier.
           </Translated>
         }
@@ -685,7 +685,7 @@ export function SX31() {
       <Excerpt
         x={x.hostName}
         caption={
-          <Translated vi="Một bản khởi tạo của template RMSNorm, mức hợp nhất 2, được đặt tên cho host.">
+          <Translated vi="Một bản khởi tạo của template RMSNorm, mức gộp 2, được đặt tên cho host.">
             One instantiation of the RMSNorm template, fusion level 2, named for the host.
           </Translated>
         }
@@ -975,7 +975,7 @@ export function SX31() {
       <Translated
         vi={
           <p>
-            Hoạt cảnh theo một RMSNorm đi qua các backend CUDA và Metal của llama.cpp, theo thứ tự: lượt hợp nhất tiêu thụ hai
+            Hoạt cảnh theo một RMSNorm đi qua các backend CUDA và Metal của llama.cpp, theo thứ tự: lượt gộp tiêu thụ hai
             node, kernel nó khởi chạy, và chuỗi mà Metal tra cứu.
           </p>
         }
@@ -990,7 +990,7 @@ export function SX31() {
           vi={
             <p>
               Đồ thị là phần đầu của một lớp Llama như llama.cpp sẽ giữ nó: thứ tự của bốn node là của khóa học này. Tên kernel,
-              các dòng và quy tắc hợp nhất là của file dữ kiện.
+              các dòng và quy tắc gộp là của file dữ kiện.
             </p>
           }
         >

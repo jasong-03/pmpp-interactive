@@ -2,7 +2,7 @@ import { useMemo, useState, type CSSProperties } from 'react';
 import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Bench, Beyond, NoteGroup, Simplification, Source, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import {
   CDF_LABEL,
@@ -95,13 +95,14 @@ function FindUStepper() {
   const u = fromPhilox ? m5U(BigInt(pSeed), BigInt(pStream), BigInt(pStep)) : uOk ? f32(Math.min(uParsed, TOP)) : 0;
   const cfg: KernelCfg = useMemo(() => ({ threads: 16, warp, vec }), [warp, vec]);
   const weights = useMemo(() => weightsFrom(sampleLogits(n), T), [n, T]);
+  const locale = useLocale();
   const run = useMemo(() => {
     const tot = kernelTotal(weights, cfg);
     const correct = drawKernel(weights, u, cfg);
     if (missing === 'none') return { tot, correct, search: correct, targets: new Array(16).fill(correct.target) as number[], hunt: null };
     const h = huntDraw(weights, u, cfg, missing, order);
     return { tot, correct, search: h.search, targets: h.targets, hunt: h.hunt };
-  }, [weights, u, cfg, missing, order]);
+  }, [weights, u, cfg, missing, order, locale]);
   const views = useMemo(() => viewsOf(run.search.chunks), [run]);
   const total = views.length;
   const pos = Math.min(at, total);

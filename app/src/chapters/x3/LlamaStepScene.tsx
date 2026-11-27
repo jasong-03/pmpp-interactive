@@ -83,7 +83,7 @@ function Pipeline({ lit, upto }: { lit: string[]; upto: number }) {
 }
 
 const nOf = (layer: number | null, jobs: string[]) => STEP.filter((l) => l.layer === layer && jobs.includes(l.job)).map((l) => String(l.n));
-const shapeLine = (l: Launch) => `${l.fn}: ${l.inputs} → ${l.outputs}`;
+const shapeLine = (l: Launch) => ((f: Launch) => `${f.fn}: ${f.inputs} → ${f.outputs}`)(stepLaunches(CFG, POS)[l.n]);
 
 const beats: Beat[] = [
   {

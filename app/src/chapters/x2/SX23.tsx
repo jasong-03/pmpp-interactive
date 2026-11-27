@@ -3,7 +3,7 @@ import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   LAYOUT_LABEL,
   LAYOUT_WEIGHTS,
@@ -293,7 +293,8 @@ function Unpack() {
   const qs = useMemo(() => quantizeQ4_0(SCENE_BLOCK).bytes.slice(2), []);
   const y = useMemo(() => sceneActivations(), []);
   const words = variant === 'cuda32' ? 4 : 8;
-  const steps = useMemo(() => unpackTrace(variant, qs, Math.min(wi, words - 1), y), [variant, qs, wi, words, y]);
+  const locale = useLocale();
+  const steps = useMemo(() => unpackTrace(variant, qs, Math.min(wi, words - 1), y), [variant, qs, wi, words, y, locale]);
   const st = steps[Math.min(k, steps.length - 1)];
   const pick = (v: UnpackVariant) => { setVariant(v); setK(0); setWi(v === 'cuda32' ? 1 : 2); };
   return (

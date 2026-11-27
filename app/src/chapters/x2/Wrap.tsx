@@ -292,12 +292,12 @@ export const questionsWrap: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Giải mã BF16, và một lượt đầu chuyển sang float32, vì zero float không thể hợp nhất vào kernel.">
+          <Translated vi="Giải mã BF16, và một lượt đầu chuyển sang float32, vì zero float không thể gộp vào kernel.">
             BF16 decoding, and a first pass to float32, because a float zero cannot be fused.
           </Translated>
         ),
         why: (
-          <Translated vi="Mọi độ lệch b theo nhóm đều tách ra được: Σ (d q + b) x = d Σ q x + b Σ x. Một lượt không hợp nhất sẽ chậm hơn cả float32.">
+          <Translated vi="Mọi độ lệch b theo nhóm đều tách ra được: Σ (d q + b) x = d Σ q x + b Σ x. Một lượt không gộp sẽ chậm hơn cả float32.">
             Any per-group offset b folds out: Σ (d q + b) x = d Σ q x + b Σ x. An unfused pass would be slower than float32.
           </Translated>
         ),
@@ -463,7 +463,7 @@ export function Wrap() {
         <Translated
           vi={
             <li>
-              Hợp nhất bước giải lượng tử hóa vào phép nhân. Một lượt riêng ghi trọng số float rồi đọc lại sẽ di chuyển nhiều
+              Gộp bước giải lượng tử hóa vào phép nhân. Một lượt riêng ghi trọng số float rồi đọc lại sẽ di chuyển nhiều
               byte hơn cả việc không lượng tử hóa.
             </li>
           }

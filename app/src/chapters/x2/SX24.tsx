@@ -317,7 +317,7 @@ function WarpStepper({ cfg, set }: { cfg: StepperConfig; set: (c: StepperConfig)
           vi={
             <>
               Mỗi lần một lệnh nạp, đếm theo quy tắc segment của chương 6. Không có bộ nhớ đệm: một segment được một lần nạp lấy
-              về sẽ bị lần nạp tiếp theo lấy lại. Màu trong dải lane xen kẽ theo khối. {SEGMENT_MODELS[cfg.seg].label}
+              về sẽ bị lần nạp tiếp theo lấy lại. Màu trong dải lane xen kẽ theo khối. {({ nvidia: 'NVIDIA: sector 32 byte trong dòng 128 byte', amd64: 'AMD: dòng cache 64 byte', amd128: 'AMD: dòng cache 128 byte', metal: 'Apple: không có tài liệu' } as Record<string, string>)[cfg.seg] ?? SEGMENT_MODELS[cfg.seg].label}
               {SEGMENT_MODELS[cfg.seg].segmentBytes == null ? `, nên segment ${cfg.assumed} byte là giả định của bạn` : ''} (
               {SEGMENT_MODELS[cfg.seg].facts}).
             </>
@@ -374,7 +374,7 @@ function WarpStepper({ cfg, set }: { cfg: StepperConfig; set: (c: StepperConfig)
         <label className="field" style={{ maxWidth: '100%', minWidth: 0 }}>
           <Translated vi="Segment">Segments</Translated>
           <select value={cfg.seg} aria-label={tr('Segments', 'Segment')} style={{ maxWidth: '100%' }} onChange={(e) => upd({ seg: e.target.value as SegmentModelId })}>
-            {(Object.keys(SEGMENT_MODELS) as SegmentModelId[]).map((s) => <option key={s} value={s}>{SEGMENT_MODELS[s].label}</option>)}
+            {(Object.keys(SEGMENT_MODELS) as SegmentModelId[]).map((s) => <option key={s} value={s}>{tr(SEGMENT_MODELS[s].label, ({ nvidia: 'NVIDIA: sector 32 byte trong dòng 128 byte', amd64: 'AMD: dòng cache 64 byte', amd128: 'AMD: dòng cache 128 byte', metal: 'Apple: không có tài liệu' } as Record<string, string>)[s] ?? SEGMENT_MODELS[s].label)}</option>)}
           </select>
         </label>
         {SEGMENT_MODELS[cfg.seg].segmentBytes == null ? (

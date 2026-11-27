@@ -479,7 +479,7 @@ export const questionsSX39: Record<string, Question> = {
     kind: 'choice',
     id: 'x3/X3.9/q-new-op',
     prompt: (
-      <Translated vi={<>Bạn muốn thêm một op hợp nhất mới vào llama.cpp, với một kernel CUDA và một kernel Metal. CONTRIBUTING.md của nó yêu cầu gì?</>}>
+      <Translated vi={<>Bạn muốn thêm một op gộp mới vào llama.cpp, với một kernel CUDA và một kernel Metal. CONTRIBUTING.md của nó yêu cầu gì?</>}>
         <>You want to add a new fused op to llama.cpp, with a CUDA and a Metal kernel. What does its CONTRIBUTING.md ask?</>
       </Translated>
     ),
@@ -493,7 +493,7 @@ export const questionsSX39: Record<string, Question> = {
         why: <Translated vi="Không có API plug-in nào: một op mới là một GGML_OP_* có cài đặt trên CPU.">There is no plug-in API: a new op is a GGML_OP_* with a CPU implementation.</Translated>,
       },
       {
-        label: <Translated vi="Một benchmark cho thấy tăng tốc so với các op chưa hợp nhất trên mọi backend mà op hỗ trợ.">A benchmark showing a speed-up over the unfused ops on every backend the op supports.</Translated>,
+        label: <Translated vi="Một benchmark cho thấy tăng tốc so với các op chưa gộp trên mọi backend mà op hỗ trợ.">A benchmark showing a speed-up over the unfused ops on every backend the op supports.</Translated>,
         why: <Translated vi="Các quy tắc được trích dẫn yêu cầu kiểm tra tính nhất quán, không yêu cầu tăng tốc trên mọi backend.">The rules quoted ask for consistency tests, not a speed-up on every backend.</Translated>,
       },
       {

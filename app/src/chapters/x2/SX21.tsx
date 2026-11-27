@@ -528,7 +528,7 @@ function FusedOrUnfused() {
     : [];
   return (
     <Bench
-      title={tr('Fused or unfused', 'Hợp nhất (fused) hay không hợp nhất (unfused)')}
+      title={tr('Fused or unfused', 'Gộp (fused) hay không gộp (unfused)')}
       task={tr('Switch the four pipelines on and off. Which ones keep the byte ratio?', 'Bật và tắt bốn pipeline. Pipeline nào giữ được tỉ lệ byte?')}
       foot={<Translated vi={<>Mô hình byte: một lớp 4096 → 4096 ở batch 1 với activation float32, mọi byte cùng một băng thông, không có bộ nhớ đệm. Thời gian tính tương đối so với GEMV float32. Với Q4_0, thời gian lab X2.2 của chính bạn cho cùng lớp xuất hiện bên cạnh mô hình khi có.</>}><>Bytes model: a 4096 → 4096 layer at batch 1 with float32 activations, every byte at the same bandwidth, no caches. Time is relative to the float32 GEMV. With Q4_0, your own lab X2.2 times for the same layer appear beside the model where they exist.</></Translated>}
     >
@@ -904,7 +904,7 @@ export function SX21() {
       <Ask q={q['x2/X2.1/q-knee-batch']} label={tr('Work it out', 'Tự tính')} />
       <Ask q={q['x2/X2.1/q-regime-q8']} label={tr('From chapter 5', 'Từ chương 5')} />
 
-      <h2><Translated vi="Hợp nhất (fused) hay không hợp nhất (unfused)">Fused or unfused</Translated></h2>
+      <h2><Translated vi="Gộp (fused) hay không gộp (unfused)">Fused or unfused</Translated></h2>
       <Translated
         vi={
           <p>
@@ -970,7 +970,7 @@ export function SX21() {
       <Translated
         vi={
           <p>
-            Giải lượng tử hóa sang FP16 thay vào đó giảm một nửa bản sao mà vẫn thua float32. Chỉ kernel hợp nhất, thứ đọc mã
+            Giải lượng tử hóa sang FP16 thay vào đó giảm một nửa bản sao mà vẫn thua float32. Chỉ kernel gộp, thứ đọc mã
             và hệ số tỉ lệ rồi giải nén chúng trong thanh ghi trên đường tới phép nhân, mới di chuyển ít byte hơn so với ban đầu.
           </p>
         }
@@ -984,7 +984,7 @@ export function SX21() {
         <Translated
           vi={
             <p>
-              Blog của PyTorch thấy một đường int8 không hợp nhất "much worse than even the fp16 performance", trên thiết bị của họ.
+              Blog của PyTorch thấy một đường int8 không gộp "much worse than even the fp16 performance", trên thiết bị của họ.
             </p>
           }
         >

@@ -78,14 +78,14 @@ const beats: Beat[] = [
   },
   {
     clip: 'one-call-2',
-    get label() { return tr('Fusion pass', 'Lượt hợp nhất op'); },
+    get label() { return tr('Fusion pass', 'Lượt gộp op'); },
     draw: (p) => {
       const scan = Math.min(G.length - 1, Math.floor(ramp(p, 0, 0.45) * G.length));
       const matched = p >= 0.45;
       const merge = ramp(p, 0.5, 0.7);
       return (
         <Frame headline={matched ? tr(`${fusedCall.call} consumes two nodes; ${plainRms.call} is never reached`, `${fusedCall.call} tiêu thụ hai nút; ${plainRms.call} không bao giờ được chạy tới`) : tr('the CUDA backend scans the graph before its switch', 'backend CUDA quét đồ thị trước câu lệnh switch của nó')}>
-          <text x={NX} y={22} fontSize="12" fontWeight="600">{tr('CUDA: fusion pass, then ggml_cuda_compute_forward', 'CUDA: lượt hợp nhất op, rồi ggml_cuda_compute_forward')}</text>
+          <text x={NX} y={22} fontSize="12" fontWeight="600">{tr('CUDA: fusion pass, then ggml_cuda_compute_forward', 'CUDA: lượt gộp op, rồi ggml_cuda_compute_forward')}</text>
           {G.map((_, i) => <Node key={i} i={i} hot={!matched && i === scan} gone={matched && fusedCall.nodes.includes(i) && merge >= 1} />)}
           {matched ? (
             <g opacity={merge}>
@@ -95,7 +95,7 @@ const beats: Beat[] = [
           ) : null}
           <Box x={NX} y={170} w={430} h={44} op={ramp(p, 0.55, 0.8)} dim={matched}
             text={`switch (dst->op), case GGML_OP_RMS_NORM: ${plainRms.call}`} sub={undefined} />
-          <text x={NX + 440} y={196} fontSize="11" opacity={ramp(p, 0.75, 0.9)} style={{ fill: 'var(--ink-2)' }}>{tr('not reached while fusion is on', 'không được chạy tới khi hợp nhất op đang bật')}</text>
+          <text x={NX + 440} y={196} fontSize="11" opacity={ramp(p, 0.75, 0.9)} style={{ fill: 'var(--ink-2)' }}>{tr('not reached while fusion is on', 'không được chạy tới khi gộp op đang bật')}</text>
           <text x={NX} y={250} fontSize="11" opacity={ramp(p, 0.85, 1)} style={{ fill: 'var(--ink-2)' }}>{tr('GGML_CUDA_DISABLE_FUSION turns the pass off', 'GGML_CUDA_DISABLE_FUSION tắt lượt này')}</text>
         </Frame>
       );
@@ -134,7 +134,7 @@ const beats: Beat[] = [
           <text x={NX + 390} y={58} fontSize="10.5" opacity={stage2} style={{ fill: 'var(--shared)' }}>{tr('shared', 'chia sẻ')}</text>
           <g opacity={ramp(p, 0.8, 0.95)}>
             <rect x={530} y={14} width={166} height={30} rx="3" fill="var(--ok-wash)" stroke="var(--ok)" />
-            <text x={540} y={33} fontSize="11.5">{HIP_TAGS[0]}</text>
+            <text x={540} y={33} fontSize="11.5">{tr(HIP_TAGS[0], ({ 'own kernel': 'kernel riêng', 'same source as CUDA': 'cùng mã nguồn với CUDA', 'hipified at build time': 'được hipify lúc build', 'generated at build time': 'được sinh ra lúc build', 'generated at run time (mx.compile)': 'được sinh ra lúc chạy (mx.compile)', 'vendor library': 'thư viện của nhà cung cấp', 'third-party submodule': 'submodule của bên thứ ba', 'composite of other ops': 'tổ hợp từ các op khác', 'fused before dispatch': 'được gộp trước khi dispatch', 'found by name string': 'tìm theo chuỗi tên', 'not read in the facts pass': 'chưa đọc trong lượt kiểm tra dữ kiện', 'no backend': 'không có backend' } as Record<string, string>)[HIP_TAGS[0]] ?? HIP_TAGS[0])}</text>
           </g>
         </Frame>
       );

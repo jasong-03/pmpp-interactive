@@ -413,7 +413,7 @@ function PortReveal({ committed }: { committed: number }): ReactNode {
             Lỗi nó không báo là một rào chắn (barrier) bị thiếu. Trình giả lập chạy mỗi luồng tới điểm đồng bộ hóa kế tiếp
             của nó (một rào chắn hoặc một warp shuffle) rồi mới chạy luồng tiếp theo, nên một lần ghi xảy ra sau điểm đồng bộ
             hóa kế tiếp của chính luồng ghi không bao giờ vượt được lần đọc của một luồng chậm hơn. Nó chỉ lộ ra rào chắn bị
-            thiếu khi một luồng ghi vào bộ đệm chia sẻ trước điểm đó. Backend race chạy các luồng cùng lúc và chỉ ra cả hai
+            thiếu khi một luồng ghi vào buffer chia sẻ trước điểm đó. Backend race chạy các luồng cùng lúc và chỉ ra cả hai
             dòng.
           </p>
         }
@@ -432,7 +432,7 @@ function PortReveal({ committed }: { committed: number }): ReactNode {
               Từng lỗi một: (a), giai đoạn thứ hai đọc những ô mà không warp nào ghi, biến các trường hợp d 64 thành NaN, vì
               một khối 256 luồng có ít warp hơn số ô mà giai đoạn đó đọc, và trình giả lập lấp bộ nhớ chia sẻ bằng{' '}
               <code>0xCD</code>. (c), đường <code>float4</code> được chọn khi d không phải bội của 4, làm lần chạy dừng với
-              một báo cáo AddressSanitizer tại lần đọc vector. (b), không có rào chắn trước khi hàng tiếp theo ghi đè bộ đệm,
+              một báo cáo AddressSanitizer tại lần đọc vector. (b), không có rào chắn trước khi hàng tiếp theo ghi đè buffer,
               qua mọi trường hợp của <code>emu</code> cho đến khi (a) được sửa bằng cách xóa các ô về 0 trước: việc xóa về 0
               là một lần ghi trước điểm đồng bộ hóa kế tiếp của luồng ghi, và khi đó các trường hợp nhiều hàng thất bại trên{' '}
               <code>emu</code> ở hai trong các thứ tự của nó. Backend race chỉ ra (b) trong mã như được giao, tại lần ghi ô và lần
@@ -490,7 +490,7 @@ function LaunchTable() {
       <td>
         <code>{l.fn}</code>
       </td>
-      <td>{l.exists ? l.lab : <b>{l.lab}</b>}</td>
+      <td>{l.exists ? tr(l.lab, l.lab.replace(' (or ', ' (hoặc ').replace(' (yours)', ' (của bạn)')) : <b>{tr(l.lab, l.lab.replace(' (or ', ' (hoặc ').replace(' (yours)', ' (của bạn)'))}</b>}</td>
     </tr>
   );
   return (
@@ -606,7 +606,7 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Lab X3.1 cũng được build cho biến thể race của trình giả lập, vì bản port của nó dùng chung một bộ đệm giữa hai
+            Lab X3.1 cũng được build cho biến thể race của trình giả lập, vì bản port của nó dùng chung một buffer giữa hai
             phép rút gọn và qua nhiều hàng. <code>python3 labs/pmpp.py run X3.1 --backend race</code> chạy các luồng của một
             khối cùng lúc dưới ThreadSanitizer, công cụ báo hai lần truy cập vào cùng một vị trí mà không có gì sắp thứ tự
             chúng, kèm cả hai dòng mã nguồn. Một lần chạy sạch là bằng chứng, không phải chứng minh: nó chỉ thấy những lịch
@@ -767,8 +767,8 @@ export function Labs() {
           <p>
             Một đồng nghiệp đã port một RMSNorm theo cấu trúc các kernel của llama.cpp: 256 luồng cho các hàng dưới 1,024
             phần tử và 1,024 luồng cho hàng lớn hơn, một đường <code>float4</code> khi lần khởi chạy đánh giá là an toàn, và
-            một phép rút gọn hai giai đoạn qua một bộ đệm chia sẻ 64 ô, trong đó ô 0 chuyển hệ số scale cho cả khối. Một lưới
-            cố định 4 khối đi qua các hàng, nên một khối dùng lại bộ đệm của nó hết hàng này sang hàng khác (bản thân
+            một phép rút gọn hai giai đoạn qua một buffer chia sẻ 64 ô, trong đó ô 0 chuyển hệ số scale cho cả khối. Một lưới
+            cố định 4 khối đi qua các hàng, nên một khối dùng lại buffer của nó hết hàng này sang hàng khác (bản thân
             llama.cpp chạy mỗi hàng một khối). Nó biên dịch được và qua một số kiểm thử. Nó có ba lỗi độc lập, cùng ba lỗi đó
             trong cả hai file. Mỗi lỗi là thứ mà các kernel của llama.cpp có phòng ngừa.
           </p>
@@ -980,7 +980,7 @@ export function Labs() {
             Một lần gọi ở rows 1 và d 4,096 di chuyển khoảng 48 KiB: hàng vào, hàng ra và trọng số. Hãy quyết định nó đạt bao
             nhiêu phần băng thông lab 5.1 của bạn, rồi 256 hàng đạt bao nhiêu phần. Cân nhắc ba lực: một hàng là một khối, và
             một khối chạy trên một lõi (core) của GPU trong khi các lõi còn lại chờ; mỗi lần khởi chạy tốn một khoảng thời gian
-            cố định bất kể nó di chuyển bao nhiêu; và benchmark lặp lại lần gọi trên cùng các bộ đệm, nên dữ liệu vừa trong
+            cố định bất kể nó di chuyển bao nhiêu; và benchmark lặp lại lần gọi trên cùng các buffer, nên dữ liệu vừa trong
             các bộ nhớ đệm (cache) không cần lấy từ bộ nhớ sau lần gọi đầu tiên, trong khi lab 5.1 truyền nhiều hơn hẳn những
             gì bất kỳ cache nào chứa được.
           </p>

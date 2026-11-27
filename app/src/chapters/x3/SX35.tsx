@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Ask, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { solutionTabStatus } from '../../components/LabKit';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { useReports } from '../../lib/reports';
 import { Aside, Bench, Beyond, Simplification, Today } from '../../components/notes';
 import { useProgress } from '../../lib/progress';
@@ -361,7 +361,7 @@ export const questionsSX35: Record<string, Question> = {
         correct: true,
       },
       {
-        label: <Translated vi="cuDNN: thư viện của hãng là phương án dự phòng sau các kernel hợp nhất, nên ưu tiên nó không thay đổi gì ở đây.">cuDNN: a vendor library is the fallback after the fused kernels, so preferring it changes nothing here.</Translated>,
+        label: <Translated vi="cuDNN: thư viện của hãng là phương án dự phòng sau các kernel gộp, nên ưu tiên nó không thay đổi gì ở đây.">cuDNN: a vendor library is the fallback after the fused kernels, so preferring it changes nothing here.</Translated>,
         why: <Translated vi="Trong thứ tự mặc định, math đứng trước cuDNN. cuDNN chỉ được thử sớm hơn khi nó được ưu tiên.">In the default order math comes before cuDNN. cuDNN is tried earlier only when it is preferred.</Translated>,
       },
       {
@@ -451,8 +451,9 @@ function WhichAttention() {
   const [ki, setKi] = useState(KEYS.indexOf(100));
   const [x, setX] = useState<AttnInput>(DEFAULT_INPUT);
   const input = useMemo(() => ({ ...x, keys: KEYS[ki] }), [x, ki]);
-  const r = useMemo(() => attnRoute(project, input), [project, input]);
-  const all = useMemo(() => ATTN_PROJECTS.map((p) => attnRoute(p, input)), [input]);
+  const locale = useLocale();
+  const r = useMemo(() => attnRoute(project, input), [project, input, locale]);
+  const all = useMemo(() => ATTN_PROJECTS.map((p) => attnRoute(p, input)), [input, locale]);
   const set = (o: Partial<AttnInput>) => setX({ ...x, ...o });
   return (
     <Bench
@@ -625,7 +626,7 @@ function StartReveal() {
         <tbody>
           {ATTENTION_HOME.map((h) => (
             <tr key={h.project + h.backend} data-own={h.allOwn ? 1 : 0}>
-              <td>{h.project}</td><td>{h.backend}</td><td>{h.home}</td><td>{h.allOwn ? tr('yes', 'có') : tr('no', 'không')}</td>
+              <td>{h.project}</td><td>{tr(h.backend, ({ 'CUDA and HIP': 'CUDA và HIP' } as Record<string, string>)[h.backend] ?? h.backend)}</td><td>{h.home}</td><td>{h.allOwn ? tr('yes', 'có') : tr('no', 'không')}</td>
             </tr>
           ))}
         </tbody>

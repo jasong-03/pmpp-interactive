@@ -1138,7 +1138,7 @@ export function SX32() {
             Lần khởi chạy cũng là của lab 2.3: <code>(k + CUDA_NEG_BLOCK_SIZE - 1) / CUDA_NEG_BLOCK_SIZE</code> khối. Bản thân SiLU là{' '}
             <code>x / (1.0f + expf(-x))</code>. SwiGLU là một kernel thứ hai, <code>unary_gated_op_kernel</code>, vẫn mỗi đầu ra một
             luồng, tính <code>op(x[j0]) * g[j1]</code>. Các phép cộng residual đi qua <code>k_bin_bcast</code>, và{' '}
-            <code>ggml_cuda_op_fused_add</code> hợp nhất 2 đến 8 phép cộng liên tiếp vào một lần khởi chạy.
+            <code>ggml_cuda_op_fused_add</code> gộp 2 đến 8 phép cộng liên tiếp vào một lần khởi chạy.
           </p>
         }
       >
@@ -1504,7 +1504,7 @@ export function SX32() {
       <Translated
         vi={
           <p>
-            Mọi kernel ở trên tồn tại dưới nhiều biến thể: theo op, theo kiểu, theo mức hợp nhất, theo độ rộng vector. Các dự án chọn
+            Mọi kernel ở trên tồn tại dưới nhiều biến thể: theo op, theo kiểu, theo mức gộp, theo độ rộng vector. Các dự án chọn
             giữa chúng ở những thời điểm khác nhau. Trên CUDA và HIP, lựa chọn thường được đưa ra khi thư viện được biên dịch; trên
             Metal, nó được đưa ra khi một pipeline được tạo, hoặc qua cái tên mà host yêu cầu; MLX và PyTorch còn sinh mã, lúc chạy
             và lúc build.

@@ -5,7 +5,7 @@ import { solutionTabStatus } from '../../components/LabKit';
 import { useReports } from '../../lib/reports';
 import { Aside, Bench, Beyond, Simplification, Source, Today, type Tier } from '../../components/notes';
 import { href } from '../../lib/router';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { HEAD, JOB_LABEL, SYNTHETIC, launchCount, stepLaunches, totals, validate, type Config, type Launch } from '../../sim/llamastep';
 import { compare, makeCase, pairOf, ropeTables, type Pairing } from '../../sim/ropepair';
 import { functionSource } from '../../sim/toolchain';
@@ -288,7 +288,8 @@ function StepThrough() {
   const [draft, setDraft] = useState<Record<Gate, string>>({ rope: '', append: '', share: '' });
   const cfg: Config = { ...SYNTHETIC, d: heads * HEAD, heads, kvHeads, hidden, layers, vocab };
   const bad = validate(cfg);
-  const ls = useMemo(() => (bad ? [] : stepLaunches(cfg, pos)), [bad, heads, kvHeads, hidden, layers, vocab, pos]); // eslint-disable-line react-hooks/exhaustive-deps
+  const locale = useLocale();
+  const ls = useMemo(() => (bad ? [] : stepLaunches(cfg, pos)), [bad, heads, kvHeads, hidden, layers, vocab, pos, locale]); // eslint-disable-line react-hooks/exhaustive-deps
   const t = useMemo(() => totals(ls), [ls]);
   const at = Math.min(n, ls.length);
   const cur: Launch | undefined = at > 0 ? ls[at - 1] : undefined;
@@ -415,7 +416,7 @@ function StepThrough() {
           <Translated
             vi={
               <>
-                <b>{cur.fn}</b> ({cur.lab}, {cur.milestone}{cur.exists ? '' : ', mới trong module này'}){cur.layer !== null ? `, lớp ${cur.layer}` : ''}:{' '}
+                <b>{cur.fn}</b> ({cur.lab.replace(' (or ', ' (hoặc ').replace(' (yours)', ' (của bạn)')}, {cur.milestone}{cur.exists ? '' : ', mới trong module này'}){cur.layer !== null ? `, lớp ${cur.layer}` : ''}:{' '}
                 {cur.inputs} → {cur.outputs}. Trọng số đọc: {bytes(cur.weightBytes)}
                 {cur.cacheBytes ? <>; cache {cur.job === 'append' ? 'ghi' : 'đọc'}: {bytes(cur.cacheBytes)}</> : null}
                 {cur.tableBytes ? <>; bảng đọc: {bytes(cur.tableBytes)}</> : null}.{' '}
@@ -453,7 +454,7 @@ function StepThrough() {
                   <td style={{ paddingLeft: '0.6rem' }}>{gap ? '… ' : ''}{l.n + 1}</td>
                   <td>{JOB_LABEL[l.job]}{l.layer !== null ? <span className="muted"><Translated vi={<> (lớp {l.layer})</>}> (layer {l.layer})</Translated></span> : null}</td>
                   <td><code style={{ overflowWrap: 'normal' }}>{breakable(l.fn)}</code></td>
-                  <td>{l.lab}{l.exists ? null : <b><Translated vi=" · mới"> · new</Translated></b>}</td>
+                  <td>{tr(l.lab, l.lab.replace(' (or ', ' (hoặc ').replace(' (yours)', ' (của bạn)'))}{l.exists ? null : <b><Translated vi=" · mới"> · new</Translated></b>}</td>
                   <td className="num">{l.weightBytes ? bytes(l.weightBytes) : '–'}</td>
                   <td className="num">{l.cacheBytes ? bytes(l.cacheBytes) : '–'}</td>
                 </tr>

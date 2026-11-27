@@ -262,7 +262,7 @@ export const questionsWrap: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="GPU này có số học bfloat16 hay không, vì kernel hợp nhất chỉ chạy được nơi bfloat16 được hỗ trợ gốc.">
+          <Translated vi="GPU này có số học bfloat16 hay không, vì kernel gộp chỉ chạy được nơi bfloat16 được hỗ trợ gốc.">
             Whether this GPU has bfloat16 arithmetic, since the fused kernel can only run where bfloat16 is native.
           </Translated>
         ),
@@ -274,7 +274,7 @@ export const questionsWrap: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Mô hình có thật sự ở trên CUDA không, vì RMSNorm hợp nhất chỉ được đăng ký cho GPU Apple.">
+          <Translated vi="Mô hình có thật sự ở trên CUDA không, vì RMSNorm gộp chỉ được đăng ký cho GPU Apple.">
             Whether the model is really on CUDA, since the fused RMSNorm is registered only for Apple GPUs.
           </Translated>
         ),
@@ -304,7 +304,7 @@ export const questionsWrap: Record<string, Question> = {
             <code>rms_norm</code> gọi <code>at::_fused_rms_norm</code>, hàm dispatch tới <code>_fused_rms_norm_cuda</code>
             . Nó lùi về một tổ hợp các phép toán tensor thông thường với đầu vào số phức, và cảnh báo "Cannot dispatch to fused
             implementation." khi dtype của trọng số khác của đầu vào: vài kernel thay vì một. Cho trọng số cùng dtype với
-            activation, hoặc ngược lại, và kernel hợp nhất có thể chạy.
+            activation, hoặc ngược lại, và kernel gộp có thể chạy.
           </p>
         }
       >
@@ -360,7 +360,7 @@ export function Wrap() {
           <ul>
             <li>
               Mỗi dự án có một chỗ nơi một op trở thành một lời gọi backend. Trong llama.cpp đó là một câu lệnh switch trên{' '}
-              <code>GGML_OP_*</code> cho mỗi backend, sau một lượt hợp nhất; trong MLX là một <code>eval_gpu</code> cho mỗi primitive
+              <code>GGML_OP_*</code> cho mỗi backend, sau một lượt gộp; trong MLX là một <code>eval_gpu</code> cho mỗi primitive
               trong thư mục của từng backend; trong PyTorch là các dispatch key của <code>native_functions.yaml</code>, và với một số
               op là một kernel được sinh ra lúc build. Hãy bắt đầu ở đó và lần theo một cái tên.
             </li>

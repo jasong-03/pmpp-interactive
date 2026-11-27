@@ -467,7 +467,7 @@ export function SX30() {
             thị, mỗi backend một cái. Trong MLX đó là một phương thức, <code>eval_gpu</code>, mà mỗi primitive cài đặt một lần
             cho mỗi thư mục backend. Trong PyTorch đó là bảng dispatch trong <code>native_functions.yaml</code>. Bắt đầu từ đó và
             lần theo một cái tên. Trên Metal, cái tên là một chuỗi do host dựng, nên hãy lần theo chuỗi. Mục{' '}
-            <a href={href('x3', 'X3.1')}>X3.1</a> làm điều này cho mọi op, kể cả hai chỗ cách này đổ vỡ: hợp nhất op (fusion),
+            <a href={href('x3', 'X3.1')}>X3.1</a> làm điều này cho mọi op, kể cả hai chỗ cách này đổ vỡ: gộp op (fusion),
             chạy trước switch, và mã được sinh ra lúc build hoặc lúc chạy.
           </p>
         }
@@ -538,7 +538,7 @@ export function SX30() {
         <tbody>
           {tour.map((t) => (
             <tr key={t.tour} data-tour={t.tour}>
-              <td>{t.tour}</td>
+              <td>{tr(t.tour, ({ 'GEMV and GEMM': 'GEMV và GEMM', 'RoPE and SwiGLU': 'RoPE và SwiGLU', elementwise: 'theo từng phần tử', sampling: 'lấy mẫu' } as Record<string, string>)[t.tour] ?? t.tour)}</td>
               <td>
                 {t.labs.map((l, i) => (
                   <span key={l.num}>

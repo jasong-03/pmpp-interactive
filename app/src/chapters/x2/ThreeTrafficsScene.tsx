@@ -17,7 +17,7 @@ const F: 'q4_0' = 'q4_0';
 const ROWS: { id: PipelineId; label: string }[] = [
   { id: 'f32', get label() { return tr('float32 weights', 'trọng số float32'); } },
   { id: 'unfused-f32', get label() { return tr('Q4_0, dequantised first', 'Q4_0, giải lượng tử hóa trước'); } },
-  { id: 'fused', get label() { return tr('Q4_0, fused', 'Q4_0, hợp nhất'); } },
+  { id: 'fused', get label() { return tr('Q4_0, fused', 'Q4_0, gộp'); } },
 ];
 const passes = (id: PipelineId) => pipelinePasses(id, F, L, B, ACT);
 const F32_BYTES = passBytes(passes('f32'));
@@ -181,7 +181,7 @@ const beats: Beat[] = [
   },
   {
     clip: 'three-traffics-3',
-    get label() { return tr('Unfused', 'Không hợp nhất'); },
+    get label() { return tr('Unfused', 'Không gộp'); },
     draw: (p) => {
       const clock = ramp(p, 0.04, 0.92) * finish('unfused-f32');
       const c = crossingAt('unfused-f32', clock);
@@ -195,7 +195,7 @@ const beats: Beat[] = [
   },
   {
     clip: 'three-traffics-4',
-    get label() { return tr('Fused', 'Hợp nhất'); },
+    get label() { return tr('Fused', 'Gộp'); },
     draw: (p) => {
       const clock = ramp(p, 0.1, 0.6) * finish('fused');
       return (

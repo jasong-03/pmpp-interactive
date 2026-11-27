@@ -1080,7 +1080,7 @@ export function Labs() {
             top-p 0.95 và min-p 0.05 mặc định của llama.cpp. Nó đo thời gian riêng phép sắp xếp của lab 14.3, toàn bộ{' '}
             <code>launchFilterRows</code> của bạn, chuỗi ghép sau phép sắp xếp, và kernel gộp trên cùng các logit đã sắp
             xếp. Lấy kết quả tốt nhất trong 5 lần đo, mỗi lần lặp lại lời gọi cho tới khi kéo dài ít nhất 2 ms; mọi kết quả
-            được đo đều được kiểm tra trước. Một kích thước 1 hàng chỉ tối đa 600 KB mỗi bộ đệm, nên hãy đọc băng thông ở các
+            được đo đều được kiểm tra trước. Một kích thước 1 hàng chỉ tối đa 600 KB mỗi buffer, nên hãy đọc băng thông ở các
             kích thước 64 hàng.
           </p>
         }
@@ -1252,9 +1252,9 @@ export function Labs() {
       <LabFiles
         lab={l3}
         files={[
-          ['kernel.cu', <Translated vi={<><code>philox4x32_10</code>, <code>philoxKatKernel</code>, <code>uniformFromBits</code>, <code>applyRepetition</code>, <code>drawRows</code>, <code>sampleWorkspaceBytes</code> và <code>launchSampleRows</code>; các hàm khởi chạy khác và phép chép vào vùng làm việc được cung cấp sẵn</>}><><code>philox4x32_10</code>, <code>philoxKatKernel</code>, <code>uniformFromBits</code>, <code>applyRepetition</code>, <code>drawRows</code>, <code>sampleWorkspaceBytes</code> and <code>launchSampleRows</code>; the other launchers and the workspace copy are provided</></Translated>],
+          ['kernel.cu', <Translated vi={<><code>philox4x32_10</code>, <code>philoxKatKernel</code>, <code>uniformFromBits</code>, <code>applyRepetition</code>, <code>drawRows</code>, <code>sampleWorkspaceBytes</code> và <code>launchSampleRows</code>; các hàm khởi chạy khác và phép sao chép vào vùng làm việc được cung cấp sẵn</>}><><code>philox4x32_10</code>, <code>philoxKatKernel</code>, <code>uniformFromBits</code>, <code>applyRepetition</code>, <code>drawRows</code>, <code>sampleWorkspaceBytes</code> and <code>launchSampleRows</code>; the other launchers and the workspace copy are provided</></Translated>],
           ['kernel.metal', <Translated vi={<><code>philox4x32_10</code>, <code>philox_kat</code>, <code>uniform_from_bits</code>, <code>apply_repetition</code> và <code>draw_rows</code></>}><><code>philox4x32_10</code>, <code>philox_kat</code>, <code>uniform_from_bits</code>, <code>apply_repetition</code> and <code>draw_rows</code></></Translated>],
-          ['launch.mm', <Translated vi={<><code>encodePhiloxKat</code>, <code>encodeApplyRepetition</code>, <code>encodeDrawRows</code> và <code>encodeSampleRows</code>; trên Metal, vùng làm việc là một bộ đệm cho mỗi giá trị trung gian, khai báo trong <code>sampler_metal.h</code></>}><><code>encodePhiloxKat</code>, <code>encodeApplyRepetition</code>, <code>encodeDrawRows</code> and <code>encodeSampleRows</code>; on Metal the workspace is one buffer per intermediate, declared in <code>sampler_metal.h</code></></Translated>],
+          ['launch.mm', <Translated vi={<><code>encodePhiloxKat</code>, <code>encodeApplyRepetition</code>, <code>encodeDrawRows</code> và <code>encodeSampleRows</code>; trên Metal, vùng làm việc là một buffer cho mỗi giá trị trung gian, khai báo trong <code>sampler_metal.h</code></>}><><code>encodePhiloxKat</code>, <code>encodeApplyRepetition</code>, <code>encodeDrawRows</code> and <code>encodeSampleRows</code>; on Metal the workspace is one buffer per intermediate, declared in <code>sampler_metal.h</code></></Translated>],
         ]}
       />
 
@@ -1356,7 +1356,7 @@ export function Labs() {
         vi={
           <p>
             Hãy suy luận từ hai sự thật. Mọi kernel chạy mỗi hàng một khối, nên ở batch 1 chỉ một multiprocessor làm việc còn
-            phần còn lại ngồi chờ (<a href={href('ch10', '10.10')}>mục 10.10</a>). Và chỉ phép chép, các penalty và phép
+            phần còn lại ngồi chờ (<a href={href('ch10', '10.10')}>mục 10.10</a>). Và chỉ phép sao chép, các penalty và phép
             chọn đọc toàn bộ từ vựng; sau top-k, mọi giai đoạn chỉ chạm tới 40 giá trị mỗi hàng. Theo mặc định llama.cpp lấy
             mẫu trên một luồng host, và đó là thứ cột CPU dùng để so sánh.
           </p>
@@ -1458,7 +1458,7 @@ export function Labs() {
           numCol(tr('GPU / CPU', 'GPU / CPU'), 'gpu_over_cpu'),
         ]}
       />
-      <Translated vi={<p>Mỗi giai đoạn được đo riêng, trên các bộ đệm được chuẩn bị bằng cách chạy các giai đoạn một lần theo thứ tự:</p>}>
+      <Translated vi={<p>Mỗi giai đoạn được đo riêng, trên các buffer được chuẩn bị bằng cách chạy các giai đoạn một lần theo thứ tự:</p>}>
         <p>Each stage timed alone, on buffers prepared by running the stages once in order:</p>
       </Translated>
       <StageTable />

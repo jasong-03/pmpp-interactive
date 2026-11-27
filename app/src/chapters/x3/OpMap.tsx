@@ -50,7 +50,7 @@ function Tags({ c }: { c: Cell }) {
     <div data-part="tags" data-tags={c.tags.join('|')}>
       {c.tags.map((t) => (
         <span key={t} style={{ ...TAG, fontStyle: t === 'not read in the facts pass' || t === 'no backend' ? 'italic' : 'normal', color: t === 'no backend' ? 'var(--ink-3)' : 'var(--ink)' }}>
-          {t}
+          {tr(t, ({ 'own kernel': 'kernel riêng', 'same source as CUDA': 'cùng mã nguồn với CUDA', 'hipified at build time': 'được hipify lúc build', 'generated at build time': 'được sinh ra lúc build', 'generated at run time (mx.compile)': 'được sinh ra lúc chạy (mx.compile)', 'vendor library': 'thư viện của nhà cung cấp', 'third-party submodule': 'submodule của bên thứ ba', 'composite of other ops': 'tổ hợp từ các op khác', 'fused before dispatch': 'được gộp trước khi dispatch', 'found by name string': 'tìm theo chuỗi tên', 'not read in the facts pass': 'chưa đọc trong lượt kiểm tra dữ kiện', 'no backend': 'không có backend' } as Record<string, string>)[t] ?? t)}
         </span>
       ))}
     </div>

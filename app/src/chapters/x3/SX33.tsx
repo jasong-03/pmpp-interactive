@@ -88,7 +88,7 @@ export const questionsSX33: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="blockReduceSum của lab 10.3 được nạp x bình phương thay vì x; phép nhân với trọng số được hợp nhất vào cùng kernel.">
+          <Translated vi="blockReduceSum của lab 10.3 được nạp x bình phương thay vì x; phép nhân với trọng số được gộp vào cùng kernel.">
             Lab 10.3's blockReduceSum fed with x squared instead of x; the weight multiply is fused into the same kernel.
           </Translated>
         ),
@@ -1150,9 +1150,9 @@ export function SX33() {
       <Translated
         vi={
           <p>
-            Có hai chi tiết đáng biết trước khi bạn đọc thêm norm.cu. Phép nhân trọng số thường được hợp nhất: lượt xử lý đồ thị của
+            Có hai chi tiết đáng biết trước khi bạn đọc thêm norm.cu. Phép nhân trọng số thường được gộp: lượt xử lý đồ thị của
             llama.cpp gộp <code>RMS_NORM</code> theo sau là <code>MUL</code> (và một <code>ADD</code>) vào một lần khởi chạy, nên
-            kernel chạy cho một nút RMSNorm là kernel đã hợp nhất trừ khi bạn đặt <code>GGML_CUDA_DISABLE_FUSION</code>. Và có hai
+            kernel chạy cho một nút RMSNorm là kernel đã gộp trừ khi bạn đặt <code>GGML_CUDA_DISABLE_FUSION</code>. Và có hai
             đường. Đường <code>float4</code> chỉ được dùng khi độ dài hàng là bội của 4 và đích được căn chỉnh 16 byte; nó chọn kích
             thước khối theo độ dài hàng. Đường vô hướng dùng 256 luồng cho các hàng dưới 1024 phần tử và 1024 luồng trong trường hợp
             còn lại.
@@ -1172,7 +1172,7 @@ export function SX33() {
         <Translated
           vi={
             <p>
-              Lượt hợp nhất nằm trong ggml-cuda.cu (dòng 5268 đến 5271, x3 facts A1). Đó là thứ đầu tiên cần kiểm tra khi kernel bạn
+              Lượt gộp nằm trong ggml-cuda.cu (dòng 5268 đến 5271, x3 facts A1). Đó là thứ đầu tiên cần kiểm tra khi kernel bạn
               đang đọc không khớp với những gì profiler cho thấy.
             </p>
           }
@@ -1208,7 +1208,7 @@ export function SX33() {
       <Translated
         vi={
           <p>
-            Mức hợp nhất là một đối số template F: 1 cho phép chuẩn hóa đơn thuần, 2 kèm trọng số, 3 kèm trọng số và một phép cộng.
+            Mức gộp là một đối số template F: 1 cho phép chuẩn hóa đơn thuần, 2 kèm trọng số, 3 kèm trọng số và một phép cộng.
             Metal tìm một kernel bằng một chuỗi tên, nên mỗi bản khởi tạo được đặt một tên: dòng khởi tạo{' '}
             <code>kernel_rms_norm_fuse_impl&lt;float, 2&gt;</code> mang{' '}
             <code>[[host_name("kernel_rms_norm_mul_f32")]]</code> (norm.metal dòng 179). Để tìm kernel Metal đứng sau một lời gọi
@@ -1286,7 +1286,7 @@ export function SX33() {
           <p>
             MLX chuyển từ kernel một hàng sang kernel lặp khi độ dài hàng vượt một ngưỡng đặt trong mã host. Đường CUDA của PyTorch
             lùi về một tổ hợp các op thông thường cho đầu vào số phức, và cảnh báo "Cannot dispatch to fused implementation." khi
-            trọng số và đầu vào có dtype khác nhau: một đường không hợp nhất rất dễ vô tình gặp phải với trọng số float32 trên một mô
+            trọng số và đầu vào có dtype khác nhau: một đường không gộp rất dễ vô tình gặp phải với trọng số float32 trên một mô
             hình bfloat16.
           </p>
         }

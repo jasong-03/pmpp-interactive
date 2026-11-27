@@ -20,7 +20,7 @@ export const questionsWrap: Record<string, Question> = {
           <>
             Bạn thử bỏ bớt lượt áp phạt. Thay vì một kernel đọc từng logit cùng số đếm của nó rồi ghi logit đã phạt trở lại,
             phép chọn của lab X1.1 áp phạt ngay khi đọc: mỗi lần trong năm lần nó đọc một logit (bốn lượt histogram và lượt
-            gom) cũng đọc số đếm của token đó. Tính trên mỗi logit, bỏ qua k cặp đầu ra, thiết kế hợp nhất di chuyển bao nhiêu
+            gom) cũng đọc số đếm của token đó. Tính trên mỗi logit, bỏ qua k cặp đầu ra, thiết kế gộp di chuyển bao nhiêu
             byte?
           </>
         }
@@ -40,8 +40,8 @@ export const questionsWrap: Record<string, Question> = {
         vi={
           <p>
             Năm lần đọc một logit 4 byte và một số đếm 4 byte: 5 × 8 = 40 byte. Hai kernel tách riêng di chuyển 12 cho lượt áp
-            phạt (đọc, đọc, ghi) và 20 cho phép chọn, tổng cộng 32. Hợp nhất có lợi khi nó loại bỏ một vòng đi về qua bộ nhớ; ở
-            đây nó bỏ được một lần ghi và một lần đọc nhưng nhân số lần đọc số đếm lên năm. Hãy đếm trước khi hợp nhất.
+            phạt (đọc, đọc, ghi) và 20 cho phép chọn, tổng cộng 32. Gộp có lợi khi nó loại bỏ một vòng đi về qua bộ nhớ; ở
+            đây nó bỏ được một lần ghi và một lần đọc nhưng nhân số lần đọc số đếm lên năm. Hãy đếm trước khi gộp.
           </p>
         }
       >
@@ -454,12 +454,12 @@ export function Wrap() {
           <tr><td><Translated vi="Temperature">Temperature</Translated></td><td><Translated vi={<><a href={href('x1', 'X1.2')}>X1.2</a> và vị trí của nó trong <a href={href('x1', 'X1.6')}>X1.6</a></>}><a href={href('x1', 'X1.2')}>X1.2</a> and its placement in <a href={href('x1', 'X1.6')}>X1.6</a></Translated></td><td><Translated vi="phép rút của lab X1.3">lab X1.3's draw</Translated></td></tr>
           <tr><td><Translated vi="Phạt lặp lại, phạt tần suất và phạt hiện diện">Repetition, frequency and presence penalties</Translated></td><td><Translated vi={<>trình khám phá phép phạt trong <a href={href('x1', 'X1.3')}>X1.3</a></>}>the penalties explorer in <a href={href('x1', 'X1.3')}>X1.3</a></Translated></td><td><Translated vi="lab X1.3, bài test 4 và 5">lab X1.3, tests 4 and 5</Translated></td></tr>
           <tr><td><Translated vi="Top-k không cần sắp xếp">Top-k without a sort</Translated></td><td><Translated vi={<>trình chạy từng bước, scene và trình khám phá chi phí trong <a href={href('x1', 'X1.4')}>X1.4</a></>}>stepper, scene and cost explorer in <a href={href('x1', 'X1.4')}>X1.4</a></Translated></td><td><Translated vi="lab X1.1">lab X1.1</Translated></td></tr>
-          <tr><td>Top-p</td><td><a href={href('x1', 'X1.5')}>X1.5</a></td><td><Translated vi="lab X1.2 phần A, rồi hợp nhất ở phần B">lab X1.2 part A, then fused in part B</Translated></td></tr>
+          <tr><td>Top-p</td><td><a href={href('x1', 'X1.5')}>X1.5</a></td><td><Translated vi="lab X1.2 phần A, rồi gộp ở phần B">lab X1.2 part A, then fused in part B</Translated></td></tr>
           <tr><td>Min-p</td><td><a href={href('x1', 'X1.6')}>X1.6</a></td><td><Translated vi="lab X1.2">lab X1.2</Translated></td></tr>
           <tr><td><Translated vi="Số ngẫu nhiên thống nhất giữa các backend">Random numbers that agree across backends</Translated></td><td><Translated vi={<>scene các vòng và các trình khám phá trong <a href={href('x1', 'X1.7')}>X1.7</a></>}>the rounds scene and explorers in <a href={href('x1', 'X1.7')}>X1.7</a></Translated></td><td><Translated vi="lab X1.3, bài test 1 và 2">lab X1.3, tests 1 and 2</Translated></td></tr>
           <tr><td><Translated vi="Phép rút">The draw</Translated></td><td><Translated vi={<>trình chạy từng bước và scene trong <a href={href('x1', 'X1.8')}>X1.8</a></>}>stepper and scene in <a href={href('x1', 'X1.8')}>X1.8</a></Translated></td><td><Translated vi="lab X1.3, bài test 3">lab X1.3, test 3</Translated></td></tr>
           <tr><td><Translated vi="Test với một tham chiếu CPU, trên các backend">Test against a CPU reference, across backends</Translated></td><td><Translated vi={<>"Thống nhất chính xác giữa các backend" trong <a href={href('x1', 'X1.8')}>X1.8</a></>}>"Exact agreement across backends" in <a href={href('x1', 'X1.8')}>X1.8</a></Translated></td><td><Translated vi={<>lab X1.3, bài test 5 đến 7, và digest trên <a href={href('x1', 'labs')}>trang labs</a></>}>lab X1.3, tests 5 to 7, and the digest on the <a href={href('x1', 'labs')}>labs page</a></Translated></td></tr>
-          <tr><td><Translated vi="Gỡ lỗi một bộ lọc hợp nhất">Debug a fused filter</Translated></td><td><Translated vi={<>các quy tắc biên của <a href={href('x1', 'X1.5')}>X1.5</a></>}>the boundary rules of <a href={href('x1', 'X1.5')}>X1.5</a></Translated></td><td><Translated vi="lab X1.4">lab X1.4</Translated></td></tr>
+          <tr><td><Translated vi="Gỡ lỗi một bộ lọc gộp">Debug a fused filter</Translated></td><td><Translated vi={<>các quy tắc biên của <a href={href('x1', 'X1.5')}>X1.5</a></>}>the boundary rules of <a href={href('x1', 'X1.5')}>X1.5</a></Translated></td><td><Translated vi="lab X1.4">lab X1.4</Translated></td></tr>
         </tbody>
       </table>
       <Translated
@@ -633,7 +633,7 @@ export function Wrap() {
                   '12.4': 'nén gọn ứng viên',
                   '14.3': 'ứng viên đã sắp xếp, mọi hàng giảm dần và ổn định',
                   'X1.1': 'top-k bằng radix select, đo so với sắp xếp toàn bộ',
-                  'X1.2': 'top-p và min-p: ghép từ các lab trước, rồi hợp nhất',
+                  'X1.2': 'top-p và min-p: ghép từ các lab trước, rồi gộp',
                   'X1.3': 'mốc dự án M5: một sampler GPU theo batch',
                 } as Record<string, string>)[m.num] ?? m.title)}</td>
                 <td className="nowrap">

@@ -607,7 +607,7 @@ export function Labs() {
             đến gần giới hạn đó bao nhiêu. Mỗi hàng benchmark bên dưới báo số byte trọng số chia cho thời gian của nó, và các
             bảng chia con số đó cho những gì lab 5.1 đo được trên cùng thiết bị: PyTorch gọi đây là mức sử dụng băng thông của
             mô hình (model bandwidth utilisation). Nó chỉ đếm trọng số, nên bỏ qua activation, đầu ra và mọi lưu lượng nháp, và
-            nó có thể ra cao hơn một chút so với mức mà phép chép đơn giản của lab 5.1 đạt được.
+            nó có thể ra cao hơn một chút so với mức mà phép sao chép đơn giản của lab 5.1 đạt được.
           </p>
         }
       >
@@ -713,7 +713,7 @@ export function Labs() {
             hòa 2.5 và −2.5. Sau đó là các kích thước từ (1, 32, 1) đến (5, 4096, 3) trên trình giả lập, và đến (8, 4096,
             4096) và (4, 14336, 4096) trên GPU. Mỗi khối của một hàng được nhân với lũy thừa của hai riêng từ 2⁻¹² đến 2¹², nên
             một hệ số tỉ lệ đọc từ khối bên cạnh sai ít nhất 32 lần; mọi khối đều chứa mã 127 và −127; một hàng toàn số 0; các
-            hệ số tỉ lệ nhỏ nhất là số dưới chuẩn (subnormal) FP16. Y bắt đầu là NaN với một dải bảo vệ phía sau, mỗi trường
+            hệ số tỉ lệ nhỏ nhất là số subnormal FP16. Y bắt đầu là NaN với một dải bảo vệ phía sau, mỗi trường
             hợp khởi chạy hai lần, và kết quả được so với một tích vô hướng độ chính xác kép trên các trọng số đã giải lượng
             tử hóa trong phạm vi 1e-4 × (1 + Σ|x w|), không bao giờ so từng bit.
           </p>

@@ -3,7 +3,7 @@ import { Ask, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { solutionTabStatus } from '../../components/LabKit';
 import { Aside, Bench, Beyond, Simplification, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { fmt, useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import {
@@ -189,7 +189,7 @@ export const questionsSX34: Record<string, Question> = {
       },
       {
         label: <Translated vi="cuBLASLt, vì MLX luôn dùng thư viện trên CUDA.">cuBLASLt, because MLX always uses the library on CUDA.</Translated>,
-        why: <Translated vi="Nó dùng thư viện mỗi khi can_use_gemv là false hoặc có bias được hợp nhất, nhưng ở đây thì không.">It does whenever can_use_gemv is false or a bias is fused, but not here.</Translated>,
+        why: <Translated vi="Nó dùng thư viện mỗi khi can_use_gemv là false hoặc có bias được gộp, nhưng ở đây thì không.">It does whenever can_use_gemv is false or a bias is fused, but not here.</Translated>,
       },
     ],
     explain: (
@@ -198,7 +198,7 @@ export const questionsSX34: Record<string, Question> = {
           <p>
             <code>return (M == 1 &amp;&amp; b_transposed) || (N == 1 &amp;&amp; !a_transposed);</code> Với b = W.T được lưu
             dưới dạng W, tích vô hướng cho đầu ra j đi dọc hàng j của W, liền kề trong bộ nhớ: đúng bố cục mà một GEMV mỗi warp
-            một hàng cần. Một bias được hợp nhất sẽ gửi cùng hình dạng đó tới cuBLASLt, vì nhánh là{' '}
+            một hàng cần. Một bias được gộp sẽ gửi cùng hình dạng đó tới cuBLASLt, vì nhánh là{' '}
             <code>!bias &amp;&amp; can_use_gemv(...)</code>.
           </p>
         }
@@ -490,10 +490,11 @@ function WhichKernel() {
   const [shape, setShape] = useState<Shape>(DEFAULT_SHAPE);
   const M = TOKENS[mi];
   const s = useMemo(() => ({ ...shape, M }), [shape, M]);
-  const r = useMemo(() => route(project, s), [project, s]);
-  const all = useMemo(() => PROJECTS.map((p) => route(p, s)), [s]);
+  const locale = useLocale();
+  const r = useMemo(() => route(project, s), [project, s, locale]);
+  const all = useMemo(() => PROJECTS.map((p) => route(p, s)), [s, locale]);
   const { reports, loading } = useReports();
-  const knees = useMemo(() => readerKnees(reports), [reports]);
+  const knees = useMemo(() => readerKnees(reports), [reports, locale]);
   const set = (o: Partial<Shape>) => setShape({ ...shape, ...o });
   const cand = ROUTES[r.candidate];
 
@@ -557,7 +558,7 @@ function WhichKernel() {
           </>
         ) : null}
         {project === 'mlx-cuda' ? (
-          <label className="check"><input type="checkbox" checked={shape.bias} onChange={(e) => set({ bias: e.target.checked })} />{' '}<Translated vi="bias được hợp nhất">fused bias</Translated></label>
+          <label className="check"><input type="checkbox" checked={shape.bias} onChange={(e) => set({ bias: e.target.checked })} />{' '}<Translated vi="bias được gộp">fused bias</Translated></label>
         ) : null}
       </div>
 
