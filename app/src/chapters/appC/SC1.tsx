@@ -578,14 +578,14 @@ export const questionsSC1: Record<string, Question> = {
         vi={
           <p>
             Đặc tả viết: "If an address space attribute is missing on a pointer or reference type declaration, a
-            compilation error occurs." (nếu khai báo kiểu con trỏ hoặc tham chiếu thiếu thuộc tính address space thì sẽ có
+        compilation error occurs." (nếu khai báo kiểu con trỏ hoặc tham chiếu thiếu thuộc tính address space thì sẽ có
             lỗi biên dịch). Trình biên dịch trên máy build áp dụng điều này cho tới MSL 4.0.
           </p>
         }
       >
         <p>
-          The specification: "If an address space attribute is missing on a pointer or reference type declaration, a
-          compilation error occurs." The compiler on the build machine enforces this up to MSL 4.0.
+        The specification: "If an address space attribute is missing on a pointer or reference type declaration, a
+        compilation error occurs." The compiler on the build machine enforces this up to MSL 4.0.
         </p>
       </Translated>
     ),

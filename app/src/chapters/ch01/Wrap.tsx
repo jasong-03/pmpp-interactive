@@ -1152,7 +1152,7 @@ export function Wrap() {
               <>
                 §1.5 (pp. 12–13): cách các chỉ thị và pragma của OpenMP hoạt động, phân rã miền của MPI, và thiết kế của OpenCL. Một
                 đoạn trong mục 1.7. MPI, NCCL và NVSHMEM mỗi thứ có một đoạn trên một trang của chương 23 của khóa học này (
-                <a href={href('ch23', '23.4')}>23.3–23.5</a>), chương giữ lại stream, chép bất đồng bộ và bộ nhớ ghim (pinned
+                <a href={href('ch23', '23.4')}>23.3–23.5</a>), chương giữ lại stream, sao chép bất đồng bộ và bộ nhớ ghim (pinned
                 memory).
               </>
             }

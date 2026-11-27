@@ -1498,7 +1498,7 @@ export function S17() {
             runtime tạo ra mã song song; nó sinh ra trên CPU rồi mở rộng sang GPU, và nó mua sự tiện lợi bằng cái giá là quyền
             kiểm soát. <b>MPI</b>: cho các cụm máy mà các nút không chia sẻ bộ nhớ, nên mọi trao đổi đều là một thông điệp tường
             minh; đó là tầng phía trên một GPU, mà khóa học này chỉ bàn ngắn gọn (<a href={href('ch23')}>chương 23</a> của nó giữ
-            lại stream, chép bất đồng bộ và bộ nhớ ghim, và chỉ đọc vòng lặp MPI của sách để xem ai chờ). <b>OpenCL</b>: gần CUDA
+            lại stream, sao chép bất đồng bộ và bộ nhớ ghim, và chỉ đọc vòng lặp MPI của sách để xem ai chờ). <b>OpenCL</b>: gần CUDA
             về khái niệm, dựa nhiều hơn vào lời gọi API và ít hơn vào phần mở rộng ngôn ngữ; một chương trình OpenCL chạy không cần
             sửa trên mọi thiết bị hỗ trợ nó, và thường cần sửa đổi để chạy tốt trên một thiết bị mới.
           </p>

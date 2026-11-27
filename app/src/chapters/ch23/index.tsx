@@ -25,7 +25,7 @@ export const chapter: Chapter = {
       id: '23.3', num: '23.3', title: 'Streams, asynchronous copies and pinned memory', pages: '553–556, 560–563',
       lede: 'Split a job that copies in, computes and copies out across streams so the copies hide behind the kernel, predict how long it takes and what idle time remains, and say why the host buffer must be pinned.',
       vi: {
-        title: 'Stream, chép bất đồng bộ và bộ nhớ ghim',
+        title: 'Stream, sao chép bất đồng bộ và bộ nhớ ghim',
         lede: 'Chia một công việc gồm chép vào, tính toán và chép ra cho nhiều stream để các lần sao chép ẩn sau kernel, dự đoán nó mất bao lâu và còn lại bao nhiêu thời gian rảnh, và nói vì sao buffer phía host phải được ghim.',
       },
       load: () => import('./S233').then((m) => ({ Component: m.S233, questions: m.questionsS233 })),

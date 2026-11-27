@@ -1059,7 +1059,7 @@ export const questionsS119: Record<string, Question> = {
         why: <Translated vi="Nhanh hơn, có thể; đúng, thì không. Phạm vi block chỉ bao gồm khối của chính bên ghi, còn bên đọc lại ở khối khác.">Faster, perhaps; correct, no. Block scope covers only the writer's own block, and the reader is in another.</Translated>,
       },
       {
-        label: <Translated vi="Hành vi không xác định: với phạm vi block trên lệnh ghi, chỉ khối của chính bên ghi được sắp thứ tự với nó.">Undefined behaviour: with block scope on the store, only the writer's own block is ordered with it.</Translated>,
+        label: tr("Undefined behaviour: with block scope on the store, only the writer's own block is ordered with it.", 'Hành vi không xác định: với phạm vi block trên lệnh ghi, chỉ khối của chính bên ghi được sắp thứ tự với nó.'),
         correct: true,
       },
       { label: <Translated vi="Chỉ đúng trên Hopper trở về sau.">Correct on Hopper and later only.</Translated>, why: <Translated vi="Mô hình bộ nhớ ở đây không phụ thuộc vào kiến trúc.">The memory model does not depend on the architecture here.</Translated> },

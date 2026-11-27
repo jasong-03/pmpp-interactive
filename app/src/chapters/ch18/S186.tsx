@@ -795,7 +795,13 @@ function ResetForms() {
     const text = f ? f.text : `// ${kernel} not found`;
     const line = f ? siteLine(text, site) : -1;
     const highlight = line >= 0 ? Array.from({ length: rows }, (_, k) => line + 1 + k) : [];
-    return { label, code: text, tiers: PRIV_TIERS, highlight, status };
+    return {
+      label: tr(label, ({ 'corrected: atomic store': 'đã sửa: ghi atomic', 'corrected: clamp': 'đã sửa: kẹp giá trị', "the book's line 29": 'dòng 29 của sách' } as Record<string, string>)[label] ?? label),
+      code: text,
+      tiers: PRIV_TIERS,
+      highlight,
+      status,
+    };
   };
   const checked = tr(
     'emulator-checked (emu and race) and front-end-checked; unverified on CUDA and HIP hardware',
@@ -804,9 +810,9 @@ function ResetForms() {
   return (
     <Code
       tabs={[
-        tab(tr('corrected: atomic store', 'đã sửa: ghi atomic'), 'bfsPrivatised', 'reset', 2, checked),
-        tab(tr('corrected: clamp', 'đã sửa: kẹp giá trị'), 'bfsPrivatisedClamp', 'clamp', 2, checked),
-        tab(tr("the book's line 29", 'dòng 29 của sách'), 'bfsPlainStore', 'reset', 1, tr('emulator-checked; the race emulator reports this line', 'emulator-checked; trình giả lập race báo dòng này')),
+        tab('corrected: atomic store', 'bfsPrivatised', 'reset', 2, checked), // i18n-ignore: the label is translated inside tab()
+        tab('corrected: clamp', 'bfsPrivatisedClamp', 'clamp', 2, checked), // i18n-ignore: the label is translated inside tab()
+        tab("the book's line 29", 'bfsPlainStore', 'reset', 1, tr('emulator-checked; the race emulator reports this line', 'emulator-checked; trình giả lập race báo dòng này')), // i18n-ignore: the label is translated inside tab()
       ]}
       caption={
         <Translated
