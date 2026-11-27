@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Ask, type Question } from '../../components/Ask';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import {
   ARITH_LABEL,
@@ -50,7 +50,8 @@ function GaussStepper({ title, task, init }: { title: string; task: string; init
   const [view, setView] = useState<'matrix' | 'equations'>('matrix');
   const [i, setI] = useState(0);
   const sys = useMemo(() => system(cfg.sys, cfg.eps), [cfg.sys, cfg.eps]);
-  const t = useMemo(() => trace(sys, { pivot: cfg.pivot, arith: cfg.arith }), [sys, cfg.pivot, cfg.arith]);
+  const locale = useLocale();
+  const t = useMemo(() => trace(sys, { pivot: cfg.pivot, arith: cfg.arith }), [sys, cfg.pivot, cfg.arith, locale]);
   useEffect(() => setI(0), [t]);
   const last = t.phases.length - 1;
   const at = Math.min(i, last);
@@ -285,7 +286,7 @@ function ErratumHunt() {
           const capCls = revealed ? (wrong.has(capKey) ? (marks.has(capKey) ? 'found' : 'missed') : marks.has(capKey) ? 'false' : '') : '';
           return (
             <div key={p.label} className="panel" data-panel={p.label}>
-              <div className="mx-label">{p.label}{p.solved ? <span className="muted"><Translated vi={<> · giải ra {p.solved}</>}> · solves {p.solved}</Translated></span> : null}</div>
+              <div className="mx-label">{tr(p.label, p.label === 'Original' ? 'Ban đầu' : p.label === 'Pivoting' ? 'Chọn phần tử chốt' : p.label.replace(/^Step /, 'Bước '))}{p.solved ? <span className="muted"><Translated vi={<> · giải ra {p.solved}</>}> · solves {p.solved}</Translated></span> : null}</div>
               {p.caption.op !== 'none' ? (
                 <button className="quiet" aria-pressed={marks.has(capKey)} data-key={capKey} data-verdict={capCls}
                   onClick={() => toggle(capKey)}

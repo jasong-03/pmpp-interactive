@@ -225,7 +225,7 @@ export const questionsWrap: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Một vòng lặp decode Metal trên Apple silicon ghi logits vào một bộ đệm có lưu trữ private, vì private dành cho dữ
+            Một vòng lặp decode Metal trên Apple silicon ghi logits vào một buffer có lưu trữ private, vì private dành cho dữ
             liệu chỉ GPU chạm tới. Việc lấy mẫu chạy trên CPU. CPU phải làm gì để đọc logits sau mỗi token?
           </>
         }
@@ -240,26 +240,26 @@ export const questionsWrap: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="Đọc logits.contents sau waitUntilCompleted: CPU và GPU dùng chung một bộ nhớ, nên bộ đệm nào CPU cũng đọc được.">
+          <Translated vi="Đọc logits.contents sau waitUntilCompleted: CPU và GPU dùng chung một bộ nhớ, nên buffer nào CPU cũng đọc được.">
             {'Read logits.contents after waitUntilCompleted: the CPU and the GPU share one memory, so every buffer is CPU-readable.'}
           </Translated>
         ),
         why: (
-          <Translated vi="Một bộ nhớ vật lý không làm cho mọi bộ đệm đều hiện ra với CPU. contents là NULL với bộ đệm private.">
+          <Translated vi="Một bộ nhớ vật lý không làm cho mọi buffer đều hiện ra với CPU. contents là NULL với buffer private.">
             One physical memory does not make every buffer CPU-visible. contents is NULL for a private buffer.
           </Translated>
         ),
       },
       {
         label: (
-          <Translated vi="Blit logits sang một bộ đệm shared, chờ command buffer đó, đọc bộ đệm shared; hoặc dùng bộ đệm shared ngay từ đầu.">
+          <Translated vi="Blit logits sang một buffer shared, chờ command buffer đó, đọc buffer shared; hoặc dùng buffer shared ngay từ đầu.">
             {'Blit the logits into a shared buffer, wait for that command buffer, read the shared one; or use a shared buffer from the start.'}
           </Translated>
         ),
         correct: true,
       },
       {
-        label: <Translated vi="Gọi didModifyRange trên bộ đệm, rồi đọc nó.">Call didModifyRange on the buffer, then read it.</Translated>,
+        label: <Translated vi="Gọi didModifyRange trên buffer, rồi đọc nó.">Call didModifyRange on the buffer, then read it.</Translated>,
         why: (
           <Translated vi="didModifyRange thuộc về lưu trữ managed, thứ không có tác dụng trên Apple silicon.">
             didModifyRange belongs to managed storage, which has no effect on Apple silicon.
@@ -273,7 +273,7 @@ export const questionsWrap: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Một lần sao chép blit giữa các bộ đệm chính là cách dữ liệu đi vào hoặc ra khỏi một bộ đệm private.">
+          <Translated vi="Một lần sao chép blit giữa các buffer chính là cách dữ liệu đi vào hoặc ra khỏi một buffer private.">
             A blit copy between buffers is exactly how data gets into or out of a private buffer.
           </Translated>
         ),
@@ -284,10 +284,10 @@ export const questionsWrap: Record<string, Question> = {
         vi={
           <p>
             Apple: tài nguyên private không truy cập được từ CPU, và <code>contents</code> trả về NULL với chúng. Dữ liệu vào
-            hoặc ra khỏi một bộ đệm private qua một lần sao chép blit sang hoặc từ một bộ đệm shared, đúng như{' '}
+            hoặc ra khỏi một buffer private qua một lần sao chép blit sang hoặc từ một buffer shared, đúng như{' '}
             <code>feedPrivateCopy</code> của lab C.1 làm ở cả hai đầu. Logits mà CPU đọc ở mỗi token không phải "dữ liệu chỉ
-            GPU chạm tới", nên một bộ đệm shared, đọc sau lần chờ, là lựa chọn đơn giản hơn. Trên một bộ nhớ chung, câu hỏi
-            không bao giờ là byte có phải đi qua đường truyền hay không; mà là bạn đã chọn loại bộ đệm nào.
+            GPU chạm tới", nên một buffer shared, đọc sau lần chờ, là lựa chọn đơn giản hơn. Trên một bộ nhớ chung, câu hỏi
+            không bao giờ là byte có phải đi qua đường truyền hay không; mà là bạn đã chọn loại buffer nào.
           </p>
         }
       >
@@ -494,7 +494,7 @@ export function Wrap() {
             <li>
               Đọc bộ nhớ host tại chỗ phải trả giá kênh kết nối ở mọi lần truy cập. Nó chỉ thắng khi số byte kernel đọc trong
               suốt vòng đời còn dưới khoảng một bảng dữ liệu; vượt qua đó, hãy sao chép trước. Trên Apple silicon không có
-              đường truyền nào để trả giá, và lựa chọn trở thành dùng loại bộ đệm nào.
+              đường truyền nào để trả giá, và lựa chọn trở thành dùng loại buffer nào.
             </li>
             <li>
               Một không gian địa chỉ ảo cho runtime biết một con trỏ nằm ở đâu, đó là lý do <code>cudaMemcpyDefault</code> hoạt
@@ -515,7 +515,7 @@ export function Wrap() {
             <li>
               Truy cập bộ nhớ của GPU khác, và bộ nhớ do bạn tự ánh xạ, cần một lần cấp quyền tường minh:{' '}
               <code>cudaDeviceEnablePeerAccess</code>, mỗi lần một chiều, và <code>cuMemSetAccess</code> sau{' '}
-              <code>cuMemMap</code>. Đặt trước địa chỉ cho phép một bộ đệm như KV cache lớn dần mà không phải dời đi.
+              <code>cuMemMap</code>. Đặt trước địa chỉ cho phép một buffer như KV cache lớn dần mà không phải dời đi.
             </li>
             <li>
               Không điều nào ở trên sắp đặt thứ tự. Một con trỏ, các trang nhất quán hay một bộ nhớ vật lý, mỗi thứ đều bỏ được
@@ -766,7 +766,7 @@ export function Wrap() {
               <Translated
                 vi={
                   <>
-                    trình chạy từng bước đặt trước-ánh xạ-cấp quyền và hoạt hình bộ đệm lớn dần trong{' '}
+                    trình chạy từng bước đặt trước-ánh xạ-cấp quyền và hoạt hình buffer lớn dần trong{' '}
                     <a href={href('appC', 'C.9')}>C.9</a>
                   </>
                 }

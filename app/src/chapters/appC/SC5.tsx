@@ -580,7 +580,7 @@ export const questionsSC5: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="Bản sao trung gian, cùng việc thiết lập sao chép và đồng bộ hóa của host.">
+          <Translated vi="Lần sao chép trung chuyển, cùng việc thiết lập sao chép và đồng bộ hóa của host.">
             The staging copy and the host's copy set-up and synchronisation.
           </Translated>
         ),
@@ -606,7 +606,7 @@ export const questionsSC5: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Halo vẫn đi qua đường truyền; mỗi lần nạp peer đều đi qua nó. Thứ biến mất là bản sao thừa và phần việc của host trong đó.">
+          <Translated vi="Halo vẫn đi qua đường truyền; mỗi lần nạp peer đều đi qua nó. Thứ biến mất là lần sao chép thừa và phần việc của host trong đó.">
             The halo still crosses the link; each peer load goes over it. What disappears is the extra copy and the host's
             part in it.
           </Translated>

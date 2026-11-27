@@ -157,7 +157,7 @@ export function DerefMap({
                   title={x.title}
                   style={{ fontSize: '0.8rem', padding: '0.25rem 0.55rem' }}
                 >
-                  {x.strip}
+                  {tr(x.strip, x.strip === 'beyond the book' ? 'ngoài sách' : x.strip)}
                 </button>
               ))}
             </div>

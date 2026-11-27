@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Ask, Predict, type Question } from '../../components/Ask';
 import { Beyond, Source, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import { TEASER_N, pct, show, teaser, ulpText } from '../../sim/fpsum';
 
@@ -9,7 +9,8 @@ const FACTS = 'notes/today/appA-facts.md';
 
 // ---------------------------------------------------------------- the teaser's reveal
 function TeaserReveal({ v }: { v: number }) {
-  const t = useMemo(() => teaser(), []);
+  const locale = useLocale();
+  const t = useMemo(() => teaser(), [locale]);
   const half = t.rows.find((r) => r.id === 'fp16-loop')!.e;
   const off = Math.abs(v - half.rel * 100);
   return (

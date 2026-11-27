@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { Ask, type Question } from '../../components/Ask';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
 import { useReports } from '../../lib/reports';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import {
   ELEMENTS,
@@ -43,7 +43,8 @@ const pow = (e: number) => (
 // ---------------------------------------------------------------- your devices
 function YourMemory() {
   const { reports, loading } = useReports();
-  const figs = useMemo(() => memoryFigures(reports), [reports]);
+  const locale = useLocale();
+  const figs = useMemo(() => memoryFigures(reports), [reports, locale]);
   const intFloats = arrayLimit('int32', 4).bytes;
   return (
     <div className="panel" data-your-memory={figs.length} style={{ margin: '0.4rem 0 1.4rem' }}>
@@ -447,7 +448,7 @@ export const questionsSC4: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="Bộ nhớ ghim nhanh hơn bộ nhớ phân trang được (pageable), nên GPU đòi dùng nó cho mọi buffer mà nó đọc tại chỗ.">
+          <Translated vi="Bộ nhớ ghim nhanh hơn bộ nhớ phân trang (pageable), nên GPU đòi dùng nó cho mọi buffer mà nó đọc tại chỗ.">
             Pinned memory is faster than pageable memory, so the GPU insisted on it for every buffer it read in place.
           </Translated>
         ),

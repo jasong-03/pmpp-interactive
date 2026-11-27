@@ -567,7 +567,7 @@ function GrowKV() {
                   `During each copy, old and new together are up to ${Number(r.peakRatio.toPrecision(3))} times the data being copied.`,
                   `Trong mỗi lần sao chép, cũ và mới cộng lại lên tới ${Number(r.peakRatio.toPrecision(3))} lần lượng dữ liệu đang được sao chép.`,
                 )
-              : tr('No copy yet: the first buffer still has room.', 'Chưa có lần sao chép nào: bộ đệm đầu tiên vẫn còn chỗ.')
+              : tr('No copy yet: the first buffer still has room.', 'Chưa có lần sao chép nào: buffer đầu tiên vẫn còn chỗ.')
             : strategy === 'exact'
               ? tr(
                   'Every token copies everything held so far, so the total copied grows with the square of the length.',
@@ -737,8 +737,8 @@ export const questionsSC9: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Một bộ đệm lớn dần mỗi lần một chunk, từ 1 chunk đến 16 chunk. Nó bắt đầu với dung lượng 1 chunk và nhân đôi dung
-            lượng mỗi khi đầy, mỗi lần đều sao chép nội dung sang bộ đệm mới. Tổng cộng có bao nhiêu chunk được sao chép?
+            Một buffer lớn dần mỗi lần một chunk, từ 1 chunk đến 16 chunk. Nó bắt đầu với dung lượng 1 chunk và nhân đôi dung
+            lượng mỗi khi đầy, mỗi lần đều sao chép nội dung sang buffer mới. Tổng cộng có bao nhiêu chunk được sao chép?
           </>
         }
       >
@@ -778,8 +778,8 @@ export const questionsSC9: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Một bộ đệm nằm trong một dải địa chỉ đặt trước. Bạn ánh xạ một chunk mới ngay sau chunk cuối. Các kernel đang giữ
-            con trỏ gốc của bộ đệm có cần con trỏ mới không?
+            Một buffer nằm trong một dải địa chỉ đặt trước. Bạn ánh xạ một chunk mới ngay sau chunk cuối. Các kernel đang giữ
+            con trỏ gốc của buffer có cần con trỏ mới không?
           </>
         }
       >
@@ -792,7 +792,7 @@ export const questionsSC9: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="Có: mỗi lần nới rộng ánh xạ bộ nhớ ở địa chỉ mới, nên gốc của bộ đệm bị dời và kernel phải được đưa gốc mới.">
+          <Translated vi="Có: mỗi lần nới rộng ánh xạ bộ nhớ ở địa chỉ mới, nên gốc của buffer bị dời và kernel phải được đưa gốc mới.">
             {"Yes: each growth maps memory at new addresses, so the buffer's base moves and kernels must be given the new one."}
           </Translated>
         ),
@@ -1065,7 +1065,7 @@ export function SC9() {
         vi={
           <p>
             Vậy là ba tài nguyên, mỗi thứ có lời gọi riêng: địa chỉ, bộ nhớ và quyền truy cập. Giữ chúng tách biệt là điều cho
-            phép một con trỏ trải trên hai device, và cũng là điều cho phép một bộ đệm lớn dần mà không phải dời đi.
+            phép một con trỏ trải trên hai device, và cũng là điều cho phép một buffer lớn dần mà không phải dời đi.
           </p>
         }
       >
@@ -1076,14 +1076,14 @@ export function SC9() {
       </Translated>
 
       <h2>
-        <Translated vi="Một bộ đệm lớn dần mà không phải dời đi">A buffer that grows without moving</Translated>
+        <Translated vi="Một buffer lớn dần mà không phải dời đi">A buffer that grows without moving</Translated>
       </h2>
       <Translated
         vi={
           <p>
             NVIDIA giờ gọi tên cách dùng quan trọng nhất với bạn: các allocator và cache "như quản lý động KV cache trong các
             mô hình ngôn ngữ lớn". Một KV cache có thêm một mục cho mỗi token được sinh ra, và kích thước cuối cùng của nó
-            không được biết khi bắt đầu sinh. Với cấp phát thông thường, lớn dần nghĩa là một bộ đệm mới, lớn hơn, và một lần
+            không được biết khi bắt đầu sinh. Với cấp phát thông thường, lớn dần nghĩa là một buffer mới, lớn hơn, và một lần
             sao chép. Với một dải địa chỉ đặt trước, nó nghĩa là ánh xạ thêm một chunk sau chunk cuối.
           </p>
         }
@@ -1150,7 +1150,7 @@ export function SC9() {
           <Translated
             vi={
               <>
-                Cache lớn dần đến 4096 token, mỗi token 512 KiB, tổng cộng 2 GiB. Nó bắt đầu là một bộ đệm 2 MiB và nhân đôi
+                Cache lớn dần đến 4096 token, mỗi token 512 KiB, tổng cộng 2 GiB. Nó bắt đầu là một buffer 2 MiB và nhân đôi
                 mỗi khi đầy, mỗi lần đều sao chép mọi thứ nó đang giữ. Trong toàn bộ quá trình, nó sao chép bao nhiêu GiB?
               </>
             }
@@ -1175,7 +1175,7 @@ export function SC9() {
                   {Math.abs(v - gib) < 0.25
                     ? 'Đúng như bạn đã đoán.'
                     : v > 4
-                      ? 'Mỗi lần sao chép chỉ chuyển lượng bộ đệm đang giữ vào lúc đó, và các lượng này giảm một nửa khi lùi về trước, nên cộng lại ít hơn kích thước cuối cùng.'
+                      ? 'Mỗi lần sao chép chỉ chuyển lượng buffer đang giữ vào lúc đó, và các lượng này giảm một nửa khi lùi về trước, nên cộng lại ít hơn kích thước cuối cùng.'
                       : 'Mỗi lần nhân đôi sao chép bằng tất cả các lần trước cộng lại, cộng thêm một chunk, nên tổng rơi ngay dưới kích thước cuối cùng.'}{' '}
                   Cấp phát vừa khít sẽ sao chép khoảng 4 TiB; đặt trước rồi ánh xạ không sao chép gì.
                 </p>

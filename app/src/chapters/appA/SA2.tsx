@@ -404,7 +404,7 @@ function statusText(c: Classified): ReactNode {
     case 'normal':
       return c.exact ? tr('normal, exact', 'chuẩn, chính xác') : tr('normal', 'chuẩn');
     case 'subnormal':
-      return c.exact ? tr('subnormal, exact', 'dưới chuẩn, chính xác') : tr('subnormal', 'dưới chuẩn');
+      return c.exact ? tr('subnormal, exact', 'subnormal, chính xác') : tr('subnormal', 'số subnormal');
     case 'zero':
       return c.input === 0 ? tr('zero', 'số 0') : <span className="chip fail">{tr('underflow to 0', 'underflow về 0')}</span>;
     case 'flushed':
@@ -1374,7 +1374,7 @@ export function SA2() {
         <Translated
           vi={
             <p>
-              Ép về 0 được mô hình hóa bằng cách làm tròn có denormal rồi thay kết quả dưới chuẩn bằng 0. Phần cứng có thể
+              Ép về 0 được mô hình hóa bằng cách làm tròn có denormal rồi thay kết quả subnormal bằng 0. Phần cứng có thể
               ép cả đầu vào, và các nhà cung cấp ghi trong tài liệu những chế độ khác nhau. Mọi phép chuyển đổi ở đây làm
               tròn về số chẵn gần nhất.
             </p>

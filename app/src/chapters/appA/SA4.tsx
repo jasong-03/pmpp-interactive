@@ -403,7 +403,7 @@ function YourDevice() {
                 <td>{b === 'emu' || b === 'race' ? <Translated vi={<>CPU (trình giả lập): phép tính của host, không phải của GPU</>}><>the CPU (emulator): the host's arithmetic, not a GPU's</></Translated> : device}</td>
                 <td>{probe.rounding === 'toward-zero' ? tr('rounds down to 1: toward zero', 'làm tròn xuống 1: về phía 0') : probe.rounding === 'nearest' ? tr('rounds up: not toward zero', 'làm tròn lên: không về phía 0') : String(probe.rounding ?? tr('not reported', 'chưa có báo cáo'))}</td>
                 <td>{probe.keeps_denormals === undefined ? tr('not reported', 'chưa có báo cáo') : yes(probe.keeps_denormals) ? tr('kept', 'giữ lại') : tr('flushed to zero', 'bị ép về 0')}</td>
-                <td>{probe.fuses_mul_add === undefined ? tr('not reported', 'chưa có báo cáo') : yes(probe.fuses_mul_add) ? tr('fused (one rounding)', 'hợp nhất (một lần làm tròn)') : tr('two roundings', 'hai lần làm tròn')}</td>
+                <td>{probe.fuses_mul_add === undefined ? tr('not reported', 'chưa có báo cáo') : yes(probe.fuses_mul_add) ? tr('fused (one rounding)', 'gộp (một lần làm tròn)') : tr('two roundings', 'hai lần làm tròn')}</td>
               </tr>
             ))}
           </tbody>
@@ -819,7 +819,7 @@ export const questionsSA4: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="nvcc đã hợp nhất phép nhân và phép cộng thành một FMA, làm tròn một lần; bản tham chiếu làm tròn tích trước.">
+          <Translated vi="nvcc đã gộp phép nhân và phép cộng thành một FMA, làm tròn một lần; bản tham chiếu làm tròn tích trước.">
             nvcc fused the multiply and add into one FMA, rounding once; the reference rounds the product first.
           </Translated>
         ),
@@ -868,10 +868,10 @@ export const questionsSA4: Record<string, Question> = {
           <>
             <p>
               <code>--fmad</code> của nvcc mặc định là true, nên kernel làm tròn một lần. Bản tham chiếu của bạn lưu tích vào{' '}
-              <code>p</code> trước, và Clang trên host chỉ hợp nhất trong một câu lệnh, nên nó làm tròn hai lần. (HIP-Clang
-              mặc định hợp nhất xuyên các câu lệnh, nên cách tách như vậy sẽ không ngăn được nó ở đó.) Nếu bản tham chiếu là
-              một câu lệnh duy nhất <code>a*b + c</code>, một host có lệnh FMA cũng có thể hợp nhất nó, và hai bên có thể khớp
-              nhau. Không kết quả nào sai: kết quả hợp nhất thực ra chính xác hơn. Hãy so sánh với một dung sai, hoặc, khi bạn
+              <code>p</code> trước, và Clang trên host chỉ gộp trong một câu lệnh, nên nó làm tròn hai lần. (HIP-Clang
+              mặc định gộp xuyên các câu lệnh, nên cách tách như vậy sẽ không ngăn được nó ở đó.) Nếu bản tham chiếu là
+              một câu lệnh duy nhất <code>a*b + c</code>, một host có lệnh FMA cũng có thể gộp nó, và hai bên có thể khớp
+              nhau. Không kết quả nào sai: kết quả gộp thực ra chính xác hơn. Hãy so sánh với một dung sai, hoặc, khi bạn
               cần khớp từng bit, hãy viết <code>__fadd_rn(__fmul_rn(a, b), c)</code>: hai intrinsic đó không bao giờ bị gộp
               thành một FMA.
             </p>
@@ -1226,7 +1226,7 @@ export function SA4() {
       <Translated
         vi={
           <p>
-            Một phép <b>fused multiply-add</b> (nhân-cộng hợp nhất) tính <code>a*b + c</code> với một lần làm tròn duy nhất ở
+            Một phép <b>fused multiply-add</b> (nhân-cộng gộp) tính <code>a*b + c</code> với một lần làm tròn duy nhất ở
             cuối, trong khi một phép nhân theo sau là một phép cộng làm tròn hai lần. Sách không nhắc đến nó, nhưng mọi trình
             biên dịch GPU đều tạo ra nó theo mặc định, và đó là lý do phổ biến nhất khiến một kernel đúng và một bản tham chiếu
             CPU đúng khác nhau ở bit cuối.
@@ -1243,9 +1243,9 @@ export function SA4() {
         <Translated
           vi={
             <p>
-              Mặc định: nvcc <code>--fmad=true</code>; HIP-Clang <code>-ffp-contract=fast-honor-pragmas</code> (hợp nhất xuyên
+              Mặc định: nvcc <code>--fmad=true</code>; HIP-Clang <code>-ffp-contract=fast-honor-pragmas</code> (gộp xuyên
               các câu lệnh); Metal cho phép gộp (contraction); Clang trên host <code>-ffp-contract=on</code> (trong một câu
-              lệnh). <code>__fadd_rn</code> và <code>__fmul_rn</code> không bao giờ bị hợp nhất (appA-facts A9, B5).
+              lệnh). <code>__fadd_rn</code> và <code>__fmul_rn</code> không bao giờ bị gộp (appA-facts A9, B5).
             </p>
           }
         >

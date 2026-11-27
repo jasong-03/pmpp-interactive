@@ -1711,7 +1711,7 @@ export function SA6() {
           vi={
             <ul>
               <li>
-                CUDA: <code>__fadd_rn</code> và <code>__fsub_rn</code> không bao giờ bị hợp nhất thành phép nhân-cộng. Việc nvcc
+                CUDA: <code>__fadd_rn</code> và <code>__fsub_rn</code> không bao giờ bị gộp thành phép nhân-cộng. Việc nvcc
                 có sắp xếp lại các phép cộng float thông thường hay không thì hướng dẫn của NVIDIA không khẳng định (mục 5.6.3
                 và 5.6.1.8 mâu thuẫn nhau).
               </li>

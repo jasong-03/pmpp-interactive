@@ -221,7 +221,7 @@ function Instruments() {
         what: tr('contents against gpuAddress (observed, not documented)', 'contents so với gpuAddress (quan sát được, không có trong tài liệu)'),
         says: tr(
           `shared buffer: ${addr.shared_same ? 'the same value' : 'different values'}; no-copy buffer: ${addr.nocopy_same ? 'the same value' : 'different values'}`,
-          `bộ đệm shared: ${addr.shared_same ? 'cùng một giá trị' : 'hai giá trị khác nhau'}; bộ đệm no-copy: ${addr.nocopy_same ? 'cùng một giá trị' : 'hai giá trị khác nhau'}`,
+          `buffer shared: ${addr.shared_same ? 'cùng một giá trị' : 'hai giá trị khác nhau'}; buffer no-copy: ${addr.nocopy_same ? 'cùng một giá trị' : 'hai giá trị khác nhau'}`,
         ),
       });
     return out;
@@ -326,7 +326,7 @@ const PATH_NAME: Record<string, string> = {
     return tr('no-copy wrap', 'bọc no-copy');
   },
   get shared() {
-    return tr('shared buffer', 'bộ đệm shared');
+    return tr('shared buffer', 'buffer shared');
   },
 };
 const msOf = (head: string, key: string): Col => ({
@@ -627,12 +627,12 @@ export function Labs() {
               <td><code style={{ whiteSpace: 'nowrap' }}>feedPrivateCopy</code></td>
               <td>Metal{/* i18n-ignore: backend name */}</td>
               <td>
-                <Translated vi="một bộ đệm trung gian shared, rồi một lần blit vào bộ đệm private">
+                <Translated vi="một buffer trung gian shared, rồi một lần blit vào buffer private">
                   a shared staging buffer, then a blit into a private buffer
                 </Translated>
               </td>
               <td>
-                <Translated vi="một bộ đệm chỉ GPU chạm tới được, sau một lần sao chép trên GPU">
+                <Translated vi="một buffer chỉ GPU chạm tới được, sau một lần sao chép trên GPU">
                   a buffer only the GPU can touch, after a GPU copy
                 </Translated>
               </td>
@@ -663,7 +663,7 @@ export function Labs() {
               <td><code style={{ whiteSpace: 'nowrap' }}>feedShared</code></td>
               <td>Metal{/* i18n-ignore: backend name */}</td>
               <td>
-                <Translated vi={<>một bộ đệm có lưu trữ shared, từ <code>newBufferWithLength</code></>}>
+                <Translated vi={<>một buffer có lưu trữ shared, từ <code>newBufferWithLength</code></>}>
                   <>a buffer with shared storage, from <code>newBufferWithLength</code></>
                 </Translated>
               </td>
@@ -719,7 +719,7 @@ export function Labs() {
         vi={
           <p>
             Trên Metal không có kênh kết nối nào giữa bộ nhớ của CPU và của GPU, nên ba đường ở đó không phải ba đường của
-            sách. Chúng khác nhau ở việc bảng có được sao chép không và ai sở hữu bộ nhớ. Một bộ đệm no-copy cần một con trỏ
+            sách. Chúng khác nhau ở việc bảng có được sao chép không và ai sở hữu bộ nhớ. Một buffer no-copy cần một con trỏ
             căn theo trang và một độ dài làm tròn lên số trang nguyên, và một lần blit trên macOS cần offset và kích thước là
             bội của 4 byte. Thời gian GPU được báo theo từng command buffer, nên hãy đặt các lần sao chép và các kernel vào các
             command buffer riêng nếu bạn muốn thấy chúng tách biệt.
@@ -738,7 +738,7 @@ export function Labs() {
         <Translated
           vi={
             <p>
-              Apple: bộ đệm private không có địa chỉ CPU. Metal "có thể áp dụng thêm các tối ưu hóa cho tài nguyên private", và
+              Apple: buffer private không có địa chỉ CPU. Metal "có thể áp dụng thêm các tối ưu hóa cho tài nguyên private", và
               không nói là tối ưu hóa nào.
             </p>
           }
@@ -783,7 +783,7 @@ export function Labs() {
             <li>
               Cấu trúc. Với các đường mapped, managed, no-copy và shared, bảng mà launcher được cung cấp ghi lại chính là vùng
               nhớ <code>produce</code> đã ghi: một con trỏ phục vụ cả hai phía. Với các đường explicit và private thì không, nên
-              đã có một lần sao chép, và trên Metal bộ đệm kernel đọc có lưu trữ private.
+              đã có một lần sao chép, và trên Metal buffer kernel đọc có lưu trữ private.
             </li>
             <li>
               <code>feedNoCopy</code>: con trỏ mà <code>produce</code> ghi qua là bội của kích thước trang.
@@ -1048,7 +1048,7 @@ export function Labs() {
           <Translated
             vi={
               <>
-                Đường private sao chép bảng trên GPU rồi đọc một bộ đệm mà CPU không chạm tới được; Apple không nói việc đọc nó có
+                Đường private sao chép bảng trên GPU rồi đọc một buffer mà CPU không chạm tới được; Apple không nói việc đọc nó có
                 nhanh hơn hay không. Thời gian cả lời gọi gồm cả cấp phát, nên hãy xem các cột sao chép GPU và kernel GPU trước khi
                 kết luận một khác biệt đến từ đâu.
               </>
@@ -1103,7 +1103,7 @@ export function Labs() {
           vi={
             <p>
               NVIDIA không còn nêu một tỷ lệ nào, và các hệ thống NVLink-C2C thu hẹp khoảng cách. Apple không ghi nhận gì về
-              quan hệ giữa <code>gpuAddress</code> của một bộ đệm và <code>contents</code> của nó; hàng Metal là một quan sát.
+              quan hệ giữa <code>gpuAddress</code> của một buffer và <code>contents</code> của nó; hàng Metal là một quan sát.
             </p>
           }
         >
@@ -1144,7 +1144,7 @@ export function Labs() {
             <li>
               <code>feedExplicit</code> dùng bộ nhớ <code>malloc</code> làm vùng trung gian. Hãy dùng <code>cudaMallocHost</code>{' '}
               thay thế và so sánh lần sao chép của nó với con số của phép dò. Khi vùng trung gian đã được ghim, nó có còn đáng
-              giữ không, hay <code>produce</code> nên ghi thẳng vào bộ đệm ghim và lần sao chép đi từ đó?
+              giữ không, hay <code>produce</code> nên ghi thẳng vào buffer ghim và lần sao chép đi từ đó?
             </li>
             <li>
               Prefetch bảng sang device trong <code>feedManaged</code> trước lượt đầu tiên. Lời gọi này đã đổi trong CUDA 13

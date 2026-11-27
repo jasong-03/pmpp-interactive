@@ -2,7 +2,7 @@ import { Fragment, useMemo, useState } from 'react';
 import { Ask, type Question } from '../../components/Ask';
 import { Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
 import { href } from '../../lib/router';
-import { Translated, tr as trText } from '../../lib/i18n';
+import { Translated, tr as trText, useLocale } from '../../lib/i18n';
 import {
   CLASSIFIER_FORMATS,
   OUTCOMES,
@@ -228,7 +228,8 @@ function Classifier() {
 
 // ---------------------------------------------------------------- what comes out?
 function WhatComesOut() {
-  const rows = useMemo(() => specialTable(), []);
+  const locale = useLocale();
+  const rows = useMemo(() => specialTable(), [locale]);
   const [picks, setPicks] = useState<Record<string, Outcome | ''>>({});
   const [shown, setShown] = useState(false);
   const right = rows.filter((r) => picks[r.id] === r.outcome).length;

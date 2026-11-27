@@ -380,7 +380,7 @@ export const questionsSC0: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Lưu trữ shared bỏ đi bản sao, không bỏ đi thứ tự. Apple bắt bạn chịu trách nhiệm về thứ tự.">
+          <Translated vi="Lưu trữ shared bỏ đi lần sao chép, không bỏ đi thứ tự. Apple bắt bạn chịu trách nhiệm về thứ tự.">
             Shared storage removes the copy, not the ordering. Apple makes you responsible for the ordering.
           </Translated>
         ),
@@ -415,7 +415,7 @@ export const questionsSC0: Record<string, Question> = {
         vi={
           <p>
             <code>commit</code> trả về trong khi công việc vẫn đang xếp hàng hoặc đang chạy. Với lưu trữ shared, không có
-            bản sao nào để nấp sau: hãy chờ command buffer hoàn tất trước khi dùng lại buffer, hoặc ghi batch tiếp theo vào
+            lần sao chép nào để nấp sau: hãy chờ command buffer hoàn tất trước khi dùng lại buffer, hoặc ghi batch tiếp theo vào
             một buffer thứ hai. Bạn đã gặp quy tắc này ở <a href={href('ch02', '2.4')}>chương 2, mục 2.4</a>.
           </p>
         }

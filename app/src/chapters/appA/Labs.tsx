@@ -137,7 +137,7 @@ function Probe() {
               </td>
               <td>{p.rounding === 'nearest' ? tr('rounds to nearest', 'làm tròn về gần nhất') : p.rounding === 'toward-zero' ? tr('rounds toward zero', 'làm tròn về phía 0') : String(p.rounding ?? tr('not reported', 'chưa có báo cáo'))}</td>
               <td>{p.keeps_denormals === undefined ? tr('not reported', 'chưa có báo cáo') : yes(p.keeps_denormals) ? tr('kept', 'giữ lại') : tr('flushed to zero', 'bị ép về 0')}</td>
-              <td>{p.fuses_mul_add === undefined ? tr('not reported', 'chưa có báo cáo') : yes(p.fuses_mul_add) ? tr('fused, one rounding', 'hợp nhất, một lần làm tròn') : tr('two roundings', 'hai lần làm tròn')}</td>
+              <td>{p.fuses_mul_add === undefined ? tr('not reported', 'chưa có báo cáo') : yes(p.fuses_mul_add) ? tr('fused, one rounding', 'gộp, một lần làm tròn') : tr('two roundings', 'hai lần làm tròn')}</td>
             </tr>
           ))}
         </tbody>
@@ -763,7 +763,7 @@ export function Labs() {
         vi={
           <p>
             Dòng đầu tiên của benchmark là probe: thiết bị của bạn có làm tròn về gần nhất không, có giữ denormal FP32
-            không và có hợp nhất phép nhân-cộng không. Sau đó là ba bảng, được mô tả ở phần số đo bên dưới. Hãy chốt từng
+            không và có gộp phép nhân-cộng không. Sau đó là ba bảng, được mô tả ở phần số đo bên dưới. Hãy chốt từng
             con số trước. Với con số đầu tiên, trình khám phá khoảng cách ở <a href={href('appA', 'A.2')}>mục A.2</a> cho
             thấy khoảng cách giữa các giá trị half ở bất kỳ độ lớn nào, còn <a href={href('appA', 'A.4')}>mục A.4</a> cho
             thấy bốn chế độ làm tròn.

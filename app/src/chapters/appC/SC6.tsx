@@ -40,7 +40,7 @@ const MODE_LABEL: Record<Mode, string> = {
     return tr('full: compute capability 6.0 and later on Linux', 'đầy đủ: compute capability 6.0 trở lên trên Linux');
   },
   get one() {
-    return tr('Apple silicon, Metal shared buffer', 'Apple silicon, bộ đệm shared của Metal');
+    return tr('Apple silicon, Metal shared buffer', 'Apple silicon, buffer shared của Metal');
   },
 };
 const MODE_SHORT: Record<Mode, string> = {
@@ -105,7 +105,7 @@ function describe(program: Program, mode: Mode, line: FigLine, step: Step | null
     case 'decl':
       return program === 'explicit'
         ? (
-          <Translated vi={<>Hai con trỏ: một cho bộ đệm CPU, một cho bộ đệm GPU. Mô hình của chương 2 cần cả hai.</>}>
+          <Translated vi={<>Hai con trỏ: một cho buffer CPU, một cho buffer GPU. Mô hình của chương 2 cần cả hai.</>}>
             <>Two pointers: one for a CPU buffer, one for a GPU buffer. Chapter 2's model needs both.</>
           </Translated>
         )
@@ -120,7 +120,7 @@ function describe(program: Program, mode: Mode, line: FigLine, step: Step | null
           <Translated
             vi={
               <>
-                Trên Apple silicon, thứ tương ứng là một bộ đệm có lưu trữ shared (<code>newBufferWithLength:options:</code> với{' '}
+                Trên Apple silicon, thứ tương ứng là một buffer có lưu trữ shared (<code>newBufferWithLength:options:</code> với{' '}
                 <code>MTLResourceStorageModeShared</code>); con trỏ <code>contents</code> của nó là thứ CPU dùng. Không có chế
                 độ managed nào để chọn: lưu trữ managed "không có tác dụng trên Apple Silicon".
               </>
@@ -150,7 +150,7 @@ function describe(program: Program, mode: Mode, line: FigLine, step: Step | null
       if (line.op?.op === 'alloc' && line.op.kind === 'device')
         return mode === 'one' ? (
           <Translated
-            vi={<>Thứ tương ứng trên Metal là một bộ đệm có lưu trữ private: trong cùng bộ nhớ vật lý, nhưng chỉ GPU dùng.</>}
+            vi={<>Thứ tương ứng trên Metal là một buffer có lưu trữ private: trong cùng bộ nhớ vật lý, nhưng chỉ GPU dùng.</>}
           >
             <>The counterpart on Metal is a buffer with private storage: in the same physical memory, but GPU only.</>
           </Translated>
@@ -193,9 +193,9 @@ function describe(program: Program, mode: Mode, line: FigLine, step: Step | null
         <Translated
           vi={
             <>
-              Lần sao chép điền bộ đệm GPU từ bộ đệm CPU: {step!.counters.copiedInMemory} trang được sao chép bên trong một
+              Lần sao chép điền buffer GPU từ buffer CPU: {step!.counters.copiedInMemory} trang được sao chép bên trong một
               bộ nhớ vật lý. Không có đường truyền nào phải đi qua, nhưng đó vẫn là một lần sao chép (trên Metal, một lần
-              blit vào bộ đệm private).
+              blit vào buffer private).
             </>
           }
         >
@@ -208,7 +208,7 @@ function describe(program: Program, mode: Mode, line: FigLine, step: Step | null
         <Translated
           vi={
             <>
-              <code>cudaMemcpy</code> chuyển cả {count('move')} trang sang bộ đệm GPU, bất kể kernel sẽ chạm tới những gì.
+              <code>cudaMemcpy</code> chuyển cả {count('move')} trang sang buffer GPU, bất kể kernel sẽ chạm tới những gì.
             </>
           }
         >
@@ -423,7 +423,7 @@ function describe(program: Program, mode: Mode, line: FigLine, step: Step | null
           <><code>cudaFree</code> releases the memory.</>
         </Translated>
       ) : (
-        <Translated vi={<><code>free</code> giải phóng bộ đệm CPU.</>}>
+        <Translated vi={<><code>free</code> giải phóng buffer CPU.</>}>
           <><code>free</code> releases the CPU buffer.</>
         </Translated>
       );
@@ -438,7 +438,7 @@ function Memories({ view, mode, hot }: { view: View; mode: Mode; hot: Set<string
   const name = (b: string, kind: string) =>
     tr(
       `${b} (${kind === 'managed' ? (mode === 'one' ? 'shared buffer' : 'managed') : kind === 'device' ? 'cudaMalloc' : 'malloc'})`,
-      `${b} (${kind === 'managed' ? (mode === 'one' ? 'bộ đệm shared' : 'managed') : kind === 'device' ? 'cudaMalloc' : 'malloc'})`,
+      `${b} (${kind === 'managed' ? (mode === 'one' ? 'buffer shared' : 'managed') : kind === 'device' ? 'cudaMalloc' : 'malloc'})`,
     );
   const row = (box: 'cpu' | 'gpu' | 'one', b: string) => {
     const v = view[b];
@@ -814,16 +814,16 @@ function ShapesTable() {
         </tr>
         <tr>
           <td>
-            <Translated vi="Một DRAM chung, quy tắc cache theo từng loại bộ đệm">One shared DRAM, caching rules per buffer type</Translated>
+            <Translated vi="Một DRAM chung, quy tắc cache theo từng loại buffer">One shared DRAM, caching rules per buffer type</Translated>
           </td>
           <td>NVIDIA Tegra; Apple silicon{/* i18n-ignore: product names */}</td>
           <td>
-            <Translated vi="Không có gì giữa các bộ nhớ. Trên Apple, bộ đệm shared không cần sao chép">
+            <Translated vi="Không có gì giữa các bộ nhớ. Trên Apple, buffer shared không cần sao chép">
               Nothing between memories. On Apple, a shared buffer needs no copy
             </Translated>
           </td>
           <td>
-            <Translated vi="Thứ tự, và chọn loại bộ đệm. Trên một số hệ thống Tegra, bộ nhớ managed theo các quy tắc hạn chế">
+            <Translated vi="Thứ tự, và chọn loại buffer. Trên một số hệ thống Tegra, bộ nhớ managed theo các quy tắc hạn chế">
               Ordering, and choosing the buffer type. On some Tegra systems managed memory follows the limited rules
             </Translated>
           </td>
@@ -891,7 +891,7 @@ export const questionsSC6: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="Cả hai đều chạy: Unified Memory giữ CPU và GPU nhất quán, nên use_data thấy bộ đệm đã sắp xếp.">
+          <Translated vi="Cả hai đều chạy: Unified Memory giữ CPU và GPU nhất quán, nên use_data thấy buffer đã sắp xếp.">
             Both work: Unified Memory keeps CPU and GPU coherent, so use_data sees the sorted buffer.
           </Translated>
         ),
@@ -1098,7 +1098,7 @@ export const questionsSC6: Record<string, Question> = {
           <p>
             Trong trình chạy từng bước, chế độ đầy đủ với kernel chạm tới mọi thứ: {FIG_PAGES} trang đi sang và {FIG_PAGES}{' '}
             trang quay về, đúng bằng {2 * FIG_PAGES} trang mà hai lời gọi <code>cudaMemcpy</code> chuyển. Bộ nhớ managed tiết
-            kiệm được một bộ đệm thứ hai và ba dòng mã, không phải lưu lượng. NVIDIA đã nói vậy từ lúc ra mắt: một chương
+            kiệm được một buffer thứ hai và ba dòng mã, không phải lưu lượng. NVIDIA đã nói vậy từ lúc ra mắt: một chương
             trình được tinh chỉnh kỹ dùng stream và <code>cudaMemcpyAsync</code> "rất có thể chạy tốt hơn" một chương trình
             chỉ dùng Unified Memory. Nơi nó thực sự tiết kiệm lưu lượng là khi kernel chỉ chạm tới một phần dữ liệu.
           </p>
@@ -1123,7 +1123,7 @@ export const questionsSC6: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Bạn chuyển <code>sortfile</code> sang Metal trên Apple silicon với bộ đệm shared. Những thay đổi nào của Fig. C.1
+            Bạn chuyển <code>sortfile</code> sang Metal trên Apple silicon với buffer shared. Những thay đổi nào của Fig. C.1
             có thứ tương ứng?
           </>
         }
@@ -1149,7 +1149,7 @@ export const questionsSC6: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Một bộ đệm shared, lần khởi chạy, và một lần chờ trước use_data. Không có gì di chuyển.">
+          <Translated vi="Một buffer shared, lần khởi chạy, và một lần chờ trước use_data. Không có gì di chuyển.">
             A shared buffer, the launch, and a wait before use_data. Nothing migrates.
           </Translated>
         ),
@@ -1170,9 +1170,9 @@ export const questionsSC6: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Ba trong bốn thay đổi còn lại: phần cấp phát (một bộ đệm có lưu trữ shared, mà CPU ghi vào <code>contents</code>{' '}
+            Ba trong bốn thay đổi còn lại: phần cấp phát (một buffer có lưu trữ shared, mà CPU ghi vào <code>contents</code>{' '}
             của nó), lần khởi chạy (mã hóa và commit), và lần chờ (<code>waitUntilCompleted</code>). Thay đổi thứ tư không
-            có: bộ đệm Metal là các đối tượng, được giải phóng như mọi đối tượng khác, không có lời gọi free. Không có chế độ
+            có: buffer Metal là các đối tượng, được giải phóng như mọi đối tượng khác, không có lời gọi free. Không có chế độ
             managed nào để di chuyển gì cả, và cũng không cần.
           </p>
         }
@@ -1299,7 +1299,7 @@ export function SC6() {
         vi={
           <p>
             Giao diện chỉ là một lời gọi. <code>cudaMallocManaged(&amp;ptr, bytes)</code> trả về một con trỏ mà cả mã host lẫn
-            kernel đều dereference được, và <code>cudaFree</code> giải phóng nó. Không có bộ đệm thứ hai, không có lời gọi sao
+            kernel đều dereference được, và <code>cudaFree</code> giải phóng nó. Không có buffer thứ hai, không có lời gọi sao
             chép: hệ thống quyết định khi nào byte di chuyển. Mục này nói về những gì điều đó mang lại và cái giá của nó.
           </p>
         }
@@ -1336,7 +1336,7 @@ export function SC6() {
       <Translated
         vi={
           <p>
-            Fig. C.1 là một hàm CPU nhỏ: cấp phát một bộ đệm, đọc một tệp vào đó, sắp xếp các byte, chuyển chúng đi tiếp. Bản
+            Fig. C.1 là một hàm CPU nhỏ: cấp phát một buffer, đọc một tệp vào đó, sắp xếp các byte, chuyển chúng đi tiếp. Bản
             chuyển managed thay đổi bốn dòng. <code>malloc</code> thành <code>cudaMallocManaged</code>, việc sắp xếp thành một
             lần khởi chạy kernel, một <code>cudaDeviceSynchronize()</code> xuất hiện ở chỗ bản CPU có một dòng trống, và{' '}
             <code>free</code> thành <code>cudaFree</code>. Các dòng <code>fread</code> và <code>use_data</code> không đổi: CPU
@@ -1358,8 +1358,8 @@ export function SC6() {
       <Translated
         vi={
           <p>
-            Trình chạy từng bước thêm một cột thứ ba, cùng bản chuyển đó làm theo cách của chương 2: một bộ đệm thứ hai từ{' '}
-            <code>cudaMalloc</code> và hai lời gọi <code>cudaMemcpy</code>. Rồi sau mỗi dòng, nó hỏi mỗi trang của bộ đệm đang
+            Trình chạy từng bước thêm một cột thứ ba, cùng bản chuyển đó làm theo cách của chương 2: một buffer thứ hai từ{' '}
+            <code>cudaMalloc</code> và hai lời gọi <code>cudaMemcpy</code>. Rồi sau mỗi dòng, nó hỏi mỗi trang của buffer đang
             ở đâu.
           </p>
         }
@@ -1612,7 +1612,7 @@ export function SC6() {
           vi={
             <p>
               Grace Hopper: CPU và GPU "dùng chung một bảng trang duy nhất cho mỗi tiến trình". Tegra: một DRAM, nhưng mỗi loại
-              bộ đệm "có hành vi truy cập và cache khác nhau". MI300A: XNACK "vẫn cần thiết". Apple silicon:{' '}
+              buffer "có hành vi truy cập và cache khác nhau". MI300A: XNACK "vẫn cần thiết". Apple silicon:{' '}
               <code>MTLStorageModeManaged</code> đã bị deprecated, "lưu trữ managed không có tác dụng trên Apple Silicon".
             </p>
           }
@@ -1651,7 +1651,7 @@ export function SC6() {
             swap sang RAM hệ thống thay vì sập khi VRAM của GPU cạn", trên Linux. Cùng mã nguồn đó build backend HIP, nơi nó
             còn advise <code>hipMemAdviseSetCoarseGrain</code>, và tài liệu của nó cảnh báo rằng trên HIP công tắc này "làm
             giảm hiệu năng với các GPU không tích hợp". MLX dùng bộ nhớ managed cho các mảng mà host thấy được trên backend
-            CUDA của nó và bộ đệm shared trên Metal: cùng một lời hứa, một con trỏ cho cả hai phía, từ hai cơ chế khác nhau.
+            CUDA của nó và buffer shared trên Metal: cùng một lời hứa, một con trỏ cho cả hai phía, từ hai cơ chế khác nhau.
           </p>
         }
       >
@@ -1690,7 +1690,7 @@ export function SC6() {
             "đang phát triển" trên Windows. Di chuyển theo truy cập cần hai thứ: <code>HSA_XNACK=1</code> trong môi trường và
             một kernel driver có HMM. Thiếu chúng, lời gọi vẫn thành công, nhưng header nói nó "hoạt động giống
             hipMallocHost": kernel đọc bộ nhớ host được ghim qua đường truyền. AMD cũng yêu cầu kích thước theo đơn vị 4 KB
-            ("it should be granularity of 4KB"). Metal hoàn toàn không có cấp phát managed: một bộ đệm shared trên một bộ nhớ
+            ("it should be granularity of 4KB"). Metal hoàn toàn không có cấp phát managed: một buffer shared trên một bộ nhớ
             chung không có gì để di chuyển.
           </p>
         }

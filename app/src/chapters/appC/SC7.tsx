@@ -334,7 +334,7 @@ function WhichParadigm() {
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }} data-part="checks">
             {checks.map((k) => (
               <li key={k.key} data-check={k.key} data-answer={k.answer} style={{ marginBottom: '0.55rem' }}>
-                <span className={'chip ' + (k.answer === 'yes' ? 'ok' : k.answer === 'no' ? 'fail' : '')}>{k.answer}</span> {k.what}
+                <span className={'chip ' + (k.answer === 'yes' ? 'ok' : k.answer === 'no' ? 'fail' : '')}>{tr(k.answer, ({ yes: 'có', no: 'không', 'not stated': 'không được nêu' } as Record<string, string>)[k.answer] ?? k.answer)}</span> {k.what}
                 <br />
                 <span className="muted">{k.why}</span>
               </li>
@@ -458,7 +458,7 @@ export const questionsSC7: Record<string, Question> = {
         vi={
           <p>
             Bảng của NVIDIA xếp tổ hợp này vào hàng thứ hai. Cơ chế lỗi trang kiểu Pascal bao quát bộ nhớ được cấp phát dạng
-            managed; bộ nhớ do hệ thống cấp phát cần truy cập bộ nhớ phân trang được (pageable), tức là HMM hoặc ATS.
+            managed; bộ nhớ do hệ thống cấp phát cần truy cập bộ nhớ phân trang (pageable), tức là HMM hoặc ATS.
           </p>
         }
       >
@@ -867,7 +867,7 @@ export function SC7() {
         <Translated
           vi={
             <p>
-              Hướng dẫn của NVIDIA: với truy cập bộ nhớ pageable, "This includes file-backed memory allocations created with
+              Hướng dẫn của NVIDIA: với truy cập bộ nhớ phân trang, "This includes file-backed memory allocations created with
               mmap" (điều này bao gồm cả các phép cấp phát gắn với tệp tạo bằng mmap) (A12). Bài viết về HMM của NVIDIA chạy
               lại Hình C.1 của sách với <Id>malloc</Id> thông thường (A9).
             </p>

@@ -467,7 +467,7 @@ export const questionsSC2: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Ngày nay, trong một tiến trình 64-bit trên một device CUDA hiện hành, bạn cấp phát một bộ đệm bằng{' '}
+            Ngày nay, trong một tiến trình 64-bit trên một device CUDA hiện hành, bạn cấp phát một buffer bằng{' '}
             <code>cudaMallocHost</code> để một kernel đọc tại chỗ. Bạn truyền gì cho kernel?
           </>
         }
@@ -659,8 +659,7 @@ export function SC2() {
         vi={
           <p>
             Bộ nhớ zero-copy này là bộ nhớ ghim (pinned memory): hệ điều hành không được đẩy nó ra khỏi RAM khi GPU đang
-            đọc. Chương 23 giải thích việc ghim (<a href={href('ch23', '23.3')}>mục 23.3</a> ở đây), và tự cấp phát các bộ
-            đệm ghim của mình bằng <code>cudaMallocHost</code>; sách không bao giờ liên hệ hai lời gọi này với nhau.
+            đọc. Chương 23 giải thích việc ghim (<a href={href('ch23', '23.3')}>mục 23.3</a> ở đây), và tự cấp phát các buffer ghim của mình bằng <code>cudaMallocHost</code>; sách không bao giờ liên hệ hai lời gọi này với nhau.
           </p>
         }
       >
@@ -1003,9 +1002,9 @@ export function SC2() {
         vi={
           <p>
             Trên Apple silicon không có kênh kết nối nào giữa bộ nhớ CPU và bộ nhớ GPU để phải trả giá, vì chỉ có một bộ
-            nhớ. Một bộ đệm shared, mặc định ở đó, được mọi kernel đọc tại chỗ, và Apple không ghi nhận sự phân biệt nào
+            nhớ. Một buffer shared, mặc định ở đó, được mọi kernel đọc tại chỗ, và Apple không ghi nhận sự phân biệt nào
             giữa bộ nhớ ghim và bộ nhớ phân trang. Để dùng bộ nhớ bạn đã có, <code>newBufferWithBytesNoCopy</code> bọc vùng
-            nhớ căn theo trang thành một bộ đệm. llama.cpp làm đúng như vậy với trọng số mô hình được ánh xạ bộ nhớ: zero
+            nhớ căn theo trang thành một buffer. llama.cpp làm đúng như vậy với trọng số mô hình được ánh xạ bộ nhớ: zero
             copy, áp dụng cho trọng số, trên một bộ nhớ duy nhất.
           </p>
         }

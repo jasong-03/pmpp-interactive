@@ -89,7 +89,7 @@ function CopyDirection() {
         </span>
         <label className="check ui" style={{ opacity: mode === 'uva' ? 1 : 0.5 }}>
           <input type="checkbox" checked={reg} disabled={mode !== 'uva'} onChange={(e) => setReg(e.target.checked)} />
-          <Translated vi="thêm một bộ đệm được đăng ký bằng cudaHostRegister">add a buffer registered with cudaHostRegister</Translated>
+          <Translated vi="thêm một buffer được đăng ký bằng cudaHostRegister">add a buffer registered with cudaHostRegister</Translated>
         </label>
       </div>
       <div className="row ui" style={{ marginBottom: '0.4rem' }}>
@@ -142,7 +142,7 @@ function CopyDirection() {
           </code>{' '}
           →{' '}
           <b>
-            {r.kind.startsWith('cudaMemcpy') ? <code>{r.kind}</code> : r.kind === 'ambiguous' ? tr('cannot tell', 'không xác định được') : r.kind === 'unmapped' ? tr('no allocation', 'không có vùng cấp phát') : tr('one buffer, two addresses', 'một bộ đệm, hai địa chỉ')}
+            {r.kind.startsWith('cudaMemcpy') ? <code>{r.kind}</code> : r.kind === 'ambiguous' ? tr('cannot tell', 'không xác định được') : r.kind === 'unmapped' ? tr('no allocation', 'không có vùng cấp phát') : tr('one buffer, two addresses', 'một buffer, hai địa chỉ')}
           </b>
         </p>
         <p style={{ margin: '0.3rem 0 0' }} data-detail>
@@ -409,8 +409,8 @@ function YourAddresses() {
       <Translated
         vi={
           <>
-            <b>Quan sát trên máy của bạn, không có trong tài liệu</b> (lab C.1, {a.when}): với một bộ đệm shared,{' '}
-            <code>contents</code> và <code>gpuAddress</code> là {same(a.shared)}; với một bộ đệm tạo bằng{' '}
+            <b>Quan sát trên máy của bạn, không có trong tài liệu</b> (lab C.1, {a.when}): với một buffer shared,{' '}
+            <code>contents</code> và <code>gpuAddress</code> là {same(a.shared)}; với một buffer tạo bằng{' '}
             <code>newBufferWithBytesNoCopy</code>, chúng là {same(a.nocopy)}.
             {!a.shared && !a.nocopy ? (
               <>
@@ -845,7 +845,7 @@ export function SC3() {
           <p>
             Với các không gian riêng, một giá trị chỉ một vị trí trong mọi không gian cùng lúc, nên chiều sao chép phải do
             bạn cung cấp: đó là lý do <code>cudaMemcpy</code> có đối số kind. Dưới một không gian địa chỉ, giá trị là đủ.
-            Thêm bộ đệm được đăng ký để thấy ngoại lệ đã được ghi nhận: một bộ đệm ở hai địa chỉ (từ{' '}
+            Thêm buffer được đăng ký để thấy ngoại lệ đã được ghi nhận: một buffer ở hai địa chỉ (từ{' '}
             {hex4(REGISTERED.host[0])} và từ {hex4(REGISTERED.device[0])} trên bản đồ), của host và của device.
           </p>
         }
@@ -1009,15 +1009,15 @@ export function SC3() {
       <Ask q={questionsSC3['appC/C.3/q-hip-host']} />
 
       <h2>
-        <Translated vi="Metal: bộ đệm, không phải con trỏ">Metal: buffers, not pointers</Translated>
+        <Translated vi="Metal: buffer, không phải con trỏ">Metal: buffers, not pointers</Translated>
       </h2>
       <Translated
         vi={
           <p>
-            Metal không bao giờ yêu cầu bạn đưa cho kernel một con trỏ CPU thô. Kernel nhận bộ đệm bằng cách gắn (bind)
+            Metal không bao giờ yêu cầu bạn đưa cho kernel một con trỏ CPU thô. Kernel nhận buffer bằng cách gắn (bind)
             chúng, nên câu hỏi địa chỉ của CPU có mang cùng ý nghĩa trên GPU hay không không xuất hiện trong mã thông
-            thường. Apple có ghi nhận một địa chỉ ảo GPU 64-bit cho mỗi bộ đệm, <code>gpuAddress</code>, và không nói gì về
-            quan hệ của nó với con trỏ <code>contents</code> của bộ đệm.
+            thường. Apple có ghi nhận một địa chỉ ảo GPU 64-bit cho mỗi buffer, <code>gpuAddress</code>, và không nói gì về
+            quan hệ của nó với con trỏ <code>contents</code> của buffer.
           </p>
         }
       >
@@ -1039,8 +1039,8 @@ export function SC3() {
       <Translated
         vi={
           <p>
-            Nếu bạn dựng một cấu trúc liên kết cho kernel Metal, hãy đặt nó trong một bộ đệm và liên kết các bản ghi bằng
-            độ lệch (offset) tính từ đầu bộ đệm, không bằng con trỏ. Một độ lệch mang cùng ý nghĩa với CPU và GPU, dù hai
+            Nếu bạn dựng một cấu trúc liên kết cho kernel Metal, hãy đặt nó trong một buffer và liên kết các bản ghi bằng
+            độ lệch (offset) tính từ đầu buffer, không bằng con trỏ. Một độ lệch mang cùng ý nghĩa với CPU và GPU, dù hai
             địa chỉ là gì đi nữa.
           </p>
         }
