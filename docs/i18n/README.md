@@ -15,6 +15,7 @@ language.
 |---|---|---|
 | Shared UI strings (rail, home, review, questions, labs pages, scene player, margin notes) | `app/src/lib/i18n/en.ts`, `vi.ts` | `const { t } = useI18n()`; same keys in both, checked by `i18n.test.ts` |
 | Lesson prose, questions, labels in interactives | the section file itself | `<Translated vi={...}>English</Translated>`, `tr('English', 'Tiếng Việt')` |
+| Step text, labels and notes built by a simulator | `app/src/sim/<name>.ts` | `tr()` from `../lib/locale.ts` (no React, no imports, so the Node checks in `app/e2e` can still import the file); getters for module-level data |
 | Chapter and section titles and ledes | `app/src/chapters/<ch>/index.tsx` | `vi: { title, lede }` beside the English fields |
 | Course table on the home page | `app/src/chapters/registry.ts` (`PLAN`) | `vi: { title, why, milestone? }` |
 | Question units and sources (plain strings) | the question record | `vi: { unit, source }` |
@@ -23,7 +24,8 @@ language.
 | Project README | `README.vi.md` | beside `README.md` |
 | Terms | `docs/i18n/glossary.md` | one rendering per term |
 
-The helpers are in `app/src/lib/i18n.tsx`.
+The helpers are in `app/src/lib/i18n.tsx`; the plain-string part (`tr`, `localized`, the stored language) is in
+`app/src/lib/locale.ts`, which `i18n.tsx` re-exports.
 
 ## Translating a section file
 
@@ -99,6 +101,11 @@ identical translation is correct: `tr('Roofline', 'Roofline')`. The audit only r
 translations longer than three words.
 
 **Lab names.** A labs page's `defineLabs` entries take `vi: { name }` beside `name`.
+
+**Simulator identities.** A sim string that is also an identity (a union member, a key, a value compared with
+`===`) stays English in the sim; the page that shows it gives the label: `tr(x, VI_LABELS[x] ?? x)` with the
+lookup inside the second argument. A memo that calls a sim function returning reader text needs
+`const locale = useLocale()` in its dependencies; the audit treats that variable as not English content.
 
 **Memoised values.** If an object holding reader text is built inside a `useMemo` that does not
 depend on the language, give it getters (`get label() { return tr(...) }`) rather than removing

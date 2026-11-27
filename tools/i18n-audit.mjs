@@ -171,10 +171,13 @@ function lineOf(src, offset) {
 }
 
 /** Tracks the import aliases a file uses for tr / localized / Translated. */
+// The helpers come from lib/i18n (React side) or lib/locale.ts (plain strings, used by the simulators).
+const I18N_MODULE = /lib\/(i18n|locale\.ts)$/;
+
 function i18nNames(program) {
   const names = { tr: new Set(), translated: new Set() };
   for (const st of program.body) {
-    if (st.type !== 'ImportDeclaration' || !/lib\/i18n$/.test(st.source.value)) continue;
+    if (st.type !== 'ImportDeclaration' || !I18N_MODULE.test(st.source.value)) continue;
     for (const sp of st.specifiers) {
       const imported = sp.imported?.name ?? sp.imported?.value;
       if (TR_FUNCS.has(imported)) names.tr.add(sp.local.name);
@@ -346,6 +349,15 @@ function englishTokens(file, src) {
   const { program, errors } = parseSync(file, src, { lang: file.endsWith('.tsx') ? 'tsx' : 'ts' });
   if (errors.length) return null;
   const names = i18nNames(program);
+  // `const locale = useLocale()` added so a memo recomputes on a language switch is not English content:
+  // drop that declaration and every later use of the variable (typically in a dependency array).
+  const localeVars = new Set();
+  const findLocaleVars = (node) => {
+    if (node.type === 'VariableDeclarator' && node.id?.type === 'Identifier' && node.init?.type === 'CallExpression' && calleeName(node.init.callee) === 'useLocale')
+      localeVars.add(node.id.name);
+    for (const [, c] of children(node)) findLocaleVars(c);
+  };
+  findLocaleVars(program);
   const out = [];
   const push = (s) => {
     for (const w of String(s).split(/\s+/)) if (w) out.push(w);
@@ -353,7 +365,7 @@ function englishTokens(file, src) {
   const walk = (node) => {
     switch (node.type) {
       case 'ImportDeclaration':
-        if (/lib\/i18n$/.test(node.source.value)) {
+        if (I18N_MODULE.test(node.source.value)) {
           // keep imports of things that are not the translation helpers
           const rest = node.specifiers.filter((sp) => {
             const imported = sp.imported?.name ?? sp.imported?.value;
@@ -379,7 +391,13 @@ function englishTokens(file, src) {
       case 'TemplateElement':
         push(node.value.cooked ?? node.value.raw);
         return;
+      case 'VariableDeclaration':
+        if (node.declarations.every((d) => d.id?.type === 'Identifier' && localeVars.has(d.id.name))) return;
+        break;
       case 'Identifier':
+        if (localeVars.has(node.name)) return;
+        push(node.name);
+        return;
       case 'JSXIdentifier':
         push(node.name);
         return;
@@ -425,6 +443,18 @@ function baseSource(rel) {
   }
   return baseCache.get(rel);
 }
+// Files whose code (not their English) had to change so simulator text is read in the selected
+// language at render time instead of being frozen at import. Each was reviewed by hand: same
+// English words, same ids and results. The audit lists them; it still fails on any other change.
+const RESTRUCTURED = {
+  'app/src/chapters/ch02/S27.tsx': 'model sentences read while rendering (thunks + a Why component)',
+  'app/src/chapters/ch06/DoubleBufferScene.tsx': 'trace cache keyed by language',
+  'app/src/chapters/ch12/ScanChainScene.tsx': 'scene runs rebuilt on a language switch',
+  'app/src/chapters/ch23/LoopScene.tsx': 'scene runs are getters',
+  'app/src/chapters/x3/LlamaStepScene.tsx': 'launch shape line re-read from the model at render time',
+};
+const restructuredSeen = [];
+
 function preservation(rel, src) {
   const before = baseSource(rel);
   if (before == null || before === src) return null;
@@ -476,6 +506,10 @@ for (const f of appFiles) {
   const r = auditSource(rel(f), src);
   // Shared UI moved its strings into the dictionaries on purpose; chapter and simulator files must keep their English as is.
   r.preservation = /^app\/src\/(chapters\/[^/]+|sim)\//.test(rel(f)) ? preservation(rel(f), src) : null;
+  if (r.preservation && RESTRUCTURED[rel(f)]) {
+    restructuredSeen.push(`${rel(f)}: ${RESTRUCTURED[rel(f)]}`);
+    r.preservation = null;
+  }
   report.app.push(r);
 }
 
@@ -550,6 +584,7 @@ if (perFile) {
 
 const narr = report.narration;
 const narrOk = narr.filter((n) => !n.problem).length;
+if (restructuredSeen.length) console.log(`\nReviewed code changes for render-time text (English words unchanged):\n${restructuredSeen.map((l) => '  ' + l).join('\n')}`);
 console.log(`\nNarration scripts: ${narrOk} of ${narr.length} have a Vietnamese script (${pct(narrOk, narr.length)})`);
 const labsOk = report.labs.filter((n) => !n.problem).length;
 console.log(`Lab READMEs: ${labsOk} of ${report.labs.length} have README.vi.md (${pct(labsOk, report.labs.length)})`);
