@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Code } from '../../components/Code';
 import { Bench, type Tier } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import {
   BLOCK_ORDER_LABEL,
   CORRECT,
@@ -64,7 +64,8 @@ export function PrivateQueueStepper() {
     () => ({ capacity, blocks, threads, preset, blockOrder, leftover: small ? 1 : undefined }),
     [capacity, blocks, threads, preset, blockOrder, small],
   );
-  const trace = useMemo(() => simulate(shape, schedule, opts), [shape, schedule, opts]);
+  const locale = useLocale();
+  const trace = useMemo(() => simulate(shape, schedule, opts), [shape, schedule, opts, locale]);
   const raced = useMemo(() => races(shape, opts), [shape, opts]);
   useEffect(() => setN(0), [trace]);
 

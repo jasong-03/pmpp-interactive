@@ -270,7 +270,8 @@ function Arrays(pr: ArraysProps) {
 const RUNNING = PRESETS[0].make(0);
 
 function CoRankExplorer() {
-  const [arr, setArr] = useState<{ A: number[]; B: number[]; label: string }>({ ...RUNNING, label: PRESETS[0].label });
+  // The label is read when shown (PRESETS labels follow the language), not copied into state.
+  const [arr, setArr] = useState<{ A: number[]; B: number[]; label: () => string }>({ ...RUNNING, label: () => PRESETS[0].label });
   const [seed, setSeed] = useState(1);
   const [textA, setTextA] = useState(RUNNING.A.join(', '));
   const [textB, setTextB] = useState(RUNNING.B.join(', '));
@@ -300,7 +301,7 @@ function CoRankExplorer() {
   const moves = trace.steps.slice(0, it + (shown ? 1 : 0)).filter((s) => s.test !== 'done').length;
 
   const reset = () => { setPos(0); setFeedback(null); };
-  const load = (A2: number[], B2: number[], label: string, k2?: number) => {
+  const load = (A2: number[], B2: number[], label: () => string, k2?: number) => {
     setArr({ A: A2, B: B2, label });
     setTextA(A2.join(', '));
     setTextB(B2.join(', '));
@@ -314,14 +315,14 @@ function CoRankExplorer() {
     const s = id === 'random' || id === 'duplicates' ? seed + 1 : seed;
     if (s !== seed) setSeed(s);
     const d = p.make(s);
-    load(d.A, d.B, id === 'random' || id === 'duplicates' ? `${p.label}, seed ${s}` : p.label); // i18n-ignore: kept in state; translated where it is shown
+    load(d.A, d.B, () => (id === 'random' || id === 'duplicates' ? `${p.label}, seed ${s}` : p.label)); // i18n-ignore: kept in state; translated where it is shown
   };
   const useOwn = () => {
     const a = parseSorted(textA);
     const b = parseSorted(textB);
     if (!a.ok) return setErr(`A: ${a.error}`);
     if (!b.ok) return setErr(`B: ${b.error}`);
-    load(a.values, b.values, 'your arrays'); // i18n-ignore: kept in state; translated where it is shown
+    load(a.values, b.values, () => 'your arrays'); // i18n-ignore: kept in state; translated where it is shown
   };
 
   const choose = (v: Verdict) => {
@@ -429,7 +430,7 @@ function CoRankExplorer() {
                 vi={
                   <>
                     Hiện tại:{' '}
-                    {arr.label
+                    {arr.label()
                       .replace('The running example', 'Ví dụ xuyên suốt')
                       .replace('Many duplicates (keys 0 to 3)', 'Nhiều khóa trùng (khóa 0 đến 3)')
                       .replace('All of A below B', 'Toàn bộ A nhỏ hơn B')
@@ -442,7 +443,7 @@ function CoRankExplorer() {
                   </>
                 }
               >
-                Now: {arr.label} (m = {m}, n = {n}).
+                Now: {arr.label()} (m = {m}, n = {n}).
               </Translated>
             </span>
           )}

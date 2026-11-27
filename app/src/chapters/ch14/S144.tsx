@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Ask, Predict, type Question } from '../../components/Ask';
 import { Code, useLabFile } from '../../components/Code';
 import { Beyond, Bench, Simplification, Source, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { href } from '../../lib/router';
 import { useSolutionStatus } from './solutionStatus';
 import {
@@ -218,7 +218,8 @@ function LsdStepper() {
   const [guess, setGuess] = useState('');
   const [last, setLast] = useState<{ pass: number; guess: number | null; id: number; key: number; landed: number } | null>(null);
 
-  const parsed = useMemo(() => (mode === 'own' ? parseKeys(ownText, 4, 8) : null), [mode, ownText]);
+  const locale = useLocale();
+  const parsed = useMemo(() => (mode === 'own' ? parseKeys(ownText, 4, 8) : null), [mode, ownText, locale]);
   const keys = useMemo(
     () => (mode === 'book' ? BOOK_KEYS : mode === 'shuffle' ? randomKeys(16, 4, seed) : parsed && 'keys' in parsed ? parsed.keys : BOOK_KEYS.slice(0, 8)),
     [mode, seed, parsed],
@@ -420,7 +421,7 @@ function FloatExplorer() {
   const label = (token: number) =>
     tr(
       pr.labels?.[token] ?? show(pr.bits[token]),
-      ({ 'smallest negative subnormal': 'số dưới chuẩn âm nhỏ nhất', 'smallest positive subnormal': 'số dưới chuẩn dương nhỏ nhất' } as Record<string, string>)[pr.labels?.[token] ?? ''] ??
+      ({ 'smallest negative subnormal': 'số subnormal âm nhỏ nhất', 'smallest positive subnormal': 'số subnormal dương nhỏ nhất' } as Record<string, string>)[pr.labels?.[token] ?? ''] ??
         pr.labels?.[token] ??
         show(pr.bits[token]),
     );
@@ -1058,7 +1059,7 @@ export function S144() {
           <p>
             Cách sửa có hai quy tắc. Đặt bit dấu của một giá trị không âm, để nó rơi phía trên mọi số âm. Đảo mọi bit của một giá
             trị âm, để độ lớn lớn hơn cho khóa nhỏ hơn. Đọc như số nguyên không dấu, kết quả theo đúng thứ tự của các float, kể cả
-            vô cực và số dưới chuẩn.
+            vô cực và số subnormal.
           </p>
         }
       >

@@ -4,7 +4,7 @@ import { Code, MATMUL_TIERS, useLabFile } from '../../components/Code';
 import { defineLabs } from '../../components/LabKit';
 import { cuStatus, metalStatus } from './labStatus';
 import { Aside, Bench, Beyond, Simplification, Source, Today } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { useReports } from '../../lib/reports';
 import { href } from '../../lib/router';
 import { BOOK_SHAPE, sharedBytes } from '../../sim/gemmbudget';
@@ -43,7 +43,8 @@ const LAB_DIR = LAB155.id;
 
 // ---------------------------------------------------------------- true or false?
 function BarrierQuiz() {
-  const stream = useMemo(() => baselineStream(4), []);
+  const locale = useLocale();
+  const stream = useMemo(() => baselineStream(4), [locale]);
   const [pick, setPick] = useState<Record<number, DepKind>>({});
   const bars = stream.filter((x) => x.kind === 'sync');
   const answered = bars.filter((b) => pick[b.barrier!] != null).length;
@@ -233,7 +234,7 @@ function GanttExplorer() {
           {tls.map((tl, i) => (
             <Lanes
               key={tl.scheme} tl={tl} x={92} y={18 + i * (LANES_H + gap)} scale={scale} deps="all" /* i18n-ignore: prop value */ bufs={tl.scheme !== 'two-barriers' && scale * Math.min(L, C) >= 26}
-              title={tr(SCHEME_LABEL[tl.scheme], { 'two-barriers': 'Một bộ đệm, hai rào chắn (Fig. 15.12a)', 'double-buffered': 'Hai bộ đệm, không xoay vòng (Fig. 15.12b)', pipelined: 'Hai bộ đệm, pipeline (Fig. 15.12c)' }[tl.scheme])}
+              title={tr(SCHEME_LABEL[tl.scheme], { 'two-barriers': 'Một buffer, hai rào chắn (Fig. 15.12a)', 'double-buffered': 'Hai buffer, không xoay vòng (Fig. 15.12b)', pipelined: 'Hai buffer, pipeline (Fig. 15.12c)' }[tl.scheme])}
             />
           ))}
         </svg>
@@ -266,7 +267,7 @@ function GanttExplorer() {
             {tls.map((tl) => (
               <tr key={tl.scheme} data-scheme={tl.scheme} data-total={tl.total} data-speedup={num2(base / tl.total)}>
                 <td style={{ paddingLeft: '0.6rem' }}>
-                  {tr(SCHEME_LABEL[tl.scheme], { 'two-barriers': 'Một bộ đệm, hai rào chắn (Fig. 15.12a)', 'double-buffered': 'Hai bộ đệm, không xoay vòng (Fig. 15.12b)', pipelined: 'Hai bộ đệm, pipeline (Fig. 15.12c)' }[tl.scheme])}
+                  {tr(SCHEME_LABEL[tl.scheme], { 'two-barriers': 'Một buffer, hai rào chắn (Fig. 15.12a)', 'double-buffered': 'Hai buffer, không xoay vòng (Fig. 15.12b)', pipelined: 'Hai buffer, pipeline (Fig. 15.12c)' }[tl.scheme])}
                 </td>
                 <td className="num">{num2(tl.total)}</td>
                 <td className="num">{num2(base / tl.total)}×</td>
@@ -319,12 +320,12 @@ function describe(s: Step, v: Variant): string {
     if (v === 'barrier-before-load')
       return tr(
         `The barrier in iteration ${s.op.iter} opens: every thread has added up buffer ${b.curr}. The loads come after it, unguarded.`,
-        `Rào chắn trong vòng lặp ${s.op.iter} mở ra: mọi luồng đã cộng xong bộ đệm ${b.curr}. Các lần nạp đến sau nó, không được bảo vệ.`,
+        `Rào chắn trong vòng lặp ${s.op.iter} mở ra: mọi luồng đã cộng xong buffer ${b.curr}. Các lần nạp đến sau nó, không được bảo vệ.`,
       );
     const curr = v === 'single-buffer' ? 0 : b.curr;
     return tr(
       `The barrier at the end of iteration ${s.op.iter} opens: every thread has added up buffer ${curr} and loaded its slot of the next tile.`,
-      `Rào chắn ở cuối vòng lặp ${s.op.iter} mở ra: mọi luồng đã cộng xong bộ đệm ${curr} và nạp ô nhớ của mình trong tile tiếp theo.`,
+      `Rào chắn ở cuối vòng lặp ${s.op.iter} mở ra: mọi luồng đã cộng xong buffer ${curr} và nạp ô nhớ của mình trong tile tiếp theo.`,
     );
   }
   const who = tr(
@@ -335,12 +336,12 @@ function describe(s: Step, v: Variant): string {
   if (s.write)
     return tr(
       `${who}: loads slot ${s.write.slot} of tile ${s.write.tile} into buffer ${s.write.buf}.`,
-      `${who}: nạp ô nhớ ${s.write.slot} của tile ${s.write.tile} vào bộ đệm ${s.write.buf}.`,
+      `${who}: nạp ô nhớ ${s.write.slot} của tile ${s.write.tile} vào buffer ${s.write.buf}.`,
     );
   const found = s.reads!.map((r) => (r.tile < 0 ? tr('empty', 'trống') : r.tile)).join(', ');
   return tr(
     `${who}: adds up the ${s.reads!.length} slots of buffer ${s.op.buf} and finds tiles ${found}. Its sum is now ${digits(s.sum!)}.`,
-    `${who}: cộng ${s.reads!.length} ô nhớ của bộ đệm ${s.op.buf} và thấy các tile ${found}. Tổng của nó giờ là ${digits(s.sum!)}.`,
+    `${who}: cộng ${s.reads!.length} ô nhớ của buffer ${s.op.buf} và thấy các tile ${found}. Tổng của nó giờ là ${digits(s.sum!)}.`,
   );
 }
 
@@ -349,7 +350,8 @@ function Stepper() {
   const [schedule, setSchedule] = useState<Schedule>('in-order');
   const [n, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const trace = useMemo(() => run({ threads: P, tiles: NT, variant }, schedule), [variant, schedule]);
+  const locale = useLocale();
+  const trace = useMemo(() => run({ threads: P, tiles: NT, variant }, schedule), [variant, schedule, locale]);
   const total = trace.steps.length;
   const at = Math.min(n, total);
   const st = useMemo(() => stateAt(trace, at), [trace, at]);
@@ -393,7 +395,7 @@ function Stepper() {
     const th = st.threads[t];
     const op = th.done ? trace.ops[trace.ops.length - 1] : trace.ops[th.pc];
     if (!op) return '';
-    if (single) return tr('buffer 0', 'bộ đệm 0');
+    if (single) return tr('buffer 0', 'buffer 0');
     if (op.phase === 'prologue') return tr('fills 0', 'nạp 0');
     if (op.phase === 'epilogue') return `curr ${op.buf}`; // i18n-ignore: code variable name
     const r = roles(op.iter);
@@ -438,7 +440,7 @@ function Stepper() {
                       'barrier-before-load': 'chuyển rào chắn lên trước loadTile',
                       'no-epilogue': 'thiếu mm sau vòng lặp',
                       'wrong-tile': 'nạp tile thay vì tile + 1',
-                      'single-buffer': 'một bộ đệm, một rào chắn',
+                      'single-buffer': 'một buffer, một rào chắn',
                       'load-first': 'nạp trước, rồi mới mm',
                     }[v])}</option>)}
           </select>
@@ -503,8 +505,8 @@ function Stepper() {
                         const t = cur.thread;
                         const w = cur.op.phase === 'prologue' ? 'phần mở đầu' : cur.op.phase === 'epilogue' ? 'sau vòng lặp' : `vòng lặp ${cur.op.iter}`;
                         return r.hazard === 'read-before-write'
-                          ? `luồng ${t} cộng bộ đệm ${cur.op.buf} trong ${w} trước khi luồng ${r.slot} nạp tile ${r.meant} vào ô nhớ ${r.slot}: ${r.tile < 0 ? 'nó vẫn còn trống' : `nó vẫn chứa tile ${r.tile}`}`
-                          : `luồng ${t} cần tile ${r.meant} ở ô nhớ ${r.slot} của bộ đệm ${cur.op.buf} trong ${w}, nhưng luồng ${r.slot} đã nạp tile ${r.tile} đè lên nó`;
+                          ? `luồng ${t} cộng buffer ${cur.op.buf} trong ${w} trước khi luồng ${r.slot} nạp tile ${r.meant} vào ô nhớ ${r.slot}: ${r.tile < 0 ? 'nó vẫn còn trống' : `nó vẫn chứa tile ${r.tile}`}`
+                          : `luồng ${t} cần tile ${r.meant} ở ô nhớ ${r.slot} của buffer ${cur.op.buf} trong ${w}, nhưng luồng ${r.slot} đã nạp tile ${r.tile} đè lên nó`;
                       })()}
                       .
                     </b>
@@ -532,7 +534,7 @@ function Stepper() {
             ) : null}
           </>
         ) : (
-          <Translated vi={<>Chưa có gì chạy. Mỗi luồng sẽ nạp ô nhớ của riêng nó trong một tile và cộng cả bốn ô nhớ của bộ đệm mà nó dùng để tính. Bấm Bước.</>}>
+          <Translated vi={<>Chưa có gì chạy. Mỗi luồng sẽ nạp ô nhớ của riêng nó trong một tile và cộng cả bốn ô nhớ của buffer mà nó dùng để tính. Bấm Bước.</>}>
             <>Nothing has run yet. Each thread will load its own slot of a tile and add up all four slots of the buffer it computes with. Press Step.</>
           </Translated>
         )}
@@ -564,7 +566,7 @@ function Stepper() {
             <thead>
               <tr>
                 <th><Translated vi="luồng">thread</Translated></th>
-                <th><Translated vi="bộ đệm">buffers</Translated></th>
+                <th><Translated vi="buffer">buffers</Translated></th>
                 <th><Translated vi="đang làm">doing</Translated></th>
                 <th><Translated vi="tổng">sum</Translated></th>
               </tr>
@@ -664,7 +666,7 @@ function Outcomes() {
                       'barrier-before-load': 'chuyển rào chắn lên trước loadTile',
                       'no-epilogue': 'thiếu mm sau vòng lặp',
                       'wrong-tile': 'nạp tile thay vì tile + 1',
-                      'single-buffer': 'một bộ đệm, một rào chắn',
+                      'single-buffer': 'một buffer, một rào chắn',
                       'load-first': 'nạp trước, rồi mới mm',
                     }[v])}
           </label>
@@ -680,7 +682,7 @@ function Outcomes() {
                       'barrier-before-load': 'chuyển rào chắn lên trước loadTile',
                       'no-epilogue': 'thiếu mm sau vòng lặp',
                       'wrong-tile': 'nạp tile thay vì tile + 1',
-                      'single-buffer': 'một bộ đệm, một rào chắn',
+                      'single-buffer': 'một buffer, một rào chắn',
                       'load-first': 'nạp trước, rồi mới mm',
                     }[v])).join('; ')}.</>}>
               Correct under every order: {everywhere.map((v) => VARIANT_LABEL[v]).join('; ')}.
@@ -717,7 +719,7 @@ function Outcomes() {
                       'barrier-before-load': 'chuyển rào chắn lên trước loadTile',
                       'no-epilogue': 'thiếu mm sau vòng lặp',
                       'wrong-tile': 'nạp tile thay vì tile + 1',
-                      'single-buffer': 'một bộ đệm, một rào chắn',
+                      'single-buffer': 'một buffer, một rào chắn',
                       'load-first': 'nạp trước, rồi mới mm',
                     }[v])}</td>
                     {cells.map((r, k) => {
@@ -781,8 +783,8 @@ function PipelineListing() {
             <>
               Lời giải tham chiếu (solution) của lab 15.5, nạp từ <code>labs/{LAB_DIR}/solution/</code>. Đó là Fig. 15.14
               biến thành mã, và khác trang sách ở những chỗ trang sách chỉ là sơ đồ (notes, mục 8): sách lược bỏ các đối số,
-              theo thứ tự khác với Figs. 15.5 và 15.6, dùng kiểu con trỏ 2D cho các bộ đệm mà Fig. 15.3 khai báo 1D, và
-              không khai báo cả bộ đệm lẫn <code>numTiles</code>. Lab khai báo hai bản của mỗi ô,{' '}
+              theo thứ tự khác với Figs. 15.5 và 15.6, dùng kiểu con trỏ 2D cho các buffer mà Fig. 15.3 khai báo 1D, và
+              không khai báo cả buffer lẫn <code>numTiles</code>. Lab khai báo hai bản của mỗi ô,{' '}
               <code>A_s[2][bM * LDA_S]</code> và <code>B_s[2][bK * bN]</code>, chọn cặp theo tính chẵn lẻ của chỉ số tile
               như lab 6.5 đã làm thay vì hoán đổi con trỏ, và đếm tile bằng một <code>int</code> có dấu, bỏ qua vòng lặp
               khi K = 0. Hãy thử <a href={href('ch15', 'labs')}>lab</a> trước khi đọc nó.
@@ -952,7 +954,7 @@ export const questionsS158: Record<string, Question> = {
     options: [
       {
         label: (
-          <Translated vi="Chúng dùng các bộ đệm khác nhau, và rào chắn kết thúc vòng lặp i ngăn mọi luồng nạp lại một bộ đệm cho đến khi tất cả đã đọc xong nó.">
+          <Translated vi="Chúng dùng các buffer khác nhau, và rào chắn kết thúc vòng lặp i ngăn mọi luồng nạp lại một buffer cho đến khi tất cả đã đọc xong nó.">
             {'They use different buffers, and the barrier ending iteration i keeps every thread from refilling a buffer until all have finished reading it.'}
           </Translated>
         ),
@@ -984,7 +986,7 @@ export const questionsS158: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Tự nó thì không an toàn; trình biên dịch chèn một rào chắn ở nơi các bộ đệm được chia sẻ.">
+          <Translated vi="Tự nó thì không an toàn; trình biên dịch chèn một rào chắn ở nơi các buffer được chia sẻ.">
             {'It is not safe on its own; the compiler inserts a barrier where the buffers are shared.'}
           </Translated>
         ),
@@ -999,8 +1001,8 @@ export const questionsS158: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Trong một vòng lặp, hai lời gọi dùng các bộ đệm khác nhau, nên chúng không thể va chạm. Giữa các vòng lặp, lần
-            ghi tiếp theo vào bộ đệm <i>curr</i> xảy ra ở vòng lặp i + 1, bởi một luồng đã qua rào chắn ở cuối vòng lặp i;
+            Trong một vòng lặp, hai lời gọi dùng các buffer khác nhau, nên chúng không thể va chạm. Giữa các vòng lặp, lần
+            ghi tiếp theo vào buffer <i>curr</i> xảy ra ở vòng lặp i + 1, bởi một luồng đã qua rào chắn ở cuối vòng lặp i;
             không luồng nào qua được nó cho đến khi tất cả đã xong <code>mm</code> của vòng lặp i. Một rào chắn bảo vệ cả
             việc tile tiếp theo đến nơi lẫn việc tái sử dụng tile cũ. Sách nêu nhiệm vụ thứ nhất; nhiệm vụ thứ hai là cách
             đọc của chúng tôi, và bảng kết quả kiểm chứng nó.
@@ -1224,7 +1226,7 @@ export const questionsS158: Record<string, Question> = {
     kind: 'choice',
     id: 'ch15/15.8/q-no-async',
     prompt: (
-      <Translated vi={<>Trên HIP và trên Metal, cái gì nạp bộ đệm kế tiếp trong khi bộ đệm hiện tại đang được dùng?</>}>
+      <Translated vi={<>Trên HIP và trên Metal, cái gì nạp buffer kế tiếp trong khi buffer hiện tại đang được dùng?</>}>
         <>On HIP and on Metal, what fills the next buffer while the current one is being used?</>
       </Translated>
     ),
@@ -1242,7 +1244,7 @@ export const questionsS158: Record<string, Question> = {
           <Translated
             vi={
               <>
-                Một engine sao chép bất đồng bộ, thông qua{' '}
+                Một copy engine bất đồng bộ, thông qua{' '}
                 <code style={{ overflowWrap: 'anywhere' }}>__builtin_amdgcn_async_work_group_copy</code> trên HIP.
               </>
             }
@@ -1379,7 +1381,7 @@ export function S158() {
           <p>
             Mục 15.7 để lại cho mỗi SM một khối làm việc theo lượt: mọi warp của nó nạp ô, rồi tất cả cùng tính. Trong khi
             các ô được nạp, các đơn vị số học không có gì làm; trong khi khối tính, hệ thống bộ nhớ không có gì làm. Mục này
-            chồng lấp hai việc đó, để độ trễ dài của các lần nạp ẩn sau các phép nhân-cộng hợp nhất (FMA).
+            chồng lấp hai việc đó, để độ trễ dài của các lần nạp ẩn sau các phép nhân-cộng gộp (FMA).
           </p>
         }
       >
@@ -1468,7 +1470,7 @@ export function S158() {
       <Ask q={questionsS158['ch15/15.8/q-false']} />
 
       <h2>
-        <Translated vi="Hai bộ đệm">Two buffers</Translated>
+        <Translated vi="Hai buffer">Two buffers</Translated>
       </h2>
       <Translated
         vi={
@@ -1563,10 +1565,10 @@ export function S158() {
       <Translated
         vi={
           <p>
-            Fig. 15.14 là kết quả, thay cho vòng lặp ô của Fig. 15.3. Nạp cặp 0 vào các bộ đệm hiện tại và đồng bộ hóa. Sau
-            đó, với mọi tile trừ tile cuối: <code>mm</code> trên các bộ đệm hiện tại, <code>loadTile</code> của cặp tiếp theo
-            vào các bộ đệm kia, một rào chắn, và hoán đổi bộ đệm nào là hiện tại. Sau vòng lặp, một lần <code>mm</code>{' '}
-            cuối cùng. Cố ý không có rào chắn giữa <code>mm</code> và <code>loadTile</code>: chúng dùng các bộ đệm khác
+            Fig. 15.14 là kết quả, thay cho vòng lặp ô của Fig. 15.3. Nạp cặp 0 vào các buffer hiện tại và đồng bộ hóa. Sau
+            đó, với mọi tile trừ tile cuối: <code>mm</code> trên các buffer hiện tại, <code>loadTile</code> của cặp tiếp theo
+            vào các buffer kia, một rào chắn, và hoán đổi buffer nào là hiện tại. Sau vòng lặp, một lần <code>mm</code>{' '}
+            cuối cùng. Cố ý không có rào chắn giữa <code>mm</code> và <code>loadTile</code>: chúng dùng các buffer khác
             nhau, và việc bỏ nó đi là điều cho phép trình biên dịch xen kẽ hai hàm đã được inline.
           </p>
         }
@@ -1603,7 +1605,7 @@ export function S158() {
         vi={
           <p>
             Vòng lặp có một rào chắn duy nhất, ở cuối mỗi vòng. Nó bảo vệ phụ thuộc thật: không luồng nào tính với cặp i + 1
-            cho đến khi mọi luồng đã nạp phần của mình. Nó cũng bảo vệ việc tái sử dụng vùng nhớ. Bộ đệm được đọc ở vòng
+            cho đến khi mọi luồng đã nạp phần của mình. Nó cũng bảo vệ việc tái sử dụng vùng nhớ. Buffer được đọc ở vòng
             lặp i được nạp lại ở vòng lặp i + 1, và không luồng nào bắt đầu vòng lặp i + 1 trước khi mọi luồng đã qua rào
             chắn, vốn nằm sau <code>mm</code> của chính nó ở vòng lặp i.
           </p>
@@ -1635,11 +1637,11 @@ export function S158() {
         vi={
           <p>
             Trình chạy từng bước chạy một phiên bản đồ chơi của vòng lặp với bốn luồng. Mỗi luồng nạp một ô nhớ của một tile
-            mỗi vòng lặp, và <code>mm</code> của nó cộng cả bốn ô nhớ của bộ đệm hiện tại, ba trong số đó do luồng khác ghi.
+            mỗi vòng lặp, và <code>mm</code> của nó cộng cả bốn ô nhớ của buffer hiện tại, ba trong số đó do luồng khác ghi.
             Với vòng lặp như trong Fig. 15.14, mã trong trình chạy từng bước, từng dòng một, chính là vòng lặp của{' '}
             <code>labs/ch15/snippets/s158_pipeline_toy.cu</code>, và mã của mỗi biến thể hỏng là vòng lặp trong tệp riêng
             của nó bên cạnh (<code>s158_no_loop_barrier.cu</code> và các tệp khác). Bỏ rào chắn, di chuyển nó, hoặc bỏ một
-            bộ đệm, và xem thứ tự luồng nào bắt được lỗi.
+            buffer, và xem thứ tự luồng nào bắt được lỗi.
           </p>
         }
       >
@@ -1770,7 +1772,7 @@ export function S158() {
       <Translated
         vi={
           <p>
-            Cái giá của hai bộ đệm là bộ nhớ chia sẻ. Với cột đệm của mục 15.6, hãy tính xem các ô của kernel pipeline chiếm
+            Cái giá của hai buffer là bộ nhớ chia sẻ. Với cột đệm của mục 15.6, hãy tính xem các ô của kernel pipeline chiếm
             bao nhiêu, và đối chiếu với thiết bị của bạn.
           </p>
         }

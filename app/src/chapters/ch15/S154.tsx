@@ -522,7 +522,7 @@ export const questionsS154: Record<string, Question> = {
         vi={
           <p>
             Với một bộ, các lần đọc của bước kế tiếp sẽ ghi đè lên thanh ghi mà bước hiện tại vẫn đang đọc: một xung đột ghi-sau-đọc
-            (write-after-read), chính là phụ thuộc giả mà mục 15.8 loại bỏ cho bộ nhớ chia sẻ bằng hai bộ đệm. CUTLASS mô tả đệm kép
+            (write-after-read), chính là phụ thuộc giả mà mục 15.8 loại bỏ cho bộ nhớ chia sẻ bằng hai buffer. CUTLASS mô tả đệm kép
             ở cả hai phạm vi, ô bộ nhớ chia sẻ và fragment thanh ghi, như cách của nó để chồng lấp truy cập bộ nhớ với tính toán bên
             trong một luồng.
           </p>

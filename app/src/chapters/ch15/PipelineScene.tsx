@@ -75,7 +75,7 @@ export function Lanes({ tl, x, y, scale, title, upTo = Infinity, deps = 'none', 
             ) : null}
             {show && bufs ? (
               <text x={X(b.start) + full / 2} y={top + 24} fontSize="9.5" textAnchor="middle" style={{ fill: 'var(--shared)' }}>
-                {full >= 60 ? tr(`buffer ${b.buf}`, `bộ đệm ${b.buf}`) : `b${b.buf}`}
+                {full >= 60 ? tr(`buffer ${b.buf}`, `buffer ${b.buf}`) : `b${b.buf}`}
               </text>
             ) : null}
           </g>
@@ -159,7 +159,7 @@ const beats: Beat[] = [
     draw: (p) => (
       <Stage beat={1} headline={tr('one block per SM: load, wait, compute, wait', 'mỗi SM một khối: nạp, chờ, tính, chờ')}
         sub={p > 0.9 ? tr(`memory busy ${pct(base.memUtil)} of the time, compute busy ${pct(base.compUtil)}`, `bộ nhớ bận ${pct(base.memUtil)} thời gian, tính toán bận ${pct(base.compUtil)}`) : undefined}>
-        <Lanes tl={base} x={X0} y={70} scale={S1} upTo={ramp(p, 0.04, 0.88) * base.total} title={tr('one buffer, two barriers per iteration', 'một bộ đệm, hai rào chắn mỗi vòng lặp')} />
+        <Lanes tl={base} x={X0} y={70} scale={S1} upTo={ramp(p, 0.04, 0.88) * base.total} title={tr('one buffer, two barriers per iteration', 'một buffer, hai rào chắn mỗi vòng lặp')} />
       </Stage>
     ),
   },
@@ -171,24 +171,24 @@ const beats: Beat[] = [
     draw: (p) => (
       <Stage beat={2} headline={p < 0.45 ? tr('after the loads: a true dependence', 'sau các lần nạp: một phụ thuộc thật') : tr('after the compute: a false dependence', 'sau phần tính: một phụ thuộc giả')}
         sub={p < 0.45 ? tr('the data has to arrive before anyone computes with it', 'dữ liệu phải đến nơi trước khi có ai tính toán với nó') : tr('the next load only waits so as not to overwrite tiles still being read', 'lần nạp kế tiếp chỉ chờ để khỏi ghi đè lên các ô còn đang được đọc')}>
-        <Lanes tl={base} x={X0} y={70} scale={S1} deps={p < 0.45 ? 'true' : 'all'} title={tr('one buffer, two barriers per iteration', 'một bộ đệm, hai rào chắn mỗi vòng lặp')} />
+        <Lanes tl={base} x={X0} y={70} scale={S1} deps={p < 0.45 ? 'true' : 'all'} title={tr('one buffer, two barriers per iteration', 'một buffer, hai rào chắn mỗi vòng lặp')} />
       </Stage>
     ),
   },
   {
     clip: 'pipeline-3',
     get label() {
-      return tr('Two buffers', 'Hai bộ đệm');
+      return tr('Two buffers', 'Hai buffer');
     },
     draw: (p) =>
       p < 0.4 ? (
-        <Stage beat={3} headline={tr('a second buffer for the next pair', 'một bộ đệm thứ hai cho cặp kế tiếp')} sub={tr('the barriers that guarded only the reuse of one buffer go', 'các rào chắn chỉ để canh việc dùng lại một bộ đệm biến mất')}>
-          <Lanes tl={base} x={X0} y={70} scale={S1} deps="all" /* i18n-ignore: prop value */ falseOpacity={1 - ramp(p, 0.08, 0.36)} title={tr('one buffer, two barriers per iteration', 'một bộ đệm, hai rào chắn mỗi vòng lặp')} />
+        <Stage beat={3} headline={tr('a second buffer for the next pair', 'một buffer thứ hai cho cặp kế tiếp')} sub={tr('the barriers that guarded only the reuse of one buffer go', 'các rào chắn chỉ để canh việc dùng lại một buffer biến mất')}>
+          <Lanes tl={base} x={X0} y={70} scale={S1} deps="all" /* i18n-ignore: prop value */ falseOpacity={1 - ramp(p, 0.08, 0.36)} title={tr('one buffer, two barriers per iteration', 'một buffer, hai rào chắn mỗi vòng lặp')} />
         </Stage>
       ) : (
-        <Stage beat={3} headline={tr('two buffers: one barrier per iteration, still taking turns', 'hai bộ đệm: một rào chắn mỗi vòng lặp, vẫn thay phiên nhau')}
+        <Stage beat={3} headline={tr('two buffers: one barrier per iteration, still taking turns', 'hai buffer: một rào chắn mỗi vòng lặp, vẫn thay phiên nhau')}
           sub={tr(`still ${units(dbl.total)}: the load of pair i + 1 sits in the next iteration, after compute i`, `vẫn ${units(dbl.total)}: lần nạp cặp i + 1 nằm ở vòng lặp sau, sau phần tính i`)}>
-          <Lanes tl={dbl} x={X0} y={70} scale={S1} deps="true" /* i18n-ignore: prop value */ bufs title={tr('two buffers, not rotated', 'hai bộ đệm, chưa xoay vòng lặp')} />
+          <Lanes tl={dbl} x={X0} y={70} scale={S1} deps="true" /* i18n-ignore: prop value */ bufs title={tr('two buffers, not rotated', 'hai buffer, chưa xoay vòng lặp')} />
         </Stage>
       ),
   },
@@ -202,8 +202,8 @@ const beats: Beat[] = [
       return (
         <Stage beat={4} headline={tr('iteration i computes pair i and loads pair i + 1', 'vòng lặp i tính cặp i và nạp cặp i + 1')}
           sub={p > 0.86 ? tr(`${units(pipe.total)} instead of ${units(base.total)}: a speed-up of ${speedup(N, 1, 1)}`, `${units(pipe.total)} thay vì ${units(base.total)}: tăng tốc ${speedup(N, 1, 1)} lần`) : undefined}>
-          <Lanes tl={base} x={X0} y={70} scale={S1} dim title={tr('before: one buffer, two barriers', 'trước: một bộ đệm, hai rào chắn')} />
-          <Lanes tl={pipe} x={X0} y={190} scale={S1} upTo={t} bufs title={tr('two buffers, pipelined (prologue, three iterations, one compute after the loop)', 'hai bộ đệm, pipeline (phần mở đầu, ba vòng lặp, một lần tính sau vòng lặp)')} />
+          <Lanes tl={base} x={X0} y={70} scale={S1} dim title={tr('before: one buffer, two barriers', 'trước: một buffer, hai rào chắn')} />
+          <Lanes tl={pipe} x={X0} y={190} scale={S1} upTo={t} bufs title={tr('two buffers, pipelined (prologue, three iterations, one compute after the loop)', 'hai buffer, pipeline (phần mở đầu, ba vòng lặp, một lần tính sau vòng lặp)')} />
         </Stage>
       );
     },
@@ -218,13 +218,13 @@ const beats: Beat[] = [
       const bar = pipe.barriers[hi];
       const text =
         hi === 0
-          ? tr('barrier after the prologue: tile 0 has arrived in buffer 0', 'rào chắn sau phần mở đầu: ô 0 đã đến bộ đệm 0')
+          ? tr('barrier after the prologue: tile 0 has arrived in buffer 0', 'rào chắn sau phần mở đầu: ô 0 đã đến buffer 0')
           : bar.reuse
-            ? tr(`barrier ${hi}: tile ${hi} has arrived, and buffer ${(hi - 1) & 1} is free for tile ${hi + 1}`, `rào chắn ${hi}: ô ${hi} đã đến, và bộ đệm ${(hi - 1) & 1} rảnh cho ô ${hi + 1}`)
+            ? tr(`barrier ${hi}: tile ${hi} has arrived, and buffer ${(hi - 1) & 1} is free for tile ${hi + 1}`, `rào chắn ${hi}: ô ${hi} đã đến, và buffer ${(hi - 1) & 1} rảnh cho ô ${hi + 1}`)
             : tr(`barrier ${hi}: tile ${hi} has arrived; no tile is left to load`, `rào chắn ${hi}: ô ${hi} đã đến; không còn ô nào để nạp`);
       return (
-        <Stage beat={5} headline={tr('the buffers swap roles every iteration', 'hai bộ đệm đổi vai trò sau mỗi vòng lặp')} sub={text}>
-          <Lanes tl={pipe} x={X0} y={70} scale={S5} bufs deps="true" /* i18n-ignore: prop value */ hiBarrier={hi} title={tr('two buffers, pipelined', 'hai bộ đệm, pipeline')} />
+        <Stage beat={5} headline={tr('the buffers swap roles every iteration', 'hai buffer đổi vai trò sau mỗi vòng lặp')} sub={text}>
+          <Lanes tl={pipe} x={X0} y={70} scale={S5} bufs deps="true" /* i18n-ignore: prop value */ hiBarrier={hi} title={tr('two buffers, pipelined', 'hai buffer, pipeline')} />
           {rolesRow(pipe, 200, S5, pipe.total)}
         </Stage>
       );
@@ -238,8 +238,8 @@ const beats: Beat[] = [
     draw: (p) => (
       <Stage beat={6} headline={tr('loads three times longer than the compute', 'nạp lâu gấp ba lần phần tính')}
         sub={p > 0.5 ? tr(`${units(slowPipe.total)} instead of ${units(slowBase.total)}: a speed-up of ${speedup(N, 3, 1).toFixed(2)}; the memory lane sets the pace`, `${units(slowPipe.total)} thay vì ${units(slowBase.total)}: tăng tốc ${speedup(N, 3, 1).toFixed(2)} lần; làn bộ nhớ quyết định nhịp độ`) : undefined}>
-        <Lanes tl={slowBase} x={X0} y={70} scale={S6} title={tr('one buffer, two barriers', 'một bộ đệm, hai rào chắn')} />
-        <Lanes tl={slowPipe} x={X0} y={190} scale={S6} upTo={ramp(p, 0.1, 0.5) * slowPipe.total} title={tr('two buffers, pipelined', 'hai bộ đệm, pipeline')} />
+        <Lanes tl={slowBase} x={X0} y={70} scale={S6} title={tr('one buffer, two barriers', 'một buffer, hai rào chắn')} />
+        <Lanes tl={slowPipe} x={X0} y={190} scale={S6} upTo={ramp(p, 0.1, 0.5) * slowPipe.total} title={tr('two buffers, pipelined', 'hai buffer, pipeline')} />
       </Stage>
     ),
   },

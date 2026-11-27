@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Code } from '../../components/Code';
 import { Bench } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { BOOK, makeGraph } from '../../sim/bfs';
 import {
   FORMS,
@@ -42,7 +42,8 @@ export function VisitStepper() {
   const sc = SCENARIOS[scId];
   const form = FORMS[formId];
   const g = scId === 'book' ? BOOK : TRAP_GRAPH;
-  const { states, events } = useMemo(() => replay(form, sc, moves), [form, sc, moves]);
+  const locale = useLocale();
+  const { states, events } = useMemo(() => replay(form, sc, moves), [form, sc, moves, locale]);
   const st = states[states.length - 1];
   const last = events[events.length - 1];
   const spinning = st.threads.findIndex((t) => t.pc !== 'done' && t.steps >= BOUND);

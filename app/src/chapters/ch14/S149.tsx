@@ -289,7 +289,7 @@ export const questionsS149: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Ở đây đủ ổn định, nhưng mỗi bước một lần khởi chạy và một lần chép về, tới 64 bước mỗi hàng.">
+          <Translated vi="Ở đây đủ ổn định, nhưng mỗi bước một lần khởi chạy và một lần sao chép về, tới 64 bước mỗi hàng.">
             Stable enough here, but one launch and one copy back per step, for up to 64 steps per row.
           </Translated>
         ),

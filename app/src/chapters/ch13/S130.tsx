@@ -886,7 +886,7 @@ export function S130() {
       <Translated
         vi={
           <p>
-            Những gì bị bỏ qua: §13.7, kernel bộ đệm vòng (pp. 321–327), giữ lại nửa mỗi ô mà kernel phân ô vứt đi. Trang
+            Những gì bị bỏ qua: §13.7, kernel buffer vòng (pp. 321–327), giữ lại nửa mỗi ô mà kernel phân ô vứt đi. Trang
             13.3 mô tả nó trong một đoạn, và trang tóm tắt nói vì sao khóa học không đi xa hơn. Hai phần nền tảng, §13.1 và
             §13.2, là trang này.
           </p>

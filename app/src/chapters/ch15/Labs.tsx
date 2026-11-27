@@ -1222,10 +1222,10 @@ export function Labs() {
         vi={
           <p>
             Bản làm của bạn bắt đầu là lời giải của lab 15.4 với vòng lặp ô bị lấy ra. Đặt nó lại sao cho vòng lặp{' '}
-            <code>tile</code> tính với cặp <code>tile</code> trong khi nạp cặp <code>tile + 1</code> vào một bộ đệm thứ hai,
+            <code>tile</code> tính với cặp <code>tile</code> trong khi nạp cặp <code>tile + 1</code> vào một buffer thứ hai,
             với một rào chắn mỗi vòng thay vì hai: hai cặp ô chia sẻ, <code>A_s[2][...]</code> và <code>B_s[2][...]</code>;
             một phần mở đầu (prologue) nạp cặp 0 và chờ; một vòng lặp qua <code>tile &lt; numTiles - 1</code> chạy{' '}
-            <code>mm</code> trên cặp <code>tile</code>, nạp cặp <code>tile + 1</code> vào các bộ đệm kia, và chờ; và một phần
+            <code>mm</code> trên cặp <code>tile</code>, nạp cặp <code>tile + 1</code> vào các buffer kia, và chờ; và một phần
             kết (epilogue) chạy <code>mm</code> trên cặp cuối.
           </p>
         }
@@ -1244,11 +1244,11 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Fig. 15.14 là một bộ khung: các đối số bị lược bỏ, các bộ đệm không được khai báo, và kiểu con trỏ không khớp với
-            các ô một chiều của Fig. 15.3. Sách hoán đổi con trỏ hiện tại và con trỏ kế tiếp mỗi vòng; chọn bộ đệm của một cặp
+            Fig. 15.14 là một bộ khung: các đối số bị lược bỏ, các buffer không được khai báo, và kiểu con trỏ không khớp với
+            các ô một chiều của Fig. 15.3. Sách hoán đổi con trỏ hiện tại và con trỏ kế tiếp mỗi vòng; chọn buffer của một cặp
             theo tính chẵn lẻ, <code>tile &amp; 1</code>, như lab 6.5 làm, cũng là cùng sự luân phiên đó. Hai trường hợp hình
             để lại cho bạn: <code>numTiles - 1</code> làm gì khi K bằng 0 (một bài test có K = 0 và giới hạn 30 giây), và phần
-            kết đọc bộ đệm nào. Mục <a href={href('ch15', '15.8')}>15.8</a> chạy từng bước qua cả hai.
+            kết đọc buffer nào. Mục <a href={href('ch15', '15.8')}>15.8</a> chạy từng bước qua cả hai.
           </p>
         }
       >
@@ -1265,7 +1265,7 @@ export function Labs() {
         files={[
           [
             'kernel.cu',
-            <Translated vi={<>các bộ đệm kép và vòng lặp ô trong <code>gemmPipelinedKernel</code></>}>
+            <Translated vi={<>các buffer kép và vòng lặp ô trong <code>gemmPipelinedKernel</code></>}>
               <>the double buffers and the tile loop in <code>gemmPipelinedKernel</code></>
             </Translated>,
           ],
@@ -1351,7 +1351,7 @@ export function Labs() {
       <Translated
         vi={
           <p>
-            Các thư viện lấy sự chồng lấp khỏi tay trình biên dịch bằng các bản sao mà phần cứng chạy ở chế độ nền. Mục{' '}
+            Các thư viện lấy sự chồng lấp khỏi tay trình biên dịch bằng các lần sao chép mà phần cứng chạy ở chế độ nền. Mục{' '}
             <a href={href('ch15', '15.9')}>15.9</a> nói backend nào có chúng.
           </p>
         }

@@ -1211,7 +1211,7 @@ export function Labs() {
             cũng vậy nhưng có cài sẵn các giá trị bằng nhau tuyệt đối, kể cả các dãy 40 giá trị bằng nhau vắt qua mọi bội của 256 từ
             512 đến 8192, để với mọi c từ 1 đến 32 sẽ có một dãy vắt qua ranh giới ô 256c khóa khi hàng đủ dài; toàn bộ giá trị bằng
             nhau; các hàng one-hot (các số không phải giữ thứ tự cột); logits có −0.0 và +0.0 xen kẽ, vô cực,{' '}
-            <code>±FLT_MAX</code> và số dưới chuẩn; và các hàng có NaN cả hai dấu.
+            <code>±FLT_MAX</code> và số subnormal; và các hàng có NaN cả hai dấu.
           </p>
         }
       >

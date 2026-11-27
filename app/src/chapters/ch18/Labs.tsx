@@ -537,7 +537,7 @@ export function Labs() {
           <p>
             <b>Word canh trên frontier chung.</b> Không đoạn mã nào kiểm tra dung lượng của frontier chung, và trang không trình
             bày lần cấp phát nào. Ở đây mỗi frontier chung chứa <code>numVertices</code> phần tử, đủ khi mỗi đỉnh được thêm một
-            lần, và chương trình điều khiển (driver) đặt các word canh sau cả hai bộ đệm và kiểm tra chúng sau mỗi phép tìm kiếm.
+            lần, và chương trình điều khiển (driver) đặt các word canh sau cả hai buffer và kiểm tra chúng sau mỗi phép tìm kiếm.
           </p>
         }
       >

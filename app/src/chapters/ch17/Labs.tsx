@@ -640,7 +640,7 @@ export function Labs() {
         <Translated
           vi={
             <p>
-              Metal không mặc định dùng số học IEEE nghiêm ngặt, và một phép cộng nguyên tử số thực trên bộ nhớ toàn cục (global memory) làm tròn các số dưới chuẩn (subnormal) về
+              Metal không mặc định dùng số học IEEE nghiêm ngặt, và một phép cộng nguyên tử số thực trên bộ nhớ toàn cục (global memory) làm tròn các số subnormal về
               0, nên một tổng COO có thể khác CPU khi gần 0.
             </p>
           }

@@ -242,7 +242,7 @@ export function LevelExplorer({ request }: { request?: ExplorerRequest | null })
           <label className="field">
             <Translated vi="Đồ thị">Graph</Translated>
             <select value={preset} onChange={(e) => choosePreset(+e.target.value)} aria-label={tr('Graph', 'Đồ thị')}>
-              {PRESETS.map((p, k) => <option key={p.id} value={k}>{p.name}</option>)}
+              {PRESETS.map((p, k) => <option key={p.id} value={k}>{tr(p.name, ({ "the book's graph (Fig. 18.1)": 'đồ thị của sách (Fig. 18.1)', 'the Exercise 1 graph (our reading of p. 450)': 'đồ thị Bài tập 1 (cách chúng tôi đọc p. 450)', 'a chain of 10 (a road)': 'một chuỗi 10 đỉnh (một con đường)', 'a star with one hub and 10 leaves': 'một hình sao với một tâm (hub) và 10 lá', 'a 4 × 4 grid': 'lưới 4 × 4' } as Record<string, string>)[p.name] ?? p.name)}</option>)}
             </select>
           </label>
           <label className="field">
@@ -281,7 +281,7 @@ export function LevelExplorer({ request }: { request?: ExplorerRequest | null })
           <div>
             <BfsGraph
               g={g}
-              label={`${g.name}, ${cur ? tr('call ', 'lần gọi ') + s : tr('before the first call', 'trước lần gọi đầu tiên')}`}
+              label={`${tr(g.name, ({ "the book's graph (Fig. 18.1)": 'đồ thị của sách (Fig. 18.1)', 'the Exercise 1 graph (our reading of p. 450)': 'đồ thị Bài tập 1 (cách chúng tôi đọc p. 450)', 'a chain of 10 (a road)': 'một chuỗi 10 đỉnh (một con đường)', 'a star with one hub and 10 leaves': 'một hình sao với một tâm (hub) và 10 lá', 'a 4 × 4 grid': 'lưới 4 × 4' } as Record<string, string>)[g.name] ?? g.name)}, ${cur ? tr('call ', 'lần gọi ') + s : tr('before the first call', 'trước lần gọi đầu tiên')}`}
               look={(v) => (v === root ? 'root' : fresh.has(v) ? 'new' : shown[v] === UNVISITED ? 'unvisited' : 'visited')}
               tag={(v) => (shown[v] === UNVISITED ? null : String(shown[v]))}
               ring={(v) => ((writers.get(v) ?? 0) > 1 ? 'fail' : null)}

@@ -254,7 +254,7 @@ function verdict(map: Mapping, r: RunResult, ok: boolean[]) {
     return (
       <p data-verdict="outside" style={{ margin: '0.4rem 0 0' }}>
         <span className="chip fail">
-          {r.readOutside ? tr('reads past the end of a buffer', 'đọc quá cuối một bộ đệm') : tr('writes past the end of C', 'ghi quá cuối C')}
+          {r.readOutside ? tr('reads past the end of a buffer', 'đọc quá cuối một buffer') : tr('writes past the end of C', 'ghi quá cuối C')}
         </span>{' '}
         <Translated vi="Lời gọi biên dịch và chạy được; trên GPU nó sẽ đọc hoặc ghi vào vùng nhớ không thuộc ma trận này.">
           The call compiles and runs; on a GPU it would read or write memory that is not this matrix.
@@ -705,8 +705,7 @@ export function S151() {
           <p>
             Ba điều cần tìm. So sánh <code>nn.Linear</code> với x @ W: khác biệt duy nhất là transa, T thay vì N, và transposeRight
             ở phía MPS. So sánh Q Kᵀ với <code>nn.Linear</code>: cùng một lời gọi, vì K được lưu như một trọng số. Rồi bật một chỉnh
-            sửa bất kỳ. Một đối số sai không làm sập gì cả: nó cho ra những con số, những con số sai, hoặc đọc quá cuối một bộ
-            đệm. Chỉ việc so sánh với một kết quả tham chiếu mới bắt được nó, đó là lý do mọi lab đều kiểm tra với một kết quả
+            sửa bất kỳ. Một đối số sai không làm sập gì cả: nó cho ra những con số, những con số sai, hoặc đọc quá cuối một buffer. Chỉ việc so sánh với một kết quả tham chiếu mới bắt được nó, đó là lý do mọi lab đều kiểm tra với một kết quả
             tham chiếu trên CPU.
           </p>
         }

@@ -460,7 +460,7 @@ export function Labs() {
             <li>
               Nạp chính xác, không phải một ô đầy cho mỗi đầu vào như §13.6: co-rank của mọi khối được tính trước, trong lần
               khởi chạy riêng của chúng, trong khi Fig. 13.11 để luồng 0 tính chúng giữa hai rào chắn (barrier). Mỗi khối một
-              ô, nên không có vòng while, không có <code>A_consumed</code>, và không còn gì thừa để một bộ đệm vòng giữ lại.
+              ô, nên không có vòng while, không có <code>A_consumed</code>, và không còn gì thừa để một buffer vòng giữ lại.
             </li>
           }
         >

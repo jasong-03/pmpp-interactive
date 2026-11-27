@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Code } from '../../components/Code';
 import { Bench, type Tier } from '../../components/notes';
-import { Translated, tr } from '../../lib/i18n';
+import { Translated, tr, useLocale } from '../../lib/i18n';
 import { useReports } from '../../lib/reports';
 import {
   CORRECT,
@@ -44,8 +44,9 @@ function Barriers() {
   const [schedule, setSchedule] = useState<Schedule>('forward');
   const [rule, setRule] = useState<Rule>('gpu');
   const [n, setN] = useState(0);
+  const locale = useLocale();
   const graph = useMemo(() => PRESET_GRAPH[preset](), [preset]);
-  const trace = useMemo(() => simulate(shape, schedule, graph, blocks, 2, rule), [shape, schedule, graph, blocks, rule]);
+  const trace = useMemo(() => simulate(shape, schedule, graph, blocks, 2, rule), [shape, schedule, graph, blocks, rule, locale]);
   useEffect(() => setN(0), [trace]);
   const total = trace.steps.length;
   const at = Math.min(n, total);
@@ -131,7 +132,7 @@ function Barriers() {
             vi={
               <>
                 Chưa có gì chạy. Một lần khởi chạy gồm {blocks} khối, mỗi khối 2 luồng, khối nào cũng thường trú; đỉnh 0 là gốc,
-                và frontier trong bộ đệm A chứa nó. Kernel: {variant ? VARIANT[variant].label : tr('your own combination', 'tổ hợp của riêng bạn')}. Mỗi
+                và frontier trong buffer A chứa nó. Kernel: {variant ? VARIANT[variant].label : tr('your own combination', 'tổ hợp của riêng bạn')}. Mỗi
                 bước chạy một luồng từ rào chắn lưới này đến rào chắn kế tiếp. Bấm Bước.
               </>
             }
@@ -178,7 +179,7 @@ function Barriers() {
           {(['A', 'B'] as const).map((buf) => (
             <div key={buf}>
               <div className="mx-label t-global" style={{ marginTop: '0.5rem' }}>
-                <Translated vi="bộ đệm">buffer</Translated> {buf}{snap.threads[0].prev === buf ? tr(' (prevFrontier of thread 0)', ' (prevFrontier của luồng 0)') : tr(' (currFrontier of thread 0)', ' (currFrontier của luồng 0)')}
+                <Translated vi="buffer">buffer</Translated> {buf}{snap.threads[0].prev === buf ? tr(' (prevFrontier of thread 0)', ' (prevFrontier của luồng 0)') : tr(' (currFrontier of thread 0)', ' (currFrontier của luồng 0)')}
               </div>
               <div className="mx global" style={{ gridTemplateColumns: `repeat(${Math.min(8, slots)}, auto)` }}>
                 {snap[buf].slice(0, slots).map((x, i) => (
@@ -201,7 +202,7 @@ function Barriers() {
           </div>
           {at >= total ? (
             <p style={{ margin: '0.9rem 0 0' }} data-outcome={trace.outcome.label}>
-              <span className={'chip ' + (trace.outcome.kind === 'correct' ? 'ok' : 'fail')}>{trace.outcome.label}</span>
+              <span className={'chip ' + (trace.outcome.kind === 'correct' ? 'ok' : 'fail')}>{tr(trace.outcome.label, ({ 'an out-of-range access': 'một truy cập ngoài phạm vi', 'early exit, deadlock': 'thoát sớm, deadlock', 'early exit': 'thoát sớm', 'appends lost to a late reset': 'các lần nối thêm bị mất vì đặt lại muộn', 'a thread read a partial count': 'một luồng đọc một số đếm dở dang', 'levels wrong': 'mức sai', correct: 'đúng' } as Record<string, string>)[trace.outcome.label] ?? trace.outcome.label)}</span>
               {trace.outcome.consequence ? <> {trace.outcome.consequence}.</> : null}
               {trace.outcome.kind === 'correct' ? <Translated vi={<> Mọi đỉnh đều đã có mức BFS của mình.</>}><> Every vertex has its BFS level.</></Translated> : null}
             </p>

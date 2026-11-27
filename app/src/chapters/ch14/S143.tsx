@@ -642,7 +642,7 @@ export function S143() {
         vi={
           <p>
           Sách để phần cài đặt cho bạn. Một cách bố trí: mỗi khối sắp một đoạn trong bộ nhớ chia sẻ (shared memory); sau đó chạy
-          log2(segments) giai đoạn trộn, mỗi giai đoạn đọc từ một bộ đệm và ghi vào bộ đệm kia, đổi vai hai bộ đệm giữa các giai
+          log2(segments) giai đoạn trộn, mỗi giai đoạn đọc từ một buffer và ghi vào buffer kia, đổi vai hai buffer giữa các giai
           đoạn. Ở mỗi giai đoạn, mỗi phép trộn được grid / merges khối, các khối này dùng phép tìm co-rank để chia phép trộn; khi
           số khối ít hơn số phép trộn, mỗi khối lặp qua vài phép. Một đoạn không có cặp (khi số đoạn không phải lũy thừa của hai)
           được chép sang nguyên vẹn. Đây là một phác thảo, không phải một lab của chương này.
@@ -666,7 +666,7 @@ export function S143() {
           Phép sắp xếp trên GPU của MLX là một phép sắp xếp trộn được dựng theo cách này. Mỗi luồng trước hết sắp vài giá trị
           trong thanh ghi (register) của nó bằng vòng lặp chẵn-lẻ của <a href={href('ch14', '14.2')}>mục 14.2</a>; sau đó một
           khối trộn các dải đó, tìm điểm chia của mỗi luồng bằng tìm kiếm nhị phân dọc theo đường chéo, chính là co-rank của
-          chương 13; các hàng dài hơn đi qua nhiều khối, chuyền qua lại giữa các bộ đệm. Phép trộn của nó chỉ lấy từ dải phải khi
+          chương 13; các hàng dài hơn đi qua nhiều khối, chuyền qua lại giữa các buffer. Phép trộn của nó chỉ lấy từ dải phải khi
           phần tử đó nhỏ hơn hẳn, nên các khóa bằng nhau giữ thứ tự đầu vào và phép sắp xếp ổn định, như tài liệu MLX ghi.
           </p>
         }

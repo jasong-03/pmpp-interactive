@@ -83,7 +83,7 @@ export const questionsStaging: Record<string, Question> = {
           </Translated>
         ),
         why: (
-          <Translated vi="Không phải trong kernel này: lần lặp tiếp theo lại nạp từ A_curr + A_consumed vào A_S[0] và ghi đè nó. Giữ lại nửa đó chính là điều kernel bộ đệm vòng của §13.7 bổ sung.">
+          <Translated vi="Không phải trong kernel này: lần lặp tiếp theo lại nạp từ A_curr + A_consumed vào A_S[0] và ghi đè nó. Giữ lại nửa đó chính là điều kernel buffer vòng của §13.7 bổ sung.">
             Not in this kernel: the next iteration loads from A_curr + A_consumed into A_S[0] again and overwrites it.
             Keeping that half is what the circular-buffer kernel of §13.7 adds.
           </Translated>
@@ -159,12 +159,12 @@ export const questionsStaging: Record<string, Question> = {
       },
       {
         label: (
-          <Translated vi="Một bộ đệm vòng để giữ các phần tử còn thừa của mỗi ô.">
+          <Translated vi="Một buffer vòng để giữ các phần tử còn thừa của mỗi ô.">
             A circular buffer to keep each tile's leftover elements.
           </Translated>
         ),
         why: (
-          <Translated vi="Với nạp chính xác thì không có phần thừa nào để giữ. Bộ đệm vòng là câu trả lời khác của sách cho cùng sự lãng phí đó.">
+          <Translated vi="Với nạp chính xác thì không có phần thừa nào để giữ. Buffer vòng là câu trả lời khác của sách cho cùng sự lãng phí đó.">
             With exact loads there are no leftovers to keep. The circular buffer is the book's other answer to the same
             waste.
           </Translated>
@@ -828,7 +828,7 @@ export function StagingPart() {
             vào đã hết. Khi đó phép tìm có thể đọc những ô nhớ vẫn còn giữ ô trước. Chọn "A hết sớm" và các ô nhớ có rủi ro
             được đánh dấu bằng dấu hỏi. Một phép tìm kiếm nhị phân chỉ đọc vài ô trong số đó: ở đó, lần lặp 1 chỉ nạp A[8]
             và A[9], dòng 48 đọc <code>A_S[7]</code>, vẫn còn giữ A[7], và đếm 8 phần tử của A trong khi các phép trộn dùng
-            2. Dòng 50 của kernel bộ đệm vòng đếm với độ dài <code>min(tile_size, ...)</code>, và dạng đó là đúng.
+            2. Dòng 50 của kernel buffer vòng đếm với độ dài <code>min(tile_size, ...)</code>, và dạng đó là đúng.
           </p>
         }
       >
@@ -945,13 +945,13 @@ export function StagingPart() {
       <LabTiled />
 
       <h2>
-        <Translated vi="Bộ đệm vòng, tóm tắt">The circular buffer, in brief</Translated>
+        <Translated vi="Buffer vòng, tóm tắt">The circular buffer, in brief</Translated>
       </h2>
       <Translated
         vi={
           <p>
             Câu trả lời của chính sách, §13.7, giữ vòng lặp phân ô và thôi vứt dữ liệu đi. Các phần tử chưa dùng của mỗi ô ở
-            lại trong bộ nhớ chia sẻ, chỉ những ô nhớ đã tiêu thụ được nạp lại, và vị trí quay vòng qua cuối bộ đệm bằng{' '}
+            lại trong bộ nhớ chia sẻ, chỉ những ô nhớ đã tiêu thụ được nạp lại, và vị trí quay vòng qua cuối buffer bằng{' '}
             <code>%</code>. Để giữ việc quay vòng ra khỏi mã cấp luồng, mọi vị trí được lưu như một độ lệch tính từ đầu ô,
             nên một ô luôn trông như một dải thẳng, và chỉ hai hàm, <code>co_rank_circular</code> và{' '}
             <code>merge_sequential_circular</code>, biến độ lệch thành chỉ số đã quay vòng. Sách rút ra bài học trong Fig.
@@ -972,8 +972,7 @@ export function StagingPart() {
       <Translated
         vi={
           <p>
-            Khóa học này không xây phần nào của nó. Không thư viện hay dự án nào được đọc cho khóa học vào 2026-11-20 dùng bộ
-            đệm vòng cho phép trộn: bốn cái có phân ô đều nạp chính xác, nên không còn gì thừa để giữ, và phép trộn Metal của
+            Khóa học này không xây phần nào của nó. Không thư viện hay dự án nào được đọc cho khóa học vào 2026-11-20 dùng buffer vòng cho phép trộn: bốn cái có phân ô đều nạp chính xác, nên không còn gì thừa để giữ, và phép trộn Metal của
             llama.cpp hoàn toàn không đưa vào bộ nhớ chia sẻ. Các đoạn mã cũng có vài chỗ nhầm, được liệt kê ở{' '}
             <a href={href('ch13', 'wrap')}>trang tóm tắt</a>.
           </p>

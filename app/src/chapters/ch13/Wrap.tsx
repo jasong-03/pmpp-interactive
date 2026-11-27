@@ -685,7 +685,7 @@ export function Wrap() {
       <Translated
         vi={
           <p>
-            Bản sách mà khóa học này dựa vào có một số chỗ có vẻ nhầm trong chương 13, phần lớn nằm trong các đoạn mã bộ đệm
+            Bản sách mà khóa học này dựa vào có một số chỗ có vẻ nhầm trong chương 13, phần lớn nằm trong các đoạn mã buffer
             vòng mà khóa học này bỏ qua. Chúng được liệt kê để bạn không bị bối rối khi đọc sách song song. Tám mục đầu là lỗi
             về câu chữ hoặc đánh số; phần lớn các mục còn lại ảnh hưởng đến mã.
           </p>
@@ -865,7 +865,7 @@ export function Wrap() {
           vi={
             <li>
               Lần nạp lại của Fig. 13.16 đọc từ <code>A[A_curr + A_consumed + i + threadIdx.x]</code>, vốn nạp lại những phần
-              tử vẫn còn trong bộ đệm. Trong bản giả lập của chính chúng tôi, cộng thêm <code>tile_size − A_S_consumed</code>{' '}
+              tử vẫn còn trong buffer. Trong bản giả lập của chính chúng tôi, cộng thêm <code>tile_size − A_S_consumed</code>{' '}
               vào độ lệch nguồn và điều kiện canh làm các phép trộn đúng; Fig. 13.15(c) vẽ lần nạp lại bắt đầu sau ô trước,
               điều này khớp.
             </li>
@@ -990,8 +990,7 @@ export function Wrap() {
       <Translated
         vi={
           <p>
-            Chương này được rút gọn trong khóa học, nên đây là những gì không được đề cập và nơi tìm chúng. §13.7, kernel bộ
-            đệm vòng (pp. 321–327, Figs. 13.15 to 13.20), có một đoạn ở trang 13.3 và các chỗ nhầm của nó ở trên: không có
+            Chương này được rút gọn trong khóa học, nên đây là những gì không được đề cập và nơi tìm chúng. §13.7, kernel buffer vòng (pp. 321–327, Figs. 13.15 to 13.20), có một đoạn ở trang 13.3 và các chỗ nhầm của nó ở trên: không có
             phần tương tác, không có mã và không có lab, vì không thư viện hay dự án nào được đọc cho khóa học này dùng nó.
             Phần đi qua từng dòng của kernel phân ô (Figs. 13.11 to 13.13, pp. 316–320) được tóm tắt ở trang 13.3; phần ghi
             sổ của nó, <code>A_consumed</code>, <code>C_completed</code> và các điều kiện canh ở đuôi, nằm trong trình khám

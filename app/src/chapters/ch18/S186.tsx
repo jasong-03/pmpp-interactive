@@ -1203,8 +1203,8 @@ export function S186() {
           <p>
             Thêm một điều sách bỏ qua: không kernel nào kiểm tra dung lượng của frontier chung, và lần cấp phát trên host không
             bao giờ được trình bày. Với compare-and-swap, mỗi đỉnh được nối nhiều nhất một lần mỗi quá trình tìm kiếm, nên một
-            bộ đệm <code>numVertices</code> phần tử là đủ. Cận đó là của chúng tôi, suy ra từ mã; lab đặt các word canh sau mỗi
-            bộ đệm frontier và kiểm tra chúng.
+            buffer <code>numVertices</code> phần tử là đủ. Cận đó là của chúng tôi, suy ra từ mã; lab đặt các word canh sau mỗi
+            buffer frontier và kiểm tra chúng.
           </p>
         }
       >
@@ -1542,7 +1542,7 @@ export function S186() {
           <p>
             Sách nói có hai lợi ích khác. CPU rảnh trong khi phép tìm kiếm chạy. Và trạng thái có thể ở lại trong bộ nhớ chia sẻ
             và thanh ghi (register) từ mức này sang mức sau thay vì đi qua bộ nhớ toàn cục, điều mà kernel này không dùng nhưng
-            một kernel hợp nhất thì có thể. Phép scan một lượt của chương 11 hợp nhất các giai đoạn của nó bằng một lần chờ một
+            một kernel gộp thì có thể. Phép scan một lượt của chương 11 gộp các giai đoạn của nó bằng một lần chờ một
             chiều vào khối trước; đây là một rào chắn đầy đủ theo cả hai chiều.
           </p>
         }
@@ -1605,7 +1605,7 @@ export function S186() {
             được theo dõi và một compute encoder thường, các dispatch chạy theo thứ tự và mỗi dispatch thấy các lần ghi của
             dispatch trước; trên <code>MTL4CommandQueue</code>, vốn không theo dõi hazard nào, điều đó không đúng. Và Metal làm
             được một việc mà CUDA và HIP không làm được dưới dạng một lần khởi chạy:{' '}
-            <code>dispatchThreadgroups(indirectBuffer:...)</code> lấy kích thước của mức sau từ một bộ đệm do GPU ghi, nên CPU
+            <code>dispatchThreadgroups(indirectBuffer:...)</code> lấy kích thước của mức sau từ một buffer do GPU ghi, nên CPU
             không bao giờ đọc nó. Số threadgroup bằng 0 không được tài liệu hóa; hãy ghi ít nhất 1 và return sớm khi frontier
             trống.
           </p>

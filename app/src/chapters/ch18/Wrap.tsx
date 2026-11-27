@@ -875,7 +875,7 @@ export function Wrap() {
           <ul data-list="gaps">
             <li>
               Không kernel nào kiểm tra dung lượng của frontier chung, và không mã host nào cấp phát nó. Với compare-and-swap,{' '}
-              <code>numVertices</code> phần tử là đủ; lab kiểm tra các word canh sau mỗi bộ đệm.
+              <code>numVertices</code> phần tử là đủ; lab kiểm tra các word canh sau mỗi buffer.
             </li>
             <li>
               Không có vòng lặp host cho các kernel theo từng mức: đặt lại bộ đếm, khởi chạy, đọc kích thước về và hoán đổi

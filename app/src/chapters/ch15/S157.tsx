@@ -444,8 +444,8 @@ function BudgetBench() {
       <div className="row" style={{ marginBottom: '0.8rem', alignItems: 'flex-start' }}>
         {FIELDS.map((f) => field(f.label, form[f.key], (v) => setForm({ ...form, [f.key]: v }), f.hint))}
         <label className="field">
-          <Translated vi="Số bộ đệm">Buffers</Translated>
-          <select value={buffers} onChange={(e) => setBuffers(Number(e.target.value) as 1 | 2)} aria-label={tr('Buffers', 'Số bộ đệm')}>
+          <Translated vi="Số buffer">Buffers</Translated>
+          <select value={buffers} onChange={(e) => setBuffers(Number(e.target.value) as 1 | 2)} aria-label={tr('Buffers', 'Số buffer')}>
             <option value={1}>1</option>
             <option value={2}>{tr('2 (section 15.8)', '2 (mục 15.8)')}</option>
           </select>
@@ -1377,7 +1377,7 @@ export function S157() {
               <b>Ít warp hơn để che độ trễ.</b> Khi các warp duy nhất trên SM đều chờ, không có gì chạy. Cách khắc phục là
               unroll mạnh tay (chương 6, mục 6.6): nó loại bỏ rẽ nhánh và bày ra các lệnh độc lập mà trình biên dịch có thể
               đặt giữa một lệnh chậm và lần dùng đầu tiên kết quả của nó. Làm tốt thì phần lớn kernel đã biên dịch là một
-              chuỗi dài các phép nhân-cộng hợp nhất (FMA) độc lập, và các đơn vị số học hiếm khi phải dừng.
+              chuỗi dài các phép nhân-cộng gộp (FMA) độc lập, và các đơn vị số học hiếm khi phải dừng.
             </li>
           }
         >

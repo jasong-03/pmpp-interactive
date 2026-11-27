@@ -195,11 +195,11 @@ export const questionsWrap: Record<string, Question> = {
     ),
     options: [
       {
-        label: <Translated vi={"Không: các lần nạp của một luồng nhanh giờ đứng trước mm của nó, nên chúng có thể ghi đè lên bộ đệm mà mm của một luồng chậm hơn đang đọc."}>{'No: a fast thread\'s loads now come before its mm, so they can overwrite the buffer a slower thread\'s mm is reading.'}</Translated>,
-        why: <Translated vi={"Các lần nạp ghi buf[(tile + 1) & 1] còn mm đọc buf[tile & 1]: hai bộ đệm khác nhau ở mọi vòng lặp."}>{'The loads write buf[(tile + 1) & 1] and mm reads buf[tile & 1]: different buffers in every iteration.'}</Translated>,
+        label: <Translated vi={"Không: các lần nạp của một luồng nhanh giờ đứng trước mm của nó, nên chúng có thể ghi đè lên buffer mà mm của một luồng chậm hơn đang đọc."}>{'No: a fast thread\'s loads now come before its mm, so they can overwrite the buffer a slower thread\'s mm is reading.'}</Translated>,
+        why: <Translated vi={"Các lần nạp ghi buf[(tile + 1) & 1] còn mm đọc buf[tile & 1]: hai buffer khác nhau ở mọi vòng lặp."}>{'The loads write buf[(tile + 1) & 1] and mm reads buf[tile & 1]: different buffers in every iteration.'}</Translated>,
       },
       {
-        label: <Translated vi={"Có: các lần nạp lấp đầy bộ đệm đã được giải phóng trước rào chắn vừa rồi, và mm đọc bộ đệm mà rào chắn đó đã hoàn tất."}>{'Yes: the loads fill the buffer freed before the last barrier, and mm reads the one that barrier completed.'}</Translated>,
+        label: <Translated vi={"Có: các lần nạp lấp đầy buffer đã được giải phóng trước rào chắn vừa rồi, và mm đọc buffer mà rào chắn đó đã hoàn tất."}>{'Yes: the loads fill the buffer freed before the last barrier, and mm reads the one that barrier completed.'}</Translated>,
         correct: true,
       },
       {
@@ -207,7 +207,7 @@ export const questionsWrap: Record<string, Question> = {
         why: <Translated vi={"Một rào chắn ở đó sẽ sắp các lần nạp trước mm, nhưng mm không đọc gì mà các lần nạp này ghi."}>{'A barrier there would order the loads before mm, but mm does not read anything these loads write.'}</Translated>,
       },
       {
-        label: <Translated vi={"Chỉ khi numTiles chẵn, để phần kết đọc bộ đệm mà lần nạp cuối đã lấp đầy."}>{'Only when numTiles is even, so that the epilogue reads the buffer the last load filled.'}</Translated>,
+        label: <Translated vi={"Chỉ khi numTiles chẵn, để phần kết đọc buffer mà lần nạp cuối đã lấp đầy."}>{'Only when numTiles is even, so that the epilogue reads the buffer the last load filled.'}</Translated>,
         why: <Translated vi={"Tính chẵn lẻ luân phiên sau mỗi vòng lặp, bất kể số lượng; phần kết đọc (numTiles - 1) & 1 trong cả hai trường hợp."}>{'The parity alternates every iteration, whatever the count; the epilogue reads (numTiles - 1) & 1 either way.'}</Translated>,
       },
     ],
@@ -215,9 +215,9 @@ export const questionsWrap: Record<string, Question> = {
       <Translated
         vi={
           <p>
-            Ở vòng lặp <code>tile</code>, các lần nạp ghi <code>buf[(tile + 1) &amp; 1]</code>, bộ đệm được{' '}
+            Ở vòng lặp <code>tile</code>, các lần nạp ghi <code>buf[(tile + 1) &amp; 1]</code>, buffer được{' '}
             <code>mm</code> đọc lần cuối ở vòng lặp <code>tile - 1</code>, trước rào chắn của vòng lặp đó; <code>mm</code> đọc{' '}
-            <code>buf[tile &amp; 1]</code>, bộ đệm đã được lấp đầy trước cùng rào chắn đó. Thứ tự nào bên trong vòng lặp cũng không
+            <code>buf[tile &amp; 1]</code>, buffer đã được lấp đầy trước cùng rào chắn đó. Thứ tự nào bên trong vòng lặp cũng không
             ảnh hưởng tới tính đúng đắn. Mô hình mức luồng của mục <a href={href('ch15', '15.8')}>15.8</a>{' '}
             {LOAD_FIRST_OK ? 'không tìm thấy tổng sai nào' : 'tìm thấy một tổng sai'} dưới mọi thứ tự luồng của nó cho 1 đến 6 ô.
             Điều thứ tự thay đổi là đoạn mã được giao cho trình biên dịch, đó là lý do lab 15.5 yêu cầu bạn đo cả hai.
@@ -306,7 +306,7 @@ export const questionsWrap: Record<string, Question> = {
       <Translated
         vi={
           <>
-            Một profiler trên kernel M3 của bạn báo occupancy đạt được 12.5%, pipe nhân-cộng hợp nhất (FMA) bận phần lớn thời gian, và
+            Một profiler trên kernel M3 của bạn báo occupancy đạt được 12.5%, pipe nhân-cộng gộp (FMA) bận phần lớn thời gian, và
             hầu như không có xung đột bank bộ nhớ chia sẻ. Một đồng nghiệp đề xuất ô luồng 4 × 4, để thanh ghi cho phép bốn khối mỗi
             SM. Bạn kỳ vọng điều gì?
           </>
@@ -466,7 +466,7 @@ export function Wrap() {
         <Translated
           vi={
             <li>
-              Hai bộ đệm loại bỏ phụ thuộc giả; xoay vòng lặp đặt việc nạp cặp kế tiếp và phép tính trên cặp hiện tại vào cùng một vòng
+              Hai buffer loại bỏ phụ thuộc giả; xoay vòng lặp đặt việc nạp cặp kế tiếp và phép tính trên cặp hiện tại vào cùng một vòng
               lặp, dưới một rào chắn. Bản thân sự chồng lấp là việc của trình biên dịch, hoặc của phần cứng với sao chép bất đồng bộ ở
               backend có hỗ trợ.
             </li>
@@ -720,7 +720,7 @@ export function Wrap() {
         <Translated
           vi={
             <li>
-              Hình 15.14 (p. 367) là một sơ đồ: các đối số của nó bị lược bớt và theo thứ tự khác với Hình 15.5 và 15.6, các bộ đệm và{' '}
+              Hình 15.14 (p. 367) là một sơ đồ: các đối số của nó bị lược bớt và theo thứ tự khác với Hình 15.5 và 15.6, các buffer và{' '}
               <code>numTiles</code> của nó không được khai báo, và các kiểu con trỏ 2D của nó không khớp với các ô một chiều của Hình
               15.3. Lab 15.5 có một phiên bản đã biên dịch và kiểm thử.
             </li>

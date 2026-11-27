@@ -166,11 +166,11 @@ function Units({ w, unitBytes, noun }: { w: WarpStore; unitBytes: number; noun: 
   const written = new Set(w.addrs);
   const shown = w.units.slice(0, 48);
   return (
-    <div data-units={w.units.length} style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 4px', alignItems: 'center' }} aria-label={tr(`${noun}s touched`, `các ${noun} bị chạm`)}>
+    <div data-units={w.units.length} style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 4px', alignItems: 'center' }} aria-label={tr(`${noun}s touched`, `các ${({ sector: 'sector', line: 'line', segment: 'phân đoạn' } as Record<string, string>)[noun] ?? noun} bị chạm`)}>
       {shown.map((u, k) => (
         <span key={u} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           {k > 0 && u !== shown[k - 1] + 1 ? <span className="muted" style={{ fontSize: '0.8rem' }}>…</span> : null}
-          <span data-unit={u} title={tr(`${noun} ${u}: bytes ${u * unitBytes} to ${(u + 1) * unitBytes - 1}`, `${noun} ${u}: byte ${u * unitBytes} đến ${(u + 1) * unitBytes - 1}`)}
+          <span data-unit={u} title={tr(`${noun} ${u}: bytes ${u * unitBytes} to ${(u + 1) * unitBytes - 1}`, `${({ sector: 'sector', line: 'line', segment: 'phân đoạn' } as Record<string, string>)[noun] ?? noun} ${u}: byte ${u * unitBytes} đến ${(u + 1) * unitBytes - 1}`)}
             style={{ display: 'inline-flex', border: '1px solid var(--global)', background: 'var(--cell)' }}>
             {Array.from({ length: per }, (_, e) => (
               <i key={e} style={{ width: per > 16 ? 4 : 6, height: 14, background: written.has(u * per + e) ? 'var(--global)' : 'transparent', borderLeft: e ? '1px solid var(--rule-soft)' : 'none' }} />
@@ -242,7 +242,7 @@ function WarpWrites() {
           vi={
             <>
               Mô hình: src/sim/radixlocal.ts. Mỗi lúc một lần ghi rộng cả warp; khóa 4 byte; đầu ra bắt đầu trên ranh giới
-              {' '}{noun}. Mỗi lượt thấy các khóa như các lượt trước để lại{p ? ` (ở đây, sau các lượt 0 đến ${p - 1})` : ''}.
+              {' '}{({ sector: 'sector', line: 'line', segment: 'phân đoạn' } as Record<string, string>)[noun] ?? noun}. Mỗi lượt thấy các khóa như các lượt trước để lại{p ? ` (ở đây, sau các lượt 0 đến ${p - 1})` : ''}.
               Hàng softmax là tổng hợp (logits phân phối chuẩn, độ lệch chuẩn 2, của khóa học này), các khóa của nó được biến
               đổi cho phép sắp xếp giảm dần như lab 14.3 làm (ch14-facts E1).
             </>

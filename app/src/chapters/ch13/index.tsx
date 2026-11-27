@@ -31,7 +31,7 @@ export const chapter: Chapter = {
     {
       id: 'wrap', num: '13.9', title: 'Summary and exercises', pages: '327–328',
       lede: "What to carry forward, a mixed check, where each of the book's four exercises is worked, the PDF's apparent slips (most of them in the circular-buffer listings this course leaves out), and why the chapter has no project milestone.",
-      vi: { title: 'Tóm tắt và bài tập', lede: 'Những gì cần mang theo, một bài kiểm tra tổng hợp, nơi mỗi bài trong bốn bài tập của sách được giải, những chỗ có vẻ nhầm của bản PDF (phần lớn nằm trong các đoạn mã bộ đệm vòng mà khóa học này bỏ qua), và vì sao chương này không có mốc dự án.' },
+      vi: { title: 'Tóm tắt và bài tập', lede: 'Những gì cần mang theo, một bài kiểm tra tổng hợp, nơi mỗi bài trong bốn bài tập của sách được giải, những chỗ có vẻ nhầm của bản PDF (phần lớn nằm trong các đoạn mã buffer vòng mà khóa học này bỏ qua), và vì sao chương này không có mốc dự án.' },
       load: () => import('./Wrap').then((m) => ({ Component: m.Wrap, questions: m.questionsWrap })),
     },
   ],
